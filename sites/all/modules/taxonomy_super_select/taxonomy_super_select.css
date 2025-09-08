@@ -1,0 +1,32 @@
+/* $Id: taxonomy_super_select.css,v 1.1.2.1 2008/09/30 04:17:51 codexmas Exp $ */
+
+/**
+ * @file
+ *   Changes the default taxonomy select box into checkbox or radio buttons.
+ */
+
+.taxonomy-super-select-checkboxes {
+  clear: both;
+  padding-top: 1em;
+}
+
+.taxonomy-super-select-checkboxes .form-item label.option {
+  float: left;
+  margin-right: 1.5em;
+}
+
+.taxonomy-super-select-radios {
+  clear: both;
+  padding-top: 1em;
+}
+
+.taxonomy-super-select-radios .form-item label.option {
+  float: left;
+  margin-right: 1.5em;
+}
+
+.taxonomy-super-select-help {
+  display: block;
+  font-style: italic;
+  margin-left: 1em;
+}

@@ -1,0 +1,10 @@
+; $Id
+name = Generate Votes
+description = Generate votes for development purposes
+package = Voting API
+dependencies = votingapi
+; Information added by drupal.org packaging script on 2011-02-25
+version = "5.x-1.x-dev"
+project = "votingapi"
+datestamp = "1298620685"
+

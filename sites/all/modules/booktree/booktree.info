@@ -1,0 +1,10 @@
+;$id$
+name = Booktree
+description = A tree representation of one or more books.
+package = Other
+
+; Information added by drupal.org packaging script on 2008-03-20
+version = "5.x-7.1"
+project = "booktree"
+datestamp = "1206042604"
+

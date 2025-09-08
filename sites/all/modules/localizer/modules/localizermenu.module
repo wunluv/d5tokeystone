@@ -1,0 +1,228 @@
+<?php
+// $Id: localizermenu.module,v 1.7.2.15 2008/09/11 08:17:43 robertogerola Exp $
+
+include_once(drupal_get_path('module', 'localizer') .'/models/localizertranslation.php');
+include_once(drupal_get_path('module', 'localizer') .'/includes/localizer.inc');
+
+function localizermenu_menu($may_cache) {
+  if (!$may_cache) {
+    localizermenu_translate_all();
+  }
+}
+
+function localizermenu_translate_all() {
+  global $_menu;
+
+  $languages = localizer_supported_languages();
+  $homelocpath = localizer_get_localized_path(variable_get('site_frontpage', 'node'), localizer_get_language());
+
+  foreach ($_menu['items'] as $mid => $item) {
+    $e = explode('/', $item['path']);
+    $is_node = FALSE;
+    if (array_key_exists(0, $e) && $e[0]=='node' && array_key_exists(1, $e) && is_numeric($e[1])) {
+      $is_node=TRUE;
+    }
+    if (($item['type'] & (MENU_CREATED_BY_ADMIN | MENU_MODIFIED_BY_ADMIN))) {
+      $expanded = false;
+
+      if ($is_node) {
+        $path = localizer_get_localized_path($item['path'], localizer_get_language());
+        $s = drupal_lookup_path('source', $path);
+        if (!$s) $s = $path;
+
+        if ($_GET['q'] == $s) {
+          $expanded = true;
+        }
+        $_menu['items'][$mid]['path'] = $path;
+      }
+
+      $translation = localizermenu_translatemenuitem($mid);
+      $_menu['items'][$mid]['title'] = empty($translation['title']) ? $item['title'] : $translation['title'];
+      $_menu['items'][$mid]['description'] = empty($translation['description']) ?  $item['description'] : $translation['description'];
+      $item = localizertranslation_findone("(object_name = 'menu' OR object_name = 'menu_item') AND object_key = '". $mid ."' AND language='" . localizer_get_default_language() ."'");
+      $menuitemhidden = false;
+      if ($item['settings'] && !(arg(0)=='admin' && arg(1)=='build' && arg(2)=='menu')) {
+        $settings = split(",", $item['settings']);
+        if (!in_array(localizer_get_language(), $settings) && array_key_exists($mid, $_menu['items'])) {
+          $pid = $_menu['visible'][$mid]['pid'];
+          unset($_menu['visible'][$mid]);
+          unset($_menu['items'][$mid]);
+          if ($_menu['items'][$pid]['children']) {
+            foreach ($_menu['items'][$pid]['children'] as $key=>$child) {
+              if ($child==$mid) {
+                unset($_menu['items'][$pid]['children'][$key]);
+                break;
+              }
+            }
+          }
+          if ($_menu['items'][$pid]['children']) {
+            foreach ($_menu['visible'][$pid]['children'] as $key=>$child) {
+              if ($child==$mid) {
+                unset($_menu['visible'][$pid]['children'][$key]);
+                break;
+              }
+            }
+          }
+          $menuitemhidden = true;
+        }
+      }
+
+      if ($expanded) {
+        $locations=localizermenu_expandmenu($mid, $menuitemhidden);
+        $locations[$homelocpath] = l(t('Home'), $homelocpath);
+        $locations = array_reverse($locations);
+        array_pop($locations);
+        drupal_set_breadcrumb($locations);
+      }
+    }
+  }
+}
+
+function localizermenu_translatemenuitem($mid, $language=NULL) {
+  static $translations = array();
+  if (!$language) $language=localizer_get_language();
+  if (!isset($translations[$language])) {
+    $items = localizertranslation_findall("(object_name = 'menu' OR object_name = 'menu_item') AND language = '$language'");
+    foreach ($items as $key => $item) {
+      $item_key = $item['object_key'];
+      $item_field = $item['object_field'];
+      $item_translation = $item['translation'];
+      $translations[$language][$item_key][$item_field] = $item_translation;
+    }
+  }
+  return $translations[$language][$mid];
+}
+
+function localizermenu_expandmenu($_mid, $menuitemhidden=false) {
+  global $_menu;
+  static $locations = array();
+
+  if ($_mid>0) {
+    $_menu['visible'][$_mid]['type'] |= MENU_EXPANDED;
+    $pid = $_menu['visible'][$_mid]['pid'];
+    if ($menuitemhidden && array_key_exists($_mid, $_menu['items'])) {
+      foreach ($_menu['items'][$pid]['children'] as $key=>$child) {
+        if ($child==$_mid) {
+          unset($_menu['items'][$pid]['children'][$key]);
+          break;
+        }
+      }
+      foreach ($_menu['visible'][$pid]['children'] as $key=>$child) {
+        if ($child==$_mid) {
+          unset($_menu['visible'][$pid]['children'][$key]);
+          break;
+        }
+      }
+    }
+    else if ($_menu['visible'][$_mid]['type'] & MENU_VISIBLE_IN_BREADCRUMB) {
+      $localpath = $_menu['visible'][$_mid]['path'];
+      $localpath = localizer_get_localized_path($localpath, localizer_get_language());
+      $locations[$localpath] = l($_menu['items'][$_mid]['title'], $localpath);
+    }
+    localizermenu_expandmenu($pid, $menuitemhidden);
+  }
+  return $locations;
+}
+
+function localizermenu_nodeapi(&$node, $op) {
+  if (user_access('administer menu')) {
+    switch ($op) {
+      case 'insert':
+      case 'update':
+        if ($node->menu['delete']) {
+          localizertranslation_deleteall("object_name='menu_item' AND object_key='". $node->menu['mid'] ."'");
+        }
+        elseif ($node->menu['title']) {
+          $translation = array(
+            'object_name' => 'menu_item',
+            'object_key' => $node->menu['mid'],
+            'object_field' => 'title',
+            'language' => localizer_get_language(),
+            'translation' => $node->menu['title']
+          );
+          localizertranslation_save($translation);
+
+          $translation['object_field'] = 'description';
+          $translation['translation'] = $node->menu['description'];
+          localizertranslation_save($translation);
+        }
+        break;
+
+      case 'delete':
+          localizertranslation_deleteall("object_name='menu_item' AND object_key='". $node->menu['mid'] ."'");
+        break;
+    }
+  }
+}
+
+function localizermenu_form_alter($form_id, &$form) {
+  if ($form['type']['#value'] & (MENU_CREATED_BY_ADMIN | MENU_MODIFIED_BY_ADMIN)) {
+    if ($form_id == 'menu_edit_menu_form' ||
+        $form_id == 'menu_edit_item_form') {
+      $form['#submit']['localizermenu_form_submission'] = array();
+
+      $item = localizertranslation_findone("(object_name = 'menu' OR object_name = 'menu_item') AND object_key = '". $form['mid']['#value'] ."'");
+      $settings = split(",", $item['settings']);
+      $selected_languages = array();      
+      foreach ($settings as $setting) {
+        $selected_languages[$setting] = $setting;
+      }
+      $languages = localizer_supported_languages_all();
+      $form['localizer_settings'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Show the menu only in these languages'),
+        '#description' => t('No selection, means show on every language'),
+        '#options' => $languages,
+        '#default_value' => $selected_languages,
+        '#weight' => 0,
+      );
+    }
+    elseif ($form_id == 'menu_item_delete_form') {
+      $form['#submit']['localizermenu_delete_confirm'] = array();
+    }
+  }
+}
+
+function localizermenu_form_submission($form_id, $form_values) {
+  if ($form_id == 'menu_edit_menu_form') {
+    $settings = $form_values['localizer_settings'];
+    $settings = localizer_clear_languagesarray($settings, true);
+    $settings = implode(',', $settings);
+    if ($settings==1) $settings='';
+    $translation = array(
+      'object_name' => 'menu',
+      'object_key' => $form_values['mid'],
+      'object_field' => 'title',
+      'language' => localizer_get_default_language(),
+      'translation' => $form_values['title'],
+      'settings' => $settings,
+    );
+    localizertranslation_save($translation);
+  }
+  elseif ($form_id == 'menu_edit_item_form') {
+    $settings = $form_values['localizer_settings'];
+    $settings = localizer_clear_languagesarray($settings, true);
+    $settings = implode(',', $settings);
+    if ($settings==1) $settings='';
+    $translation = array(
+      'object_name' => 'menu_item',
+      'object_key' => $form_values['mid'],
+      'object_field' => 'title',
+      'language' => localizer_get_default_language(),
+      'translation' => $form_values['title'],
+      'settings' => $settings,
+    );
+    localizertranslation_save($translation);
+
+    $translation['object_field'] = 'description';
+    $translation['translation'] = $form_values['description'];
+    localizertranslation_save($translation);
+  }
+}
+
+function localizermenu_delete_confirm($form_id, $form_values) {
+  if (!empty($form_values['mid'])) {
+    localizertranslation_deleteall("(object_name='menu' OR object_name='menu_item') AND object_key='". $form_values['mid'] ."'");
+  }
+}
+

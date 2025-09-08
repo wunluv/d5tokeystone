@@ -1,0 +1,10 @@
+name = Block
+description = Controls the boxes that are displayed around the main content.
+package = Core - required
+version = VERSION
+
+; Information added by drupal.org packaging script on 2013-09-30
+version = "5.23+3-dev"
+project = "drupal"
+datestamp = "1380570434"
+

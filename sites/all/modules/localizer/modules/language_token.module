@@ -1,0 +1,29 @@
+<?php
+// $Id: language_token.module,v 1.1.2.2 2008/07/15 08:52:07 robertogerola Exp $
+
+/**
+ * Localizer token module.
+ * @author NorthStudio, 2008, http://www.northstudio.ca
+ */
+
+/**
+ * adds [language] as a token for pathauto
+ */
+function language_token_token_values($type, $object = NULL, $options = array()) {
+  if ($type == 'node') {
+    $node = $object;
+    $tokens['language']      = $node->language;
+    return $tokens;
+  }
+}
+
+/**
+ * adds [language] to the token listing 
+ */
+function language_token_token_list($type = 'all') {
+  if ($type == 'node' || $type == 'all') {
+    $tokens['node']['language']      = t("The language of the node as provided by Localizer.");
+    return $tokens;
+  }
+}
+ 

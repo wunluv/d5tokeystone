@@ -1,0 +1,12 @@
+; $Id: subscriptions_taxonomy.info,v 1.1.2.3 2008/04/14 22:24:17 chx Exp $
+name = Taxonomy Subscriptions
+description = Allows users to subscribe to taxonomy terms.
+package = "Subscriptions"
+dependencies = subscriptions subscriptions_content taxonomy
+
+
+; Information added by drupal.org packaging script on 2009-07-22
+version = "5.x-2.5"
+project = "subscriptions"
+datestamp = "1248283957"
+

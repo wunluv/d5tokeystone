@@ -1,0 +1,7 @@
+; $Id: nodetype.info,v 1.1 2007/02/03 14:27:05 timcn Exp $
+name = Nodetype
+description = Allows you to change the content type of posts while editing them.
+; Information added by drupal.org packaging script on 2007-02-04
+version = "5.x-1.x-dev"
+project = "nodetype"
+

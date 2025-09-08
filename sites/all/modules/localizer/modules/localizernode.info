@@ -1,0 +1,12 @@
+; $Id: localizernode.info,v 1.5.2.2 2008/06/16 16:05:23 robertogerola Exp $
+name = Localizer node
+description = Provides multilingual support for node module
+dependencies = localizer node
+package = Localizer
+project = "localizer"
+
+; Information added by drupal.org packaging script on 2008-09-23
+version = "5.x-3.13"
+project = "localizer"
+datestamp = "1222157418"
+

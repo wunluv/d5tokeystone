@@ -1,0 +1,27 @@
+// $Id: CHANGELOG.txt,v 1.1.6.6 2009/06/09 18:43:28 smk Exp $
+
+Transliteration 5.x-2.x, xxxx-xx-xx
+-----------------------------------
+#199660 by smk-ka: Added a constant to disallow converting pre-existing
+  filenames by default.
+#357254 by overall, Cynicus: Fixed transliteration of Russian letters.
+#364931 by PaV: Added Esperanto transliteration.
+by smk-ka: Rewrote retroactive transliteration to get rid of SUBSTRING_INDEX
+  function dependency.
+#312021 by pcorbett: Added SQL Server support.
+#257041 by Freso: More transliterations (x21??).
+
+
+Transliteration 5.x-2.0, 2008-06-12
+-----------------------------------
+#255646 by smk-ka: Added a language parameter to transliteration_get().
+#246875 by smk-ka: Added language-specific replacements for Danish letters.
+#199660 by smk-ka: Added retroactive transliteration of existing filenames
+  during installation or update. Original idea by colan.
+#253916 by Freso: Fixed typo in .info file.
+
+
+Transliteration 5.x-1.0, 2007-12-09
+-----------------------------------
+Initial release.
+

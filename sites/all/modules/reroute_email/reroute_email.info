@@ -1,0 +1,10 @@
+name = Reroute emails
+description = Reroutes emails send from the site to a predefined email. Useful for test sites.
+package = Development
+core = 5.x
+
+; Information added by drupal.org packaging script on 2013-05-25
+version = "5.x-1.0+7-dev"
+project = "reroute_email"
+datestamp = "1369451958"
+

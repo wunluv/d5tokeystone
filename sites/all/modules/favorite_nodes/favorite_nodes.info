@@ -1,0 +1,4 @@
+; $Id: favorite_nodes.info,v 1.1.2.1 2007/06/18 23:06:42 dww Exp $
+name = Favorite Nodes
+description = Allows users to manage a favorite list of nodes.
+package = 

@@ -1,0 +1,9 @@
+; $Id: cmf.info,v 1.1.2.3 2009/07/31 02:38:34 nancyw Exp $
+name = "Content management filter"
+description = "This module adds an easier way for administrators to filter the content on a Drupal site for administration purposes."
+package = "Administration"
+; Information added by drupal.org packaging script on 2009-07-31
+version = "5.x-1.6"
+project = "cmf"
+datestamp = "1249008336"
+

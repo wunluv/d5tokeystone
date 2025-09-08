@@ -1,0 +1,128 @@
+Vote Up/Down 5.x installation documentation:
+--------------------------------------------------------------------------------
+Author              = Ron Williams (ron at ronsnexus dot com)
+Current Maintainer  = Fredrik Jonsson
+Requires Drupal 5
+Licensed under GPL
+
+
+Requirements:
+--------------------------------------------------------------------------------
+
+You will need to download the following items:
+  * Vote Up/Down Package http://drupal.org/project/vote_up_down
+  * Links Package http://drupal.org/project/links
+    (only needed with storylink module)
+  * Voting API http://drupal.org/project/votingapi
+
+To be able to automatically promote story links that have a specified
+number of votes to the front page you also need to download these:
+  * Actions http://drupal.org/project/actions
+  * Voting Actions http://drupal.org/project/voting_actions
+
+Recommended but not required modules:
+  * Views http://drupal.org/project/views (for creating customized views
+    of content)
+  * User Points http://drupal.org/project/userpoints (if you wish to
+    have users awarded points for submitting content or voting)
+  * Content Recommendation Engine http://drupal.org/project/cre
+    (to recommend nodes and users to other user bases on the voting.
+    Use query type "VotingAPI Point System Query".)
+
+
+Step By Step Installation for sites needing 'automatic promotion to front page':
+--------------------------------------------------------------------------------
+
+01) Download and decompress the vote_up_down, links, votingapi, actions,
+    voting_actions, views, and userpoints modules (listed above).
+
+02) Upload the resulting directories to your /sites/all/modules/ directory.
+    If this directory does not exist, please create it.
+
+03) Log into your site as an admin user, and navigate to the
+    www.example.com/admin/build/modules page.
+
+04) Enable these modules:
+    * Actions
+    * Links
+    * Userpoints
+    * Views
+    * Storylink
+    * Vote up/down
+    * Voting API Actions
+    * Voting API
+
+05) Next, go to www.example.com/admin/user/access and enable the following items
+    * userpoints module
+      ** view userpoints (for anonymous and authenticated)
+    * vote_storylink module
+      ** create storylinks (for authenticated; only if you wish to allow users
+                            to create storylink posts for others to vote on)
+      ** edit own storylinks (for authenticated; only if you wish to allow
+                              users to edit their own storylinks)
+    * vote_up_down module
+      ** use up-down vote (for authenticated)
+      ** view up-down vote (for anonymous and authenticated)
+
+06) Go to www.example.com/admin/build/actions and click 'list'
+    (this allows the Actions module to detect available actions).
+
+07) Go to www.example.com/admin/content/types/storylink, and
+    uncheck 'promoted to front page' (under workflow).
+
+08) Go to www.example.com/admin/settings/vote_up_down
+    * Under types, check 'storylink'.
+    * Under Vote widget settings for nodes, in the field below
+      "Vote widget display"", select 'disabled'.
+    * Under "Vote widget settings for comments", in the "Vote widget display"
+      and "Link display of vote points", select 'do not display for both'.
+
+09) Go to www.example.com/admin/settings/userpoints
+    * To enable credit for just voting and creating storylinks, enter the
+      amounts you wish to give for them in the below fields.
+    * "Points for posting a story link" and the
+      "Points for voting on a node(requires the Vote up/down module)".
+
+10) Go to www.example.com/admin/settings/voting_actions
+    * Under "action set name", enter in a field "Promote node to front page"
+      then click Save.
+    * Select edit and enter the following:
+      - select points under value type.
+      - enter vote under tag.
+      - enter sum under function.
+      - select is greater than under comparison.
+      - enter the required number for front page promotion.
+      - under action select "Promote node to front page" and click Save.
+      - under action select "Award userpoints from..." and click Save.
+
+Also see the screenshot at 
+/sites/all/modules/vote_up_down/documentation/voting_actions_examples/Promote_to_front_page.png
+
+11) Go to www.example.com/admin/settings/voting_actions
+    * Under action set name, enter in a field other than promote node to
+      front page, "demote node from front page" then click Save.
+    * Select edit and enter the following:
+    - select points under value type.
+    - enter vote under tag.
+    - enter sum under function.
+    - select is less than under comparison.
+    - enter the required number for front page demotion.
+    - under action select "Remove node from front page" and click Save.
+    - under action select "Deduct userpoints from..." and click Save.
+
+Also see the screenshot at 
+/sites/all/modules/vote_up_down/documentation/voting_actions_examples/Demote_from_front_page.png
+
+12) Upload the node-storylink.tpl.php and template.php to the directory
+    of your theme. If you already have a template.php, you will have to
+    merge them. Merging instructions for the faint-of-heart are at
+    http://drupal.org/phptemplate and http://drupal.org/node/152426.
+
+OBS! When using "node-storylink.tpl.php" you must turn off
+"Vote widget display..." in "admin/settings/vote_up_down" to avoid
+getting double voting widgets.
+
+And you're done!
+
+Last updated:
+------------

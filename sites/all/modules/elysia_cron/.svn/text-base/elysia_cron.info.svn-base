@@ -1,0 +1,8 @@
+name = "Elysia Cron"
+description = "Extended cron support with crontab-like scheduling and other features."
+
+; Information added by drupal.org packaging script on 2011-11-12
+version = "5.x-2.0"
+project = "elysia_cron"
+datestamp = "1321119631"
+

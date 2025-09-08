@@ -1,0 +1,173 @@
+# $Id: pt.po,v 1.1.2.1 2007/07/06 12:55:53 darrenoh Exp $
+#
+# Portuguese translation of Drupal (gsitemap.module)
+# Copyright 2007 Fernando Silva <fernando.silva@openquest.pt>
+# Generated from files:
+#  gsitemap.module,v 1.56.2.1 2007/01/11 07:04:16 samamac
+#  gsitemap.info,v 1.3.2.2 2007/01/12 05:52:48 samamac
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: gsitemap.module\n"
+"POT-Creation-Date: 2007-07-04 18:50+0100\n"
+"PO-Revision-Date: 2007-07-04 18:50+0100\n"
+"Last-Translator: Fernando Silva <fernando.silva@openquest.pt>\n"
+"Language-Team: Fernando Silva <fernando.silva@openquest.pt>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: gsitemap.module:16
+msgid "The following options allow you to alter the behavior of the Google Sitemap module. Your sitemap can be found at <a href=\"@url\">@url</a>."
+msgstr "As seguintes opções permitem-lhe alterar o comportamento do módulo Google Sitemap. O seu Sitemap pode ser encontrado em <a href=\"@url\">@url</a>."
+
+#: gsitemap.module:37 gsitemap.info:0
+msgid "Google Sitemap"
+msgstr "Google Sitemap"
+
+#: gsitemap.module:38
+msgid "Adjust the settings used to generate your Google Sitemap."
+msgstr "Ajustar as opções usadas para gerar o Google Sitemap."
+
+#: gsitemap.module:46;434;437;477;480;0
+msgid "gsitemap"
+msgstr "gsitemap"
+
+#: gsitemap.module:53
+msgid "gsitemap verification page"
+msgstr "página de verificação do gsitemap"
+
+#: gsitemap.module:69
+msgid "gsitemap Settings"
+msgstr "Opções do gsitemap"
+
+#: gsitemap.module:75
+msgid "Priority override"
+msgstr "Re-escrever a prioridade"
+
+#: gsitemap.module:79
+msgid "Optionally specify a value for the priority in the Google Sitemap, or -1 to prevent it from appearing in the sitemap."
+msgstr "POde opcionalmente especificar um valor para a prioridade no Google Sitemap, ou -1 para prevenir que apareça no sitemap."
+
+#: gsitemap.module:141
+msgid "Priority must be a number between 0.0 and 1.0, inclusive, or -1 to prevent this node from appearing in the sitemap."
+msgstr "A prioridade deve ser um número entre 0.0 e 1.0, inclusive, ou -1 para prevenir este nó de aparecer no sitemap."
+
+#: gsitemap.module:196
+msgid "Priority Settings"
+msgstr "Opções de prioridade"
+
+#: gsitemap.module:201
+msgid "Front page priority"
+msgstr "Prioridade da página principal"
+
+#: gsitemap.module:205
+msgid "This is the absolute priority for the front page.  Values can range between 0.0 and 1.0."
+msgstr "Esta é a prioridade absoluta para a página principal. Os valores ficam no intervalo de 0.0 e 1.0."
+
+#: gsitemap.module:209
+msgid "Promotion adjustment"
+msgstr ""
+
+#: gsitemap.module:213
+msgid "This number will be added to the priority of each node that is promoted to the front page."
+msgstr ""
+
+#: gsitemap.module:217
+msgid "Comment ratio weight"
+msgstr "Peso do rácio dos comentários"
+
+#: gsitemap.module:221
+msgid "This number will be multiplied with the ratio of the number of comments on the node over the number of comments on the node with the most comments, i.e., this number will be added to the priority of the node with the most comments."
+msgstr "Este número será multiplicado pelo rácio do número de comentários no nó sobre o número de comentários no nó com mais comentŕios, ex. este número será adicionado à prioridade do nó com mais comentários."
+
+#: gsitemap.module:227
+msgid "You can enter -1 in any of the following fields to prevent nodes of that type from appearing in the sitemap."
+msgstr "Pode inserir -1 em qualquer dos seguintes campos para prevenir que nós desse tipo apareçam no sitemap."
+
+#: gsitemap.module:233
+msgid "%name adjustment"
+msgstr "ajuste %name"
+
+#: gsitemap.module:237
+msgid "This number will be added to the priority of nodes of type %name."
+msgstr "Este número será adicionado à prioridade dos nós do tipo %name."
+
+#: gsitemap.module:243
+msgid "Other Settings"
+msgstr "Outras Opções"
+
+#: gsitemap.module:249
+msgid "Verification link"
+msgstr "Ligação de verificação"
+
+#: gsitemap.module:252
+msgid "In order to view stats, Google will ask you to verify that you control this site by creating a page with a certain name.  Enter that name here and the gsitemap module will hook that filename.  Note that this will only work if you have clean URLs enabled."
+msgstr "Para poder ver as estatísticas, o Google vai-lhe pedir para verificar que controla este site criando uma página com um determinado nome. Insira esse nome aqui e o gsitemap vai capturar esse nome de ficheiro. Note que esta funcionalidade apenas funcionará se tiver activo URLs amigáveis."
+
+#: gsitemap.module:256
+msgid "Count comments in change date and frequency"
+msgstr "Contabilizar comentários por data de alteração e frequência"
+
+#: gsitemap.module:259
+msgid "If enabled, the frequency of comments on a node will affect its change frequency and last modification date."
+msgstr "Se activo, a frequência dos comentários num nó, afectará a sua frequência de alteração e última data de modificação."
+
+#: gsitemap.module:263
+msgid "Include links to taxonomy term pages"
+msgstr "Incluir ligações para as páginas de termos de taxonomia."
+
+#: gsitemap.module:266
+msgid "If enabled, links to taxonomy term pages will be included in the sitemap."
+msgstr "Se activo, ligações para as páginas de termos de taxonomia serão incluídas no sitemap."
+
+#: gsitemap.module:270
+msgid "Submit sitemap to Google when updated"
+msgstr "Submeter o sitemap para o Google sempre que for actualizado"
+
+#: gsitemap.module:273
+msgid "If enabled, the sitemap will be submitted to Google via HTTP request each time it is updated.  If you have submitted your sitemap using a Google Account, this is probably unnecessary."
+msgstr "Se activo, o sitemap vai ser submetido para o Google através de um pedido HTTP sempre que for actualizado. Se tiver submetido o sitemap usando um Conta Google, isto provavelmente não é necessário."
+
+#: gsitemap.module:277
+msgid "Submit sitemap to Google on cron run"
+msgstr "Submeter o sitemap para o Google na execução do cron"
+
+#: gsitemap.module:280
+msgid "If enabled, the sitemap will be submitted to Google via HTTP request each time the cron job is run.  If you have submitted your sitemap using a Google Account, this is probably unnecessary."
+msgstr "Se activo, o sitemap vai ser submetido para o Google através de um pedido HTTP sempre que o cron for executado. Se tiver submetido o sitemap usando um Conta Google, isto provavelmente não é necessário."
+
+#: gsitemap.module:284
+msgid "Log accesses"
+msgstr "Registar acessos"
+
+#: gsitemap.module:287
+msgid "If enabled, an watchdog entry will be made each time the sitemap is accessed, containing information about the requestor."
+msgstr "Se activo, uma entrada no watchdog será feita sempre que o sitemap é acedido, contendo informação sobre quem fez o pedido."
+
+#: gsitemap.module:434
+msgid "Sitemap downloaded by Google."
+msgstr "Sitemap descarregado pelo Google."
+
+#: gsitemap.module:437
+msgid "Sitemap downloaded by @user-agent at @address."
+msgstr "Sitemap descarregado pelo @user-agent de @address."
+
+#: gsitemap.module:477
+msgid "Sitemap successfully submitted to Google."
+msgstr "Sitemap submetido com sucesso para o Google."
+
+#: gsitemap.module:480
+msgid "Error occurred submitting sitemap to Google: @code"
+msgstr "Ocorreu um erro ao submeter o sitemap para o Google: @code"
+
+#: gsitemap.module:24
+msgid "override node priority"
+msgstr "re-escrever a prioridade do nó"
+
+#: gsitemap.info:0
+msgid "Creates a Google Sitemap."
+msgstr "Cria um Google Sitemap."
+

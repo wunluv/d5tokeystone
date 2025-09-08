@@ -1,0 +1,15 @@
+; $Id: tellafriend.info,v 1.10 2008/06/12 22:41:07 thierrygd Exp $
+name = Tell a friend
+description = "Allows you to create a Tell-a-Friend page to spread the word about your site."
+
+; Information added by drupal.org packaging script on 2008-04-20
+version = "5.x-2.1"
+project = "tellafriend"
+datestamp = "1208727027"
+
+
+; Information added by drupal.org packaging script on 2008-06-15
+version = "5.x-2.7"
+project = "tellafriend"
+datestamp = "1213525514"
+

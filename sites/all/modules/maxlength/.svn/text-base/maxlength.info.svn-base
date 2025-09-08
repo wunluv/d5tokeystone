@@ -1,0 +1,10 @@
+; $Id: maxlength.info,v 1.2 2007/06/18 22:53:49 dww Exp $
+
+name = "Maxlength"
+description = "Set a maximum length for body fileds."
+
+; Information added by drupal.org packaging script on 2008-09-29
+version = "5.x-2.0-beta2"
+project = "maxlength"
+datestamp = "1222647613"
+

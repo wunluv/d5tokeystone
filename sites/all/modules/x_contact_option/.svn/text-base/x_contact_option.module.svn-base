@@ -1,0 +1,41 @@
+<?php
+/**
+ * implementation of hook_perm
+ * only users who belong to roles with this permission can
+ * use personal contact form
+ */
+function x_contact_option_perm(){
+	return array('create personal contact form');	
+}
+
+/**
+ * implementation of hook_form_alter
+ * hide this option for users without the privilege
+ */
+function x_contact_option_form_alter($form_id, &$form){
+	if (arg(0)=='user' && arg(2)=='edit'){
+		if (!user_access('create personal contact form')){
+			unset ($form['contact']);
+		}
+	}
+}
+
+/**
+ * implementation of hook_menu
+ * 'Contact' tab and contact form are hidden / disabled for users 
+ *  without the privilege
+ */
+//remove contact tab
+function x_contact_option_menu($may_cache){
+	$items = array();
+	if (arg(0)=='user'){
+	
+		if (!user_access('create personal contact form')){
+	        $items[] = array('path' => 'user/'. arg(1) .'/contact',
+	          'access' => FALSE,
+	          'weight' => 2,
+	        );
+		}
+	}
+	return $items;
+}

@@ -1,0 +1,49 @@
+<?php
+// $Id: simplefeed_item.install,v 1.9 2007/10/02 17:52:06 m3avrck Exp $
+
+/**
+ * Implementation of hook_install().
+ */
+function simplefeed_item_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {simplefeed_feed_item} (
+        vid int unsigned NOT NULL,
+        nid int unsigned NOT NULL,
+        iid varchar(255) NOT NULL,
+        fid int unsigned NOT NULL,
+        expires int unsigned NOT NULL default '0',
+        url varchar(255) NOT NULL,
+        PRIMARY KEY (vid),
+        KEY nid (nid),
+        KEY iid (iid),
+        KEY fid (fid)
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
+      break;
+    case 'pgsql':
+      db_query("CREATE TABLE {simplefeed_feed_item} (
+        vid int_unsigned NOT NULL,
+        nid int_unsigned NOT NULL,
+        iid varchar(255) NOT NULL,
+        fid int_unsigned NOT NULL,
+        expires int_unsigned NOT NULL default '0',
+        url varchar(255) NOT NULL,
+        PRIMARY KEY (vid)
+      )");
+      db_query("CREATE INDEX {simplefeed_feed_item}_nid_idx ON {simplefeed_feed_item} (nid)");
+      db_query("CREATE INDEX {simplefeed_feed_item}_url_idx ON {simplefeed_feed_item} (iid)");
+      db_query("CREATE INDEX {simplefeed_feed_item}_fid_idx ON {simplefeed_feed_item} (fid)");
+      break;
+  }
+
+  drupal_set_message(t('SimpleFeed Item successfully installed.'));
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function simplefeed_item_uninstall() {
+  db_query('DROP TABLE {simplefeed_feed_item}');
+  node_type_delete('feed_item');
+}

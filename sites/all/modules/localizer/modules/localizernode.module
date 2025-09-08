@@ -1,0 +1,321 @@
+<?php
+// $Id: localizernode.module,v 1.8.2.14 2008/09/23 07:52:35 robertogerola Exp $
+
+/**
+ * Localizer node module.
+ * @author Roberto Gerola, 2006-2008, http://www.speedtech.it
+ */
+
+/**
+ * Implementation of the hook menu for adding localizernode menu items.
+ */
+function localizernode_menu($may_cache) {
+  $items = array();
+
+  if (!$may_cache) {
+    if (function_exists('drupal_set_content')) {
+      require_once(drupal_get_path('module', 'localizer') .'/models/localizernode.php');
+      require_once(drupal_get_path('module', 'localizer') .'/includes/localizer.inc');
+
+      if (arg(0)=='admin' && arg(1)=='content' && arg(2)=='localizer' && arg(3)=='content') {
+        require_once(drupal_get_path('module', 'localizernode') .'/localizernode.admin.inc');
+      }
+
+      if (arg(0)=='node' && is_numeric(arg(1)) && arg(2)=='translations') {
+        require_once(drupal_get_path('module', 'localizernode') .'/localizernode.admin.translations.inc');
+      }
+      if (arg(0)=='admin' && arg(4)=='translation') {
+        require_once(drupal_get_path('module', 'localizernode') .'/localizernode.admin.translations.inc');
+      }
+    }
+
+    if (arg(0) == 'node' && is_numeric(arg(1))) {
+      $node = node_load(arg(1));
+      $content_types_enabled = variable_get('localizer_contents_types', array('page' => 'page', 'story' => 'story'));
+      if (array_key_exists($node->type, $content_types_enabled) && $content_types_enabled[$node->type]) {
+        $items[] = array(
+          'path' => 'node/'. arg(1) .'/translations',
+          'title' => t('Translations'),
+          'callback' => 'drupal_get_form',
+          'callback arguments' => 'localizernode_translations',
+          'access' => user_access('Localizer content: access translations'),
+          'type' => MENU_LOCAL_TASK,
+          'weight' => 3
+        );
+      }
+    }
+    $items[] = array(
+      'path' => 'admin/content/localizer/content',
+      'title' => t('Localizer content translation'),
+      'description' => t('Manage Localizer content translations'),
+      'callback' => 'localizernode_content',
+      'access' => user_access('Localizer content: administer translations'),
+      'weight' => 19,
+      'type' => MENU_NORMAL_ITEM
+    );
+    $items[] = array(
+      'path' => 'admin/content/localizer/content/translation/remove',
+      'title' => t('Remove node from translation set'),
+      'callback' => 'localizernode_translation_remove',
+      'access' => user_access('Localizer content: disconnect translations'),
+      'type' => MENU_CALLBACK,
+    );
+    $items[] = array(
+      'path' => 'admin/content/localizer/content/translation/create',
+      'title' => t('Create a new translation'),
+      'callback' => 'localizernode_translation_create',
+      'callback arguments' => array(arg(6), arg(7)),
+      'access' => user_access('Localizer content: create translations'),
+      'type' => MENU_CALLBACK,
+    );
+    $items[] = array(
+      'path' => 'localizernode/book_parents_js',
+      'title' => t('Parents for a book (js)'),
+      'callback' => '_localizernode_book_parents_js',
+      'access' => user_access('access content'),
+      'type' => MENU_CALLBACK
+    );
+  }
+  return $items;
+}
+
+function localizernode_nodeapi(&$node, $op, $teaser, $page) {
+  global $user;
+
+  $contents_types_enabled = variable_get('localizer_contents_types', array('page' => 'page', 'story' => 'story'));
+
+  switch ($op) {
+    case 'load':
+      if ($contents_types_enabled[$node->type]) {
+        $localizernode = localizernode_find_by_nid($node->nid);
+        return array('localizer_language' => $localizernode['language'], 'localizer_pid' => $localizernode['pid']);
+      }
+      break;
+    case 'insert':
+    case 'update':
+      if ($contents_types_enabled[$node->type]) {
+        $localizernode = array('nid' => $node->nid, 'pid' => $node->localizer_pid, 'language' => $node->localizer_language);
+        if ($node->localizer_language) {
+          localizernode_save($localizernode);
+        }
+      }
+      break;
+    case 'delete':
+      if ($contents_types_enabled[$node->type]) {
+        localizernode_delete($node->nid);
+      }
+      break;
+    case 'validate':
+      if ($contents_types_enabled[$node->type] && $user->uid) {
+        if ($node->nid) {
+          $old_node = node_load($node->nid);
+          if ($old_node->localizer_language != $node->localizer_language && !user_access('Localizer content: change the language')) {
+            form_set_error('localizer_language', t('You are not granted to change the language '));
+          }
+        }
+
+        $languages = localizer_supported_languages();
+        if (!_localizer_access_translation($languages[$node->localizer_language])) {
+          form_set_error('localizer_language', t('You are not granted the permission to use '. $languages[$node->localizer_language] .' language.'));
+        }
+        if ($node->localizer_pid) {
+          $tr = localizernode_findone("pid=". $node->localizer_pid ." AND language='". $node->localizer_language ."'" );
+          if (array_key_exists('nid', $tr) && $tr['nid']!=$node->nid) {
+            $trnode = node_load($tr['nid']);
+            $m = t('A translation for %language language is already present in this set.', array('%language' => $languages[$node->localizer_language])) .'<br />';
+            $m .= t('Remove the translation ') . l($trnode->title, 'node/'. $trnode->nid) .' from this set before proceeding';
+            form_set_error('language', $m);
+          }
+        }
+      }
+      break;
+  }
+}
+
+function localizernode_form_alter($form_id, &$form) {
+
+if (!isset($form['type'])) {
+  return;
+}
+
+switch ($form_id) {
+  case $form['type']['#value'] .'_node_form':
+    $contents_types_enabled = variable_get('localizer_contents_types', array('page' => 'page', 'story' => 'story'));
+    if ($contents_types_enabled[$form['type']['#value']]) {
+      $languages = localizer_supported_languages();
+      if (arg(1)=='add' || arg(2)=='add') {
+        if (variable_get('localizer_switch_byhostname', FALSE)) {
+          $currenthost = $_SERVER['HTTP_HOST'];
+          $languagebyhostname = localizer_language_by_hostname($currenthost);
+          $form['#node']->localizer_language = $languagebyhostname;
+        }
+        else {
+          $form['#node']->localizer_language = localizer_get_language();
+        }
+        
+        $tlanguages = array();
+        foreach ($languages as $l => $n) {
+          if (_localizer_access_translation($n)) {
+            $tlanguages[$l] = $n;
+          }
+        }
+        $languages = $tlanguages;
+      }
+
+      $is_book = FALSE;
+      if (arg(0)=='node' && arg(1)=='add' && arg(2)=='book') {
+        $is_book = TRUE;
+        $nid_exclude = 0;
+      }
+      else if (arg(0)=='node' && arg(1) && is_numeric(arg(1))) {
+        $node = node_load(arg(1));
+        if ($node->type=='book') {
+          $is_book = true;
+          $nid_exclude = arg(1);
+        }
+      }
+
+      if ($is_book) {
+        $settings = array('localizernode' => array(
+                      'book_parents_url' => url('localizernode/book_parents_js/')
+          )
+        );
+        drupal_add_js($settings, 'setting');
+        drupal_add_js(drupal_get_path('module', 'localizer') .'/js/localizer.js', 'module', 'header', FALSE);
+        $attributes = array('onchange' => "localizernode_book_parents(this, 'edit-parent', ". $nid_exclude .")");
+      }
+      else {
+        $attributes = array();
+      }
+
+      $form['localizer_language'] = array(
+        '#type' => 'select',
+        '#title' => t('Language'),
+        '#default_value' => $form['#node']->localizer_language,
+        '#options' => $languages,
+        '#required' => FALSE,
+        '#weight' => -18,
+        '#attributes' => $attributes,
+      );
+      $form['localizer_pid'] = array(
+        '#type' => 'hidden',
+        '#default_value' => $form['#node']->localizer_pid,
+      );
+    }
+    break;
+  }
+}
+
+function localizernode_db_rewrite_sql($query, $primary_table, $primary_field) {
+  global $user;
+  $sql = array();
+  if (!$query) return $sql;
+
+  $applyfallback = variable_get('localizer_fallback_support', TRUE);
+  $applylocalizer = ($primary_table == 'n');
+  $applylocalizer = $applylocalizer && !preg_match('/'. $primary_table .'\.nid\s*=\s*\'?(%d|\d+)\'?/', $query);
+
+  if (module_exists('gsitemap') && !variable_get('localizer_switch_byhostname', FALSE)) {
+    if (($primary_table == 'n') && preg_match('/gsitemap/', $query)) {
+      //Don't apply localizer because we are serving a
+      //gsitemap request on a site with switchbyhostname
+      $applylocalizer = FALSE;
+    }
+  }
+
+  if (preg_match("/'applylocalizer'='applylocalizer'/", $query)) {
+    $applylocalizer = TRUE;
+  }
+
+  if ($applylocalizer) {
+    $contents_types_enabled = variable_get('localizer_contents_types', array());
+    preg_match('/'. $primary_table .'\.type\s*=\s*\'\S*\'/', $query, $matches);
+    $pos = strpos($matches[0], "'");
+    $type = str_replace("'", "", substr($matches[0], $pos));
+    if ($type && !$contents_types_enabled[$type]) $applylocalizer = FALSE;
+  }
+
+  $applyfallback = variable_get('localizer_fallback_support', TRUE);
+  if (preg_match("/'localizer_no_fallback'='localizer_no_fallback'/", $query)) {
+    $applyfallback = FALSE;
+  }
+
+  if ($applylocalizer) {
+    $is_book = false;
+    if (arg(0)=='node' && arg(1)=='add' && arg(2)=='book') {
+      $is_book = true;
+      $language = localizer_get_language();
+    }
+    else if (arg(0)=='node' && arg(1) && is_numeric(arg(1))) {
+      $node = node_load(arg(1));
+      if ($node->type=='book') {
+        $is_book = true;
+        $language = $node->localizer_language;
+      }
+    }
+    if ($is_book && $language) {
+      $sql['join'] = "LEFT JOIN {localizernode} loc ON loc.nid=". $primary_table .".nid";
+      $sql['where'] = "loc.language='". $language ."' OR loc.language IS NULL";
+    }
+    else if ($applyfallback) {
+      $languages = localizer_supported_languages();
+      $w = '';
+      foreach ($languages as $l => $n) {
+        if ($l==localizer_get_language()) {
+          $weight = -100;
+        }
+        else {
+          $fallbackorder = 'fallbacklangorder_'. $l;
+          if ($user->uid && ($user->$fallbackorder)) {
+            $weight = $user->$fallbackorder;
+          }
+          else {
+            $weight = variable_get("localizer_language_fallback_weight_". $l, 0);
+          }
+        }
+
+        if ($w) {
+          $w .= ' UNION ';
+        }
+        $w .= " SELECT $weight AS weight, CAST('$l' AS CHAR(10)) AS language ";
+      }
+
+      $sql['join'] = "LEFT JOIN {localizernode} loc ON loc.nid=". $primary_table .".nid";
+      if ($w) {
+        $sql['join'] .= " LEFT JOIN($w) lanw ON lanw.language=loc.language LEFT JOIN (select pid, MIN(weight) AS minweight from {localizernode} loc2 LEFT JOIN ($w) lanw2 on lanw2.language=loc2.language group by pid) loc1 ON loc.pid=loc1.pid ";
+        $sql['where'] = 'lanw.weight=loc1.minweight';
+      }
+    }
+    else {
+      $language = localizer_get_language();
+      $sql['join'] = "LEFT JOIN {localizernode} loc ON loc.nid=". $primary_table .".nid";
+      $sql['where'] = "loc.language='". $language ."' OR loc.language IS NULL";
+    }
+  }
+  return $sql;
+}
+
+function _localizernode_book_parents_js($language=NULL, $nid_exclude=0) {
+  if (!$language) $language = localizer_get_language();
+  $result = db_query("SELECT n.nid, n.title, b.parent, b.weight FROM {node} n INNER JOIN {book} b ON n.vid = b.vid INNER JOIN {localizernode} l ON n.nid=l.nid WHERE n.status = 1 AND l.language='%s' ORDER BY b.weight, n.title", $language);
+
+  $children = array();
+  while ($node = db_fetch_object($result)) {
+    if (!$children[$node->parent]) {
+      $children[$node->parent] = array();
+    }
+    $children[$node->parent][] = $node;
+  }
+
+  $toc = array();
+  // If the user has permission to create new books, add the top-level book page to the menu;
+  if (user_access('create new books')) {
+    $toc[0] = '<'. t('top-level') .'>';
+  }
+
+  $toc = book_toc_recurse(0, '', $toc, $children, $nid_exclude);
+
+  print drupal_to_js($toc);
+  exit();
+}
+

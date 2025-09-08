@@ -1,0 +1,9 @@
+; $Id: bueditor.info,v 1.1 2007/02/13 14:35:16 ufku Exp $
+name = "BUEditor"
+description = "A plain textarea editor aiming to facilitate code writing."
+
+
+; Information added by drupal.org packaging script on 2007-03-11
+version = "5.x-1.x-dev"
+project = "bueditor"
+

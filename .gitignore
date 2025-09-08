@@ -1,0 +1,9 @@
+# Ignore entire sites directory except sites/all
+sites/*
+!sites/all/
+!sites/all/**
+
+# Ignore specific file patterns
+.htaccess
+settings.php
+.env

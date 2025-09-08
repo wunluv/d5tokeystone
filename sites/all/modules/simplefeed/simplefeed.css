@@ -1,0 +1,15 @@
+/* $Id: simplefeed.css,v 1.3 2007/10/03 21:19:05 m3avrck Exp $ */
+ul.simplefeed, ul.simplefeed-item {
+margin:0;
+padding:0.3em;
+border:1px solid #ccc;
+background:#eee;
+}
+
+ul.simplefeed li, ul.simplefeed-item li {
+display: inline;
+list-style-type: none;
+background:none;
+margin:0;
+padding:0 2em 0 0;
+}

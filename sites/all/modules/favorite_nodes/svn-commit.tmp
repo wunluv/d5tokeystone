@@ -1,0 +1,4 @@
+removing module for re-import. .svn file got corrupt during upgrade
+--This line, and those below, will be ignored--
+
+D    files:///home/svn/repos/heavenletters/trunk/5x/modules/contrib/favorite_nodes

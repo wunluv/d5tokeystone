@@ -1,0 +1,11 @@
+; $Id: saveguard.info,v 1.1 2007/11/27 20:48:36 starbow Exp $
+name = SaveGuard
+description = Warn user when they are leaving a page with unsaved changes
+package = User Interface
+
+
+; Information added by drupal.org packaging script on 2007-11-27
+version = "5.x-0.1"
+project = "saveguard"
+datestamp = "1196199308"
+

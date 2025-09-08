@@ -1,0 +1,9 @@
+<?php
+// $Id: autotimezone.install,v 1.1.2.2 2007/05/31 16:26:03 lukelast Exp $
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function autotimezone_uninstall() {
+  variable_del('autotimezone_update_guest');
+}

@@ -1,0 +1,11 @@
+; $Id: aggregation.info,v 1.2.2.5 2007/06/21 23:40:32 mistknight Exp $
+name = Aggregation
+description = A module used to aggregate from XML feeds such as RSS, ATOM or any custom XML
+dependencies = taxonomy
+package = "Feed Parser"
+
+; Information added by drupal.org packaging script on 2009-01-01
+version = "5.x-4.8"
+project = "aggregation"
+datestamp = "1230841203"
+

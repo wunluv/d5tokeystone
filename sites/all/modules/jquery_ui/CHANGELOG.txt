@@ -1,0 +1,37 @@
+
+jQuery UI x.x-x.x, xxxx-xx-xx
+-----------------------------
+
+
+jQuery UI 5.x-1.x, xxxx-xx-xx
+-----------------------------
+
+
+jQuery UI 5.x-1.2, 2010-09-08
+-----------------------------
+#559582 by sun, drupal-id.com: Fixed installation instructions.
+#325831 by sun: Fixed url() in hook_requirements() breaks install profiles.
+#879446 by Jolidog, Itangalo, webchick: Updated link for jQuery 1.6.
+#325831 by hanoii: Fixed drupal_get_path() in hook_requirements() breaks install
+  profiles.
+#758910 by fp, sun: Fixed jQuery UI download link.
+#542908 by sun: Clarified installation instructions.
+
+
+jQuery UI 5.x-1.1, 2009-06-21
+-----------------------------
+#325831 by quicksketch, James Andres, ksenzee: Fixed drupal_get_path() fails
+  during Drupal installation.
+#362509 by Rob Loach, Deciphered, sun, and adrinux: New release system with
+  jQuery UI 1.6.
+#322731 by sun: Fixed improper use of t() in module install file.
+#227687 by sun: Fixed improperly capitalized package name.
+
+
+jQuery UI 5.x-1.0, 2008-07-16
+-----------------------------
+#268645 by webchick: Fixed compatibility with jQuery UI 1.5 (stable).
+#277640 by sun: Fixed invalid access permission for module settings.
+#263785 by sun: Initial port of jQuery UI for Drupal 5.x.
+
+

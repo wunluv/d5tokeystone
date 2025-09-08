@@ -1,0 +1,10 @@
+; $Id: sharedemail.info,v 1.1 2008/10/06 15:35:41 aufumy Exp $
+
+name = "Shared E-mail"
+description = Allow site members to use the same email address more than once.
+version = "0.2"
+; Information added by drupal.org packaging script on 2008-11-17
+version = "5.x-1.0"
+project = "sharedemail"
+datestamp = "1226908224"
+

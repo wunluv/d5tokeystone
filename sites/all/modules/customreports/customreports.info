@@ -1,0 +1,8 @@
+name = "Custom Reports"
+description = "Enables devs to create reports for later downloading."
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "5.x-1.x-dev"
+project = "customreports"
+datestamp = "1298619074"
+

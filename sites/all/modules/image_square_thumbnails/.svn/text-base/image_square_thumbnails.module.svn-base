@@ -1,0 +1,63 @@
+<?php
+// $Id: image_square_thumbnails.module,v 1.1 2008/03/06 13:31:05 nimrodwebdesign Exp $
+
+/**
+ * @defgroup image_square_thumbnails Image square thumbnails
+ *
+ * Make thumbnails that are square. Create thumbnails images that are square, 
+ * using the width dimension.
+ * It does not scale the original image (causing distortion). It crops to 
+ * get the largest square it can from the center, then scales that down.
+ */
+ 
+/**
+ * @file
+ *
+ * Main file for image_square_thumbnails module.
+ *
+ * @ingroup example
+ */
+
+/**
+ * Implementation of hook_image_alter().
+ */
+function image_square_thumbnails_image_alter($source, $destination, $size) {
+  // Only adjust the size of thumbnails
+  if ($size == 'thumbnail') {
+    // Create the thumbnail from scratch from the original image
+    if (empty($source->images['_original'])) {
+      return false;
+    }
+
+    $info = image_get_info($source->images['_original']);
+
+    // Calculate the coordinates to crop from
+    if ($info['height'] < $info['width']) {
+      $cropSize = $info['height'];
+      $cropX = ($info['width'] - $info['height'])/2;
+      $cropY = 0;
+    }
+    else {
+      $cropSize = $info['width'];
+      $cropX = 0;
+      $cropY = ($info['height'] - $info['width'])/2;
+    }
+
+    // Crop the image to a square as large as possible, centered in the image
+    $result = image_crop($source->images['_original'], $destination, $cropX, $cropY, $cropSize, $cropSize);
+    if (!$result) {
+      return false;
+    }
+
+    // Get the dimensions of the images sizes.
+    $aSizes = image_get_sizes();
+
+    // Resize the square image to the 'width' of the thumbnail setting (so height is essentially ignored)
+    return image_resize($destination, $destination, $aSizes[$size]['width'], $aSizes[$size]['width']);
+  }
+  else {
+    // Just return false for non thumbnail images
+    return true;
+  }
+}
+

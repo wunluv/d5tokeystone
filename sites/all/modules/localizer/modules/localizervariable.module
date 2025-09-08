@@ -1,0 +1,97 @@
+<?php
+// $Id
+
+/**
+ * localizervariable submodule. (Inspired by Internationalization module)
+ * First version : Anton Sidashin aka Troy, 2007, http://russianwebstudio.com
+ * Rewritten by : Roberto Gerola, 2007, http://www.speedtech.it
+ */
+
+include_once(drupal_get_path('module', 'localizer') .'/models/localizertranslation.php');
+include_once(drupal_get_path('module', 'localizer') .'/includes/localizer.inc');
+
+function localizervariable_menu() {
+$items = array();
+static $lookup;
+if(!$may_cache && !$lookup) {
+  global $conf;
+  $variables = localizertranslation_findall("object_name='variable' AND language='". localizer_get_language() ."'");
+  foreach ($variables as $key => $variable) {
+    $variable_key = $variable['object_key'];
+    $variable_field = $variable['object_field'];
+    $variable_translation = $variable['translation'];
+    if (array_key_exists($variable_key, $conf) && $variable_field=='value' && isset($variable_translation)) {
+      $conf[$variable_key] = $variable_translation;
+    }
+  }
+  $lookup=TRUE;
+}
+
+return $items;
+}
+
+function localizervariable_get_variables($form_id=NULL) {
+  static $variables;
+  if (!$variables) {
+    $variables['system_site_information_settings'] = array(
+      'site_name' => 1,
+      'site_slogan' => 1,
+      'site_mission' => 1,
+      'site_footer' => 1,
+      'localizer_switchuilanguage_select' => 1,
+    );
+
+    $variables['user_admin_settings'] = array(
+      'user_registration_help' => 1,
+      'user_mail_welcome_subject' => 1,
+      'user_mail_welcome_body' => 1,
+      'user_mail_approval_subject' => 1,
+      'user_mail_approval_body' => 1,
+      'user_mail_pass_subject' => 1,
+      'user_mail_pass_body' => 1,
+      'user_mail_admin_subject' => 1,
+      'user_mail_admin_body' => 1,
+      'localizer_switchuilanguage_select' => 1,
+    );
+  }
+
+  if ($form_id) {
+    $result = $variables[$form_id];
+  }
+  else {
+    $result = $variables;
+  }
+
+  if (!$result) $result = array();
+  return $result;
+}
+
+function localizervariable_form_alter($form_id, &$form) {
+  $variables = localizervariable_get_variables();
+  if (array_key_exists($form_id, $variables)) {
+    $form['#submit']['localizervariable_form_submission'] = array(); // register callback
+  }
+}
+
+function localizervariable_form_submission($form_id, $form) {
+  $variables = localizervariable_get_variables();
+  if (array_key_exists($form_id, $variables)) {
+    $variables = localizervariable_get_variables($form_id);
+    $translation = array(
+      'tid'  =>  '',
+      'object_name'  =>  'variable',
+      'object_key'  =>  '',
+      'object_field'  =>  'value',
+      'language'  =>  localizer_get_language(),
+      'translation'  =>  ''
+    );
+    foreach ($variables as $name => $value) {
+      if (array_key_exists($name, $form)) {
+        $translation['object_key'] = $name;
+        $translation['translation'] = $form[$name];
+        localizertranslation_save($translation);
+      }
+    }
+  }
+}
+

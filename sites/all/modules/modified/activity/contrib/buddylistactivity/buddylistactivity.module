@@ -1,0 +1,214 @@
+<?php
+
+/**
+ * Activity definition file
+ *
+ * This defines what hooks activity module should use
+ */
+function buddylistactivity_activity_info() {
+  return array(
+    'ops' => array(
+      'add' => t('Add'), 
+      'remove' => t('Remove'), 
+      'request' => t('Request'), 
+      'deny' => t('Deny'), 
+      'cancel' => t('Cancel'),
+    ),
+    'types' => array('buddylist' => t('Buddylist')),
+    'roles' => array(
+      'author' => array(
+        '#name' => t('Author'),
+        '#description' => t('The person who performed the action.'),
+        '#default' => array(
+          'add' 	=> t('[author] added [buddy] to [possessive] [buddylist-link]'),
+          'remove' 	=> t('[author] removed [buddy] from [possessive] [buddylist-link]'),
+          'request' => t('[author] asked [buddy] to be added to [possessive] [buddylist-link]'),
+          'deny' 	=> t('[author] denied [buddy]\'s request to be added to [possessive] [buddylist-link]'),
+          'cancel' 	=> t('[author] cancelled [possessive] request to add [buddy] to [possessive] [buddylist-link]'),
+        ),
+      ),
+      // This is what corresponds to ACTIVITY_ALL
+      'all' => array(
+        '#name' => t('All'),
+        '#description' => t('The general public.'),
+        '#default' => array(
+          'add' 	=> t('[author-all] added [buddy-all] to their [buddylist-link]'),
+          'remove' 	=> t('[author-all] removed [buddy-all] from their [buddylist-link]'),
+          'request' => t('[author-all] asked [buddy-all] to be added to their [buddylist-link]'),
+          'deny' 	=> t('[author-all] denied [buddy-all]\'s request to be added to their [buddylist-link]'),
+          'cancel' 	=> t('[author-all] cancelled their request to add [buddy-all] to their [buddylist-link]'),
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+ * Token module integration. Defines available default tokens.
+ */
+function buddylistactivity_token_list($type = 'all') {
+  if ($type == 'buddylistactivity') {
+    $tokens['buddylistactivity'] = array(
+      'possessive'		=> t('Possessive pronoun indicating whose buddylist ("yours" or "theirs")'),
+      'buddylist-link'	=> t("Link to the user's buddylist"),
+      'buddy-uid'		=> t('User Id of the person who has been added or removed'),
+      'buddy'			=> t('Person who has been added or removed (used for "author" role)'),
+      'buddy-all'		=> t('Person who has been added or removed (used for "all" role)'),
+      'buddy-name'		=> t("The name of the person who has been added or removed"),
+    );
+    $tokens['buddylistactivity'] += buddylist_translation();
+    return $tokens;
+  }
+}
+
+/**
+ * Token module integration. Defines available default token values.
+ */
+function buddylistactivity_token_values($type, $data = NULL, $options = array()) {
+  global $user;
+  static $authors;
+  if ($type == 'buddylistactivity' && !empty($data)) {
+    if (!isset($authors[$data['buddy-uid']])) {
+      $authors[$data['buddy-uid']] = activity_user_load($data['buddy-uid']);
+    }
+    $buddy = $authors[$data['buddy-uid']];
+    $data['possessive'] = ($user->uid == $data['uid']) ? t('your') : t('their');
+    $data['buddy'] = theme('activity_username', $buddy, TRUE);
+    $data['buddy-all'] = theme('activity_username', $buddy);
+    $data['buddy-name'] = $buddy->name;
+    $data['buddylist-link'] = l(t('@buddylist', buddylist_translation()), 'buddylist/'. $data['uid']);
+    $data += buddylist_translation();
+    return $data;
+  }
+}
+
+/**
+ * Implementation of hook_buddylist_api().
+ * $arg[0] = operation
+ * $arg[1] = user being added/removed
+ * $arg[2] = user doing the add/remove
+ */
+function buddylistactivity_buddylist() {
+  $args = func_get_args();
+  $op = $args[0];
+  $type = 'buddylist';
+
+  // Check if both type and operation are
+  // enabled for activity. If not then stop here
+  if (!in_array($type, variable_get('buddylistactivity_token_types', array($type)), TRUE) || 
+    !in_array($op, variable_get('buddylistactivity_op_types', array($op)), TRUE)) {
+    return FALSE;
+  }
+
+  // Privacy setting check
+  $user = user_load(array('uid' => $args[2]->uid));
+  if (activity_user_privacy_optout($user)) {
+    return FALSE;
+  }
+
+  $data = array(
+    'buddy-uid' => $args[1]->uid,
+  );
+
+  $target_users_roles = array(
+    ACTIVITY_ALL => 'all',
+    $user->uid => 'author',
+  );
+
+  activity_insert($user->uid, 'buddylistactivity', $type, $op, $data, $target_users_roles);
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function buddylistactivity_block($op = 'list', $delta = 0, $edit = array()) {
+  global $user;
+
+  switch ($op) {
+    case 'list':
+      $block['buddies']['info'] = t("Activity - My buddies: show activities of current user's buddies.");
+      return $block;
+
+    case 'configure':
+      $form['items'] = array(
+        '#type' => 'select',
+        '#title' => t('Number of items'),
+        '#default_value' => variable_get('activity_block_'. $delta, 5),
+        '#options' => drupal_map_assoc(range(1, 50)),
+      );
+      return $form;
+
+    case 'save':
+      variable_set('activity_block_'. $delta, $edit['items']);
+      break;
+
+    case 'view':
+      switch ($delta) {
+        case 'buddies':
+          if (user_access('view own activity')) {
+            $uids = array_keys(buddylist_get_buddies($user->uid, 'uid'));
+            if (!$uids) {
+              return FALSE;
+            }
+
+            $activity = array();
+            $activity = activity_get_activity($uids, NULL, variable_get('activity_block_'. $delta, 5) + 1);
+            drupal_add_css(drupal_get_path('module', 'activity') .'/activity.css');
+            if (count($activity) > variable_get('activity_block_'. $delta, 5)) {
+              $more_link = theme('activity_more_link', 'activity/buddies');
+              array_pop($activity);
+            }
+
+            $activities = array();
+            foreach ($activity as $item) {
+              $activities[] = theme('activity', activity_token_replace($item), $item) . activity_delete_link($item);
+            }
+
+            return array(
+              'subject' => t('My @buddies\' activity', buddylist_translation()),
+              'content' => theme('activity_block', $activities, $more_link)
+            );
+          }
+          break;
+      }
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function buddylistactivity_menu($may_cache) {
+  $items = array();
+  
+  if ($may_cache) {
+    $items[] = array(
+      'path' => 'activity/buddies',
+      'title' => t('My buddies\' activity'),
+      'callback' => 'buddylistactivity_page',
+      'type' => MENU_LOCAL_TASK,
+      'access' => user_access('view own activity'),
+    );
+  }
+  
+  return $items;
+}
+
+/**
+ * buddylist activity page callback
+ */
+function buddylistactivity_page($page = 'buddies') {
+  global $user;
+  drupal_add_css(drupal_get_path('module', 'activity') .'/activity.css');
+
+  if ($page == 'buddies') {
+    if (user_access('view own activity')) {      
+      $uids = array_keys(buddylist_get_buddies($user->uid, 'uid'));
+      $activities = array();
+      if ($uids) {
+        $activities = activity_get_activity($uids, NULL, variable_get('activity_page_pager', 20));
+      }
+      $table = theme('activity_table', $activities);
+      return theme('activity_page', $activities, $table);
+    }
+  }
+}

@@ -1,0 +1,13 @@
+; $Id: image_square_thumbnails.info,v 1.1 2008/03/06 13:31:05 nimrodwebdesign Exp $
+name = Image square thumbnails
+description = "Thumbnails will be generated as squares."
+dependencies = image
+package = Image
+
+
+
+; Information added by drupal.org packaging script on 2008-03-06
+version = "5.x-1.0"
+project = "image_square_thumbnails"
+datestamp = "1204814112"
+

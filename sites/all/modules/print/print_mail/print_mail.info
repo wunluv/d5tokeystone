@@ -1,0 +1,11 @@
+; $Id: print_mail.info,v 1.2.2.2 2008/10/15 11:03:28 jcnventura Exp $
+name = "Send by e-mail"
+description = "Provides the capability to send the web page by e-mail"
+dependencies = print
+package = "Printer, e-mail and PDF versions"
+
+; Information added by drupal.org packaging script on 2009-10-14
+version = "5.x-4.9"
+project = "print"
+datestamp = "1255561269"
+

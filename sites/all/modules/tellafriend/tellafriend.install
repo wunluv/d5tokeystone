@@ -1,0 +1,20 @@
+<?php
+// $Id: tellafriend.install,v 1.9 2008/06/12 22:41:26 thierrygd Exp $
+
+// Copyright 2007 Thierry GUEGAN http://www.arvoriad.com 
+
+
+function tellafriend_uninstall() {
+  variable_del('tellafriend_address_limit');
+  variable_del('tellafriend_closing'); 
+  variable_del('tellafriend_fromaddress'); 
+  variable_del('tellafriend_hourly_threshold');    
+  variable_del('tellafriend_message');    
+  variable_del('tellafriend_pagetitle');    
+  variable_del('tellafriend_server'); 
+  variable_del('tellafriend_subject'); 
+  variable_del('tellafriend_success'); 
+  variable_del('tellafriend_topmessage');  
+  variable_del('tellafriend_block_title');  
+  variable_del('tellafriend_block_linklabel');  
+}

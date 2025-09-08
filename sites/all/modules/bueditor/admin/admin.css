@@ -1,0 +1,26 @@
+/*$Id: admin.css,v 1.2 2007/02/13 14:40:58 ufku Exp $*/
+
+.button-table {
+  width: 100%;
+}
+.button-table tr.new-button {
+  background-color: #feebed;
+}
+.button-table td{
+  vertical-align: top;
+}
+.button-table th.content {
+  width: 50%;
+}
+.sel-action {
+  text-align: right;
+}
+.sel-action div {
+  display: inline;
+}
+.sel-action select, .sel-action input {
+  margin: 0px;
+}
+#editor-demo {
+  width: 94%;
+}

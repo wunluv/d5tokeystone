@@ -1,0 +1,10 @@
+name = Vote up/down
+description = Adds a up/down vote widget to selected node types, part of Vote up/down.
+dependencies = votingapi
+package = Voting
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "5.x-1.x-dev"
+project = "vote_up_down"
+datestamp = "1298620684"
+

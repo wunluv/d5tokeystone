@@ -1,0 +1,11 @@
+; $Id: comment_cck.info,v 1.1 2007/09/08 17:54:45 dmitrig01 Exp $
+name = Comment CCK
+description = Allows comments to alter CCK fields
+package = CCK
+
+
+; Information added by drupal.org packaging script on 2007-09-08
+version = "5.x-1.0"
+project = "comment_cck"
+datestamp = "1189274703"
+

@@ -1,0 +1,31 @@
+/* $ID$ */
+
+/**
+ * @file
+ * Content management filter style sheet.
+ */
+
+#node-admin-filter label.option {
+  white-space: pre;
+}
+
+#node-admin-filter dl.multiselect dt  {
+  margin: 0 1em 0 1em;
+  vertical-align: top;
+}
+
+#node-admin-filter dl.multiselect label  {
+  vertical-align: top;
+}
+
+#node-admin-filter dl.multiselect dd.b select {
+  width: 18em;
+}
+
+#node-admin-filter dl.multiselect dd.b input {
+  width: 17.5em;
+}
+
+#node-admin-buttons {
+  margin-left: 5em;
+}

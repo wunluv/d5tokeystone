@@ -1,0 +1,53 @@
+<?php
+// $Id: simplefeed.install,v 1.10 2007/10/03 17:39:33 m3avrck Exp $
+
+/**
+ * Implementation of hook_install().
+ */
+function simplefeed_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {simplefeed_feed} (
+        vid int unsigned NOT NULL,
+        nid int unsigned NOT NULL,
+        url varchar(255) NOT NULL default '',
+        expires int NOT NULL default '0',
+        refresh int NOT NULL default '0',
+        checked int NOT NULL default '0',
+        PRIMARY KEY (vid),
+        KEY nid (nid),
+        KEY url (url)
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
+      break;
+    case 'pgsql':
+      db_query("CREATE TABLE {simplefeed_feed} (
+        vid int_unsigned NOT NULL,
+        nid int_unsigned NOT NULL,
+        url varchar(255) NOT NULL default '',
+        expires int NOT NULL default '0',
+        refresh int NOT NULL default '0',
+        checked int NOT NULL default '0',
+        PRIMARY KEY (vid)
+      )");
+      db_query("CREATE INDEX {simplefeed_feed}_nid_idx ON {simplefeed_feed} (nid)");
+      db_query("CREATE INDEX {simplefeed_feed}_url_idx ON {simplefeed_feed} (url)");
+      break;
+  }
+
+  drupal_set_message(t('SimpleFeed successfully installed.'));
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function simplefeed_uninstall() {
+  db_query('DROP TABLE {simplefeed_feed}');
+  node_type_delete('feed');
+  variable_del('simplefeed_expires');
+  variable_del('simplefeed_refresh');
+  variable_del('simplefeed_format');
+  variable_del('simplefeed_vocab');
+  variable_del('simplefeed_categories');
+  variable_del('simplefeed_cron_throttle');
+}

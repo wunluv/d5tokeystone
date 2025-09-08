@@ -1,0 +1,163 @@
+<?php
+
+/**
+ * @file
+ * Install file for activity module.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function activity_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("
+        CREATE TABLE {activity} (
+          aid int(11) NOT NULL,
+          uid int(11) NOT NULL DEFAULT 0,
+          module varchar(50) NOT NULL default '',
+          type varchar(25) NOT NULL default '',
+          operation varchar(25) NOT NULL default '',
+          created int(11) NOT NULL,
+          data longtext NOT NULL,
+          PRIMARY KEY (aid),
+          KEY (module),
+          KEY (created)
+        ) /*!40100 DEFAULT CHARACTER SET UTF8 */
+      ");
+      db_query(
+        "CREATE TABLE {activity_targets} (
+          aid int(11) NOT NULL,
+          target_uid int(11) NOT NULL,
+          target_role varchar(50) NOT NULL default '',
+          PRIMARY KEY (aid, target_uid),
+          KEY (target_uid, target_role),
+          KEY (target_role)
+        ) /*!40100 DEFAULT CHARACTER SET UTF8 */
+      ");
+      db_query("ALTER TABLE {variable} CHANGE `name` `name` varchar(128) NOT NULL DEFAULT ''");
+      break;
+    case 'pgsql':
+      db_query("
+        CREATE TABLE {activity} (
+          aid int NOT NULL,
+          uid int NOT NULL DEFAULT 0,
+          module varchar(50) NOT NULL default '',
+          type varchar(25) NOT NULL default '',
+          operation varchar(25) NOT NULL default '',
+          created int NOT NULL,
+          data text NOT NULL,
+          PRIMARY KEY (aid)
+        )");
+
+      db_query("CREATE INDEX {activity}_module_idx ON {activity} (module)");
+      db_query("CREATE INDEX {activity}_created_idx ON {activity} (created)");
+      db_query("CREATE SEQUENCE {activity}_seq");
+
+      db_query(
+        "CREATE TABLE {activity_targets} (
+          aid int NOT NULL,
+          target_uid int NOT NULL,
+          target_role varchar(50) NOT NULL default '',
+          PRIMARY KEY (aid, target_uid)
+        )");
+      db_query("CREATE INDEX {activity_targets}_target_uid_target_role_idx ON {activity_targets} (target_uid, target_role)");
+      db_query("CREATE INDEX {activity_targets}_target_role_idx ON {activity_targets} (target_role)");
+      db_query("ALTER TABLE {variable} ALTER COLUMN name TYPE varchar(128)");
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function activity_uninstall() {
+  if (db_table_exists('activity')) {
+    db_query("DROP TABLE {activity}");
+  }
+  if (db_table_exists('activity_targets')) {
+    db_query("DROP TABLE {activity_targets}");
+  }
+  switch ($GLOBALS['db_type']) {
+    case 'pgsql':
+      db_query("DROP SEQUENCE {activity}_seq");
+      break;
+  }
+  variable_del('activity_page_pager');
+  variable_del('activity_purge');
+  variable_del('activity_time_limit');
+  variable_del('activity_user_optout');
+  variable_del('activity_user_profile_records');
+  db_query("DELETE FROM {variable} WHERE name LIKE 'activity_block_%'");
+}
+
+function activity_update_1() {
+  $ret = array();
+  switch($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql('ALTER TABLE {activity} ADD PRIMARY KEY (aid)');
+      $ret[] = update_sql('ALTER TABLE {activity} ADD KEY (uid)');
+      $ret[] = update_sql('ALTER TABLE {activity} ADD KEY (module)');
+      break;
+  }
+  return $ret;
+}
+
+/**
+ * Increase the variable name column length to the Drupal 6 default of 128
+ * characters.
+ */
+function activity_update_2() {
+  $ret = array();
+  $ret[] = update_sql("ALTER TABLE {variable} CHANGE `name` `name` varchar(128) NOT NULL DEFAULT ''");
+  return $ret;
+}
+
+function activity_update_3() {
+  $ret = array();
+  $ret[] = update_sql("ALTER TABLE {activity} ADD COLUMN scope int(11) AFTER timestamp");
+  return $ret;
+}
+
+/**
+ * This column was added in update 3 but was short
+ * lived and no longer needed. Remove if it exists.
+ */
+function activity_update_4() {
+  $ret = array();
+  switch($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {activity} DROP COLUMN scope");
+      break;
+  }
+  return $ret;
+}
+
+/**
+ * A column for the user ID is being added back to make certain things
+ * easier to do going forward
+ */
+function activity_update_5400() {
+  $ret = array();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      update_sql('ALTER TABLE {activity} ADD COLUMN uid INT(11) NOT NULL DEFAULT 0');
+      break;
+    case 'pgsql':
+      db_add_field($ret, 'activity', 'uid', array('type' => 'int', 'not null' => TRUE, 'default' => 0));
+      break;
+  }
+  $activities = db_query('SELECT aid, module, data FROM {activity}');
+  while ($activity = db_fetch_object($activities)) {
+    $aid = $activity->aid;
+    $data = unserialize($activity->data);
+    $uid = ($activity->module == 'user_relationshipsactivity' ? $data['requester-id'] : $data['author-uid']);
+    db_query('UPDATE {activity} SET uid = %d WHERE aid = %d', $uid, $aid);
+  }
+
+  return $ret;
+}

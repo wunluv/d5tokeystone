@@ -1,0 +1,10 @@
+; $Id: find_path.info,v 1.1 2007/03/13 00:53:22 starbow Exp $
+name = Find URL Alias
+description = Small utility to make finding aliased nodes easier
+
+
+; Information added by drupal.org packaging script on 2008-07-17
+version = "5.x-1.4"
+project = "find_path"
+datestamp = "1216318809"
+

@@ -1,0 +1,10 @@
+
+name = User Stats
+dependencies = profile
+description = "Provides post count and other user statistics. Integrates well with Workflow-ng, Token and Advanced Forum (if installed)."
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "5.x-1.x-dev"
+project = "user_stats"
+datestamp = "1298620604"
+

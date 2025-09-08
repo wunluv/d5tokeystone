@@ -1,0 +1,384 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Localizer 5.x-1.7\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2007-03-17 15:44+0200\n"
+"Last-Translator: Claudiu Cristea <claudiu@cristea.info>\n"
+"Language-Team: Romanian <clau.cristea@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Romanian\n"
+"X-Poedit-Country: ROMANIA\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: localizer.module:275
+#: ;305 modules/localizeruser.module:81
+msgid "Languages"
+msgstr "Limbi"
+
+#: localizer.module:283
+#: modules/localizeruser.module:89
+msgid "When switching user interface locale, switch also the content locale"
+msgstr "Comută localizarea conţinutului atunci când se schimbă localizarea interfeţei"
+
+#: localizer.module:284
+#: modules/localizeruser.module:90
+msgid "Keep separated user interface and content locale"
+msgstr "Păstrează interfaţa utilizator separată de localizarea conţinutului"
+
+#: localizer.module:290
+#: ;315 modules/localizeruser.module:96
+msgid "User interface and content locale switch"
+msgstr "Comutare localizare interfaţă şi conţinut"
+
+#: modules/localizerblock.module:16
+#: modules/localizernode.module:106
+msgid "Locale"
+msgstr "Local"
+
+#: modules/localizermenu.module:112
+#: ;141 modules/localizernode.module:17
+#: modules/localizertaxonomy.module:17
+#: ;53
+msgid "Translations"
+msgstr "Traduceri"
+
+#: modules/localizermenu.module:121
+#: ;150 modules/localizertaxonomy.module:26
+#: ;62 modules/localizerviews.module:57
+#: ;65;70
+msgid "@language"
+msgstr "@language"
+
+#: modules/localizermenu.module:127
+#: ;156 modules/localizernode.module:124
+msgid "Title"
+msgstr "Titlu"
+
+#: modules/localizermenu.module:161
+#: modules/localizertaxonomy.module:37
+#: ;73
+msgid "Description"
+msgstr "Descriere"
+
+#: modules/localizermenu.module:65
+msgid "Home"
+msgstr "Acasă"
+
+#: modules/localizertaxonomy.module:32
+#: ;68
+msgid "Vocabulary name"
+msgstr "Nume clasificare"
+
+#: modules/localizertaxonomy.module:42
+msgid "Help text"
+msgstr "Text ajutor"
+
+#: modules/localizeruser.module:72
+msgid "Multilingual content"
+msgstr "Conţinut multilingual"
+
+#: modules/localizeruser.module:91
+msgid "Use global options"
+msgstr "Utilizează opţiunile globale"
+
+#: localizer.module:35
+msgid "Localizer switch ui locale"
+msgstr ""
+
+#: localizer.module:42
+#: localizer.info:0
+#: ;0 modules/localizerblock.info:0
+#: modules/localizermenu.info:0
+#: modules/localizernode.info:0
+#: modules/localizertaxonomy.info:0
+#: modules/localizeruser.info:0
+#: modules/localizerviews.info:0
+msgid "Localizer"
+msgstr "Localizer"
+
+#: localizer.module:43
+msgid "Configure multilingual support"
+msgstr ""
+
+#: localizer.module:60
+msgid "Locale switching block"
+msgstr ""
+
+#: localizer.module:68
+msgid "Switch block title"
+msgstr ""
+
+#: localizer.module:69
+msgid "Select language"
+msgstr ""
+
+#: localizer.module:77
+msgid "Hide the current locale"
+msgstr ""
+
+#: localizer.module:83
+#: ;220
+msgid "Show language name"
+msgstr ""
+
+#: localizer.module:89
+#: ;226
+msgid "Show flags"
+msgstr "Arată steaguri"
+
+#: localizer.module:95
+#: ;232
+msgid "Flag and language separator"
+msgstr "Separator steaguri şi limbi"
+
+#: localizer.module:104
+#: ;241
+msgid "Flag icons path"
+msgstr "Cale imagini steaguri"
+
+#: localizer.module:113
+#: ;250
+msgid "Flag icons size"
+msgstr "Mărime imagine steag"
+
+#: localizer.module:122
+msgid "Locale initial detection options"
+msgstr ""
+
+#: localizer.module:130
+msgid "Detect through browser's locale"
+msgstr ""
+
+#: localizer.module:137
+msgid "Locale switching options"
+msgstr ""
+
+#: localizer.module:145
+msgid "Redirect front page to the localized version"
+msgstr "Redirectează prima pagină la versiunea localizată"
+
+#: localizer.module:152
+msgid "Switch by locale parameter"
+msgstr "Comută după parametrul localizare"
+
+#: localizer.module:159
+msgid "Switch by node's locale"
+msgstr "Comută după localizare nod"
+
+#: localizer.module:166
+msgid "Switch by url's locale prefix"
+msgstr "Comută după prefix local URL"
+
+#: localizer.module:173
+msgid "By hostname"
+msgstr "După nume host"
+
+#: localizer.module:180
+msgid "Switch by hostname"
+msgstr "Comută după nume host"
+
+#: localizer.module:188
+msgid "@hostaname"
+msgstr "@hostaname"
+
+#: localizer.module:194
+msgid "Multilingual support"
+msgstr "Suport multilingual"
+
+#: localizer.module:202
+msgid "Multilingual content block"
+msgstr ""
+
+#: localizer.module:210
+msgid "Multilingual content block title"
+msgstr ""
+
+#: localizer.module:211
+msgid "Select content languages"
+msgstr ""
+
+#: localizer.module:259
+msgid "Multilingual content display options"
+msgstr ""
+
+#: localizer.module:267
+msgid "Authenticated users"
+msgstr ""
+
+#: localizer.module:297
+msgid "Anonymous users"
+msgstr ""
+
+#: localizer.module:323
+msgid "Views support options"
+msgstr ""
+
+#: localizer.module:331
+msgid "Activate global views support"
+msgstr ""
+
+#: localizer.module:357
+#: ;364
+msgid "@localizer_switchblock_title"
+msgstr "@localizer_switchblock_title"
+
+#: localizer.module:359
+msgid "@localizer_mlblock_title"
+msgstr "@localizer_mlblock_title"
+
+#: localizer.module:368
+msgid "%localizer_mlblock_title"
+msgstr "%localizer_mlblock_title"
+
+#: localizer.module:482
+msgid "Change"
+msgstr "Schimbă"
+
+#: localizer.module:13
+msgid "access localizer"
+msgstr "acces localizer"
+
+#: localizer.module:13
+msgid "administer localizer"
+msgstr "administrează localizer"
+
+#: localizer.info:0
+msgid "Provides multilingual support"
+msgstr "Furnizează suport multilingual"
+
+#: localizer.info:0
+#: modules/localizerblock.info:0
+#: modules/localizermenu.info:0
+#: modules/localizernode.info:0
+#: modules/localizertaxonomy.info:0
+#: modules/localizeruser.info:0
+#: modules/localizerviews.info:0
+msgid "localizer"
+msgstr "localizer"
+
+#: modules/localizernode.module:123
+msgid "Current translations"
+msgstr ""
+
+#: modules/localizernode.module:124
+msgid "Language"
+msgstr ""
+
+#: modules/localizernode.module:124
+msgid "Options"
+msgstr ""
+
+#: modules/localizernode.module:133
+msgid "Not translated"
+msgstr ""
+
+#: modules/localizernode.module:134
+msgid "create translation"
+msgstr ""
+
+#: modules/localizernode.module:136
+msgid "select node"
+msgstr ""
+
+#: modules/localizernode.module:146
+#: ;173
+msgid "Remove"
+msgstr ""
+
+#: modules/localizernode.module:146
+msgid "Remove node from this translation set"
+msgstr ""
+
+#: modules/localizernode.module:169
+#: ;211
+msgid "Save"
+msgstr ""
+
+#: modules/localizernode.module:197
+msgid "No nodes available in @language"
+msgstr ""
+
+#: modules/localizernode.module:207
+msgid "Select translation for @language"
+msgstr ""
+
+#: modules/localizernode.module:220
+msgid "The translation has been saved"
+msgstr ""
+
+#: modules/localizerviews.module:21
+msgid "Text without flag"
+msgstr ""
+
+#: modules/localizerviews.module:22
+msgid "Text with flag"
+msgstr ""
+
+#: modules/localizerviews.module:23
+msgid "Only flag"
+msgstr ""
+
+#: modules/localizerviews.module:36
+#: ;42
+msgid "is"
+msgstr ""
+
+#: modules/localizerviews.module:44
+msgid "Active"
+msgstr ""
+
+#: modules/localizerviews.module:44
+msgid "Inactive"
+msgstr ""
+
+#: modules/localizerblock.info:0
+msgid "Localizer block"
+msgstr ""
+
+#: modules/localizerblock.info:0
+msgid "Provides multilingual support for block module"
+msgstr ""
+
+#: modules/localizermenu.info:0
+msgid "Localizer menu"
+msgstr ""
+
+#: modules/localizermenu.info:0
+msgid "Provides multilingual support for menu module"
+msgstr ""
+
+#: modules/localizernode.info:0
+msgid "Localizer node"
+msgstr ""
+
+#: modules/localizernode.info:0
+msgid "Provides multilingual support for node module"
+msgstr ""
+
+#: modules/localizertaxonomy.info:0
+msgid "Localizer taxonomy"
+msgstr ""
+
+#: modules/localizertaxonomy.info:0
+msgid "Provides multilingual support for taxonomy module"
+msgstr ""
+
+#: modules/localizeruser.info:0
+msgid "Localizer user"
+msgstr ""
+
+#: modules/localizeruser.info:0
+msgid "Provides multilingual support for user module"
+msgstr ""
+
+#: modules/localizerviews.info:0
+msgid "Localizer views"
+msgstr ""
+
+#: modules/localizerviews.info:0
+msgid "Provides multilingual support for views module"
+msgstr ""
+

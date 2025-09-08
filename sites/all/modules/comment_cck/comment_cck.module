@@ -1,0 +1,135 @@
+<?php
+// $Id: comment_cck.module,v 1.1 2007/09/08 17:54:45 dmitrig01 Exp $
+
+/**
+ * Implementation of hook_form_alter.
+ */
+function comment_cck_form_alter($form_id, &$form) {
+  if ($form_id == 'comment_form') {
+    $node = node_load($form['nid']['#value']);
+    // Check if fields for this type are enabled
+    if (variable_get('comment_cck_node_'. $node->type, FALSE) == TRUE) {
+      // If so, get the fields
+      $fields = variable_get('comment_cck_fields_'. $node->type, array());
+      // Get the full form as well
+      $content_form = content_form($node);
+      // This will hold the form with only the fields we need
+      $final_form = array();
+
+      foreach ($fields as $field) {
+        if (isset($content_form[$field])) {
+          // Only add fields that are comment_cck enabled
+          $final_form[$field] = $content_form[$field];
+        }
+      }
+      // Add it to comment_filter so it maintains the correct postion in the form
+      $form['comment_filter']['comment_cck'] = $final_form;
+      // Make it sink
+      $form['comment_filter']['comment_cck']['#weight'] = 50;
+      // It's tons easier like this
+      $form['comment_filter']['comment_cck']['#tree'] = TRUE;
+    }
+    return;
+  }
+  if ($form_id == '_content_admin_field') {
+    $form['field']['allow_comment_altering'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Allow comments to alter this field'),
+      '#description' => t('If checked, comments can alter this CCK field.'),
+      '#default_value' => in_array($form['field_name']['#value'], variable_get('comment_cck_fields_'. $form['type_name']['#value'], array())),
+    );
+    $form['#submit']['_comment_cck_submit'] = array();
+  }
+}
+
+function _comment_cck_submit($form_id, $form_values) {
+  if ($form_id == '_content_admin_field') {
+    if ($form_values['allow_comment_altering'] == TRUE) {
+      variable_set('comment_cck_node_'. $form_values['type_name'], TRUE);
+      // Merge other fields for this node type with the one currently being added.
+      // $form_values['field_name'] is the key for two reasons: first of all,
+      // it's much easier to remove fields, second it prevents duplicates
+      variable_set('comment_cck_fields_'. $form_values['type_name'], array_merge(array($form_values['field_name'] => $form_values['field_name']), variable_get('comment_cck_fields_'. $form_values['type_name'], array())));
+    }
+    return;
+  }
+}
+
+function comment_cck_comment($comment, $op) {
+  switch ($op) {
+    case 'insert':
+      // Merge the new array with the old node
+      $node = (object) array_merge((array) node_load($comment['nid']), $comment['comment_cck']);
+      $previous_vid = $node->vid;
+      // We want a new revision
+      $node->revision = 1;
+      // Required to get the data in the right format
+      content_submit($node);
+      // Save the node
+      node_save($node);
+      // Record that this comment added a revision
+      db_query('INSERT INTO {comment_cck_revisions} (cid, vid, nid, previous_vid) VALUES (%d, %d, %d, %d)', $comment['cid'], $node->vid, $node->nid, $previous_vid);
+      break;
+    case 'view':
+      $node = node_load($comment->nid);
+      if (variable_get('comment_cck_node_'. $node->type, FALSE) == TRUE) {
+        $fields = variable_get('comment_cck_fields_'. $node->type, array());
+        $previous_text = $comment->comment;
+        $comment_revision = db_fetch_object(db_query('SELECT * FROM {comment_cck_revisions} WHERE cid = %d', $comment->cid));
+        $current_node = _comment_cck_build_node((int) $comment_revision->nid, $comment_revision->vid);
+        $previous_node = _comment_cck_build_node((int) $comment_revision->nid, $comment_revision->previous_vid);
+        $cck_fields = content_types($node->type);
+        
+        $result = array();
+        
+        foreach($fields as $field) {
+          if ($current_node->$field != $previous_node->$field) {
+            $current = _comment_cck_render_field($field, $cck_fields, $current_node);
+            $previous = _comment_cck_render_field($field, $cck_fields, $previous_node);
+            foreach ($current as $delta => $item) {
+              if ($item != $previous[$delta]) {
+                // They're different.  Add them.
+                $result[] = array($cck_fields['fields'][$field]['widget']['label'] .':&nbsp', $previous[$delta]['view'], "&raquo;", $item['view']);
+              }
+            }
+          }
+        }
+        if (!empty($result)) {
+          $comment->comment = theme('table', array(), $result) . $previous_text;
+        }
+      }
+      break;
+  }
+  return $comment;
+}
+
+function _comment_cck_build_node($criteria, $rev) {
+  $node = node_load($criteria, $rev);
+  $node = node_build_content($node, $teaser, $page);
+  
+  return $node;
+}
+
+function _comment_cck_render_field($field_name, $cck_fields, $node) {
+  
+  // Mostly taken from content.module
+  $final = array();
+  $field = $cck_fields['fields'][$field_name];
+  $node_field = isset($node->$field_name) ? $node->$field_name : array();
+  $formatter = isset($field['display_settings'][$context]['format']) ? $field['display_settings'][$context]['format'] : 'default';
+  $value = '';
+  if (content_handle('field', 'view', $field) == CONTENT_CALLBACK_CUSTOM) {
+    $module = $field_types[$field['type']]['module'];
+    $function = $module .'_field';
+    if (function_exists($function)) {
+      // TODO: I'm not sure what this should be
+      $value = $function('view', $node, $field, $node_field, $teaser, $page);
+    }
+  }
+  else {
+    foreach ($node_field as $delta => $item) {
+      $final[$delta] = $item;
+    }
+  }
+  return $final;
+}

@@ -1,0 +1,10 @@
+; $Id: gsitemap.info,v 1.3.2.6 2007/06/18 23:06:45 dww Exp $
+name = XML Sitemap
+description = Creates an XML site map in accordance with the sitemaps.org specification.
+
+
+; Information added by drupal.org packaging script on 2007-08-02
+version = "5.x-1.x-dev"
+project = "gsitemap"
+datestamp = "1186077978"
+

@@ -1,0 +1,9 @@
+name = Image
+description = Allows uploading, resizing and viewing of images.
+package = Image
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "5.x-2.x-dev"
+project = "image"
+datestamp = "1298619410"
+

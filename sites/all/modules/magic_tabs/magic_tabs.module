@@ -1,0 +1,224 @@
+<?php
+// $Id: magic_tabs.module,v 1.3.2.10 2008/07/29 05:39:52 yhager Exp $
+
+function magic_tabs_get($callback, $active = 'first', $_ajax = FALSE) {
+  global $theme;
+  global $user;
+  global $_menu;
+
+  if (!isset($theme)) {
+    init_theme();
+  }
+  drupal_add_css(drupal_get_path('module', 'magic_tabs') .'/magic_tabs.css');
+
+  // switch to referer path, to allow called functions to refer to the original path
+  $q = $_GET['q'];
+  if ($_ajax) {
+    unset($_menu['items']);
+    menu_set_active_item($_GET['referer']);
+    if (!_menu_item_is_accessible(menu_get_active_item())) {
+      // no access to this URL. Return nothing and report.
+      watchdog('magic_tabs', t('User %user possibly tried to access %path using an AJAX call, but has no permission to access this URL.', array('%user' => $user->name, '%path' => $_GET['referer'])), WATCHDOG_WARNING);
+      return;
+    }
+  } else {
+    // not ajax, register the callback before executing
+    magic_tabs_register_callback($callback);
+  }
+
+  if (!magic_tabs_check_callback($callback)) {
+    // callback not registered. report and bail out
+    watchdog('magic_tabs', t('User %user tried to use a callback %callback without it being registered first.', array('%user' => $user->name, '%callback' => $callback)), WATCHDOG_WARNING);
+    return;
+  }
+
+  $output = '';
+  $index = 0;
+  if (isset($_GET[$callback .'_tab'])) {
+    // save user's request
+    $_SESSION['magic_tabs'][$callback .'_tab'] = $_GET[$callback .'_tab'];
+  }
+  if (isset($_SESSION['magic_tabs'][$callback .'_tab'])) {
+    // serve user's last request
+    $active = $_SESSION['magic_tabs'][$callback .'_tab'];
+  }
+  if (!is_numeric($active)) {
+    switch ($active) {
+      case 'last':
+        $active = -1;
+        break;
+      default: // case 'first', but cover up for garbage
+        $active = 0;
+    }
+  }
+
+  $tabs = call_user_func($callback, $active);
+
+  // go back to our original path
+  if ($_ajax) {
+    unset($_menu['items']);
+    menu_set_active_item($q);
+  }
+
+  if (empty($tabs)) {
+    return;
+  }
+
+  // ensure $active is within limits and positive
+  $tabs_count = count($tabs);
+  $active = ($active + $tabs_count) % $tabs_count;
+  
+  // extract titles and contents
+  foreach ($tabs as $tab) {
+    $title = $tab['title'] ? $tab['title'] : t('Tab %index', array('%index' => $index));
+    $class = strtolower(preg_replace('/[^a-zA-Z0-9]+/ ', '-', $tab['title']));
+    $path = $_ajax ? $_GET['referer'] :$_GET['q'];
+    $cb_path = url("magic_tabs/$callback", "${callback}_tab=$index&referer=". urlencode($path));
+    $items[] = l(
+      '<span>'. $title .'</span>',
+      $path,
+      array(
+        'class' => ($index == $active) ? 'selected '. $class .'-active' : $class,
+        'onclick' => "
+          $('#$callback .magic_content').addClass('hidden');
+          $('#$callback .loading').removeClass('hidden');
+          $('#$callback').load('$cb_path');
+          return false",
+      ),
+      magic_tabs_query_string(array($callback . '_tab' => $index, 'referer' => urlencode($path))),
+      NULL, FALSE, TRUE
+    );
+    $index++;
+  }
+
+  // find the correct theme function
+  $theme_func = $callback;
+  if (!theme_get_function($theme_func)) {
+    // default theme for tabs
+    $theme_func = 'magic_tabs';
+  }
+
+  $output = theme($theme_func, $callback, $items, $tabs[$active]['content']) .'<div class="loading hidden"></div>';
+  if (!$_ajax) {
+    $output = "<div id='$callback' class='magic_tabs'>". $output .'</div>';
+  }
+  return $output;
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function magic_tabs_menu($may_cache) {
+  if (!$may_cache) {
+    $items[] = array(
+      'path' => 'magic_tabs',
+      'callback' => 'magic_tabs_ajax',
+      'access' => user_access('access content'),
+      'type' => MENU_CALLBACK,
+    );
+  }
+  return $items;
+}
+
+function magic_tabs_ajax($callback) {
+
+  global $theme;
+
+  /**
+   * need to initialize the theme engine first, otherwise, $callback might not
+   * be in the function list
+   */
+  if (!isset($theme)) {
+    init_theme();
+  }
+
+  if (function_exists($callback)) {
+    print magic_tabs_get($callback, 'first', TRUE);
+    exit();
+  }
+}
+
+function magic_tabs_query_string($params = array()) {
+  $q = array_merge($_GET, $params);
+  $querystring = array();
+  unset($q['q']);
+  foreach ($q as $key => $value) {
+    if ($key != 'q') {
+      $querystring[] = $key .'='. $value;
+    }
+  }
+  return !empty($querystring) ? implode('&', $querystring) : NULL;
+}
+
+function magic_tabs_register_callback($callback) {
+  // register a callback in the cache. This is not to benefit performance, but to allow saving a temporary state
+  // other solutions considered where:
+  // 1. $_SESSION - not good due to page_cache,
+  // 2. variable table - entries might get stored for too long and provide security risk
+  $callbacks = array();
+  if (($cache = cache_get('magic_tabs_callbacks')) && !empty($cache->data)) {
+    $callbacks = unserialize($cache->data);
+  }
+  $callbacks[$callback] = TRUE;
+  cache_set('magic_tabs_callbacks', 'cache', serialize($callbacks), CACHE_TEMPORARY);
+}
+
+function magic_tabs_check_callback($callback) {
+  // check if the callback is in the list of allowed callbacks
+  if (($cache = cache_get('magic_tabs_callbacks')) && !empty($cache->data)) {
+    $callbacks = unserialize($cache->data);
+    return $callbacks[$callback];
+  }
+}
+
+/**
+ * Themeable functions
+ */
+function theme_magic_tabs($callback, $items, $content) {
+  return theme('item_list', $items, NULL, 'ul', array('class' => 'tabs')) .'<div class="magic_content">'. $content .'</div>';
+}
+
+/**
+ * Example callback function
+ */
+function magic_tabs_example_callback($active = 0) {
+  $tabs[] = array(
+    'title' => t('First magic tab'),
+    'content' => t('Content of first magic tab'),
+  );
+  $tabs[] = array(
+    'title' => t('Second magic tab'),
+    'content' => t('Content of the second magic tab'),
+  );
+  $tabs[] = array(
+    'title' => t('Third magic tab'),
+    'content' => ($active == 2 || $active == -1) ? magic_tabs_get('magic_tabs_inline_callback') : '',
+  );
+  /*
+   ** Uncomment to display a custom block with $bid==2
+   */
+  /*
+  $bid = 2;
+  $block = (object)module_invoke('block', 'block', 'view', $bid);
+  $block->module = 'block';
+  $block->delta = $bid;
+  $tabs[] = array(
+    'title' => t('Display a custom block'),
+    'content' => theme('block', $block),
+  );
+  */
+  return $tabs;
+}
+
+function magic_tabs_inline_callback() {
+  $tabs[] = array(
+    'title' => t('First nested magic tab'),
+    'content' => t('Content of first nested magic tab'),
+  );
+  $tabs[] = array(
+    'title' => t('2nd nested magic tab'),
+    'content' => t('Content of the second nested magic tab'),
+  );
+  return $tabs;
+}
+

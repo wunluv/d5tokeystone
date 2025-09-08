@@ -1,0 +1,56 @@
+<?php
+// $Id: localizernode.install,v 1.5.2.1 2008/07/15 08:52:07 robertogerola Exp $
+
+function localizernode_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {localizernode} (
+        nid int(10) unsigned NOT NULL ,
+        language VARCHAR(10) NOT NULL default '-',
+        pid int(10) unsigned NOT NULL ,
+        PRIMARY KEY (nid),
+        KEY localizernode_idx1 (pid),
+        UNIQUE KEY localizernode_idx2 (language,pid)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+    break;
+    case 'pgsql':
+      db_query("CREATE TABLE {localizernode} (
+        nid int4 NOT NULL ,
+        language VARCHAR(10) NOT NULL default '-',
+        pid int4 NOT NULL ,
+        PRIMARY KEY (nid),
+        UNIQUE (language,pid)
+      );");
+      db_query("CREATE INDEX localizernode_pid_index ON {localizernode} (pid)");
+    break;
+  }
+  global $locale;
+  if (!$locale) $locale='en';
+  db_query("INSERT INTO {localizernode} (nid,language,pid) SELECT nid,'%s',nid FROM {node};", $locale);
+}
+
+function localizernode_update_1() {
+  $items = array();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $items[] = update_sql("ALTER TABLE {localizernode} CHANGE locale language VARCHAR(10)");
+      $items[] = update_sql("ALTER TABLE {localizernode} DROP INDEX localizernode_idx2");
+      $items[] = update_sql("ALTER TABLE {localizernode} ADD UNIQUE KEY localizernode_idx2 (language,pid)");
+    break;
+    case 'pgsql':
+      $items[] = update_sql("ALTER TABLE {localizernode} RENAME COLUMN locale TO language");
+      $items[] = update_sql("DROP INDEX localizernode_pid_index");
+      $items[] = update_sql("CREATE INDEX localizernode_pid_index ON {localizernode} (pid)");
+    break;
+  }
+
+
+  return $items;
+}
+
+function localizernode_uninstall() {
+  db_query("DROP TABLE IF EXISTS {localizernode}");
+}
+

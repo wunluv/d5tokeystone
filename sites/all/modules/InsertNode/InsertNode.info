@@ -1,0 +1,10 @@
+name = InsertNode
+description = A filter that includes content from one node in another
+package = "Input filters"
+dependencies = filter
+
+; Information added by drupal.org packaging script on 2009-10-28
+version = "5.x-1.2"
+project = "InsertNode"
+datestamp = "1256700941"
+

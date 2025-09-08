@@ -1,0 +1,12 @@
+name = Localizer language Token
+description = Adds a token that displays the node language as [language].
+dependencies = localizer token
+package = Localizer
+project = "localizer"
+
+
+; Information added by drupal.org packaging script on 2008-09-23
+version = "5.x-3.13"
+project = "localizer"
+datestamp = "1222157418"
+

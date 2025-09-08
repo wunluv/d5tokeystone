@@ -1,0 +1,3 @@
+; $Id: search_keywords.info,v 1.1.2.2 2007/04/15 11:09:06 sugree Exp $
+name = Search Keywords
+description = Keeps track of search keywords used to find content on this site.

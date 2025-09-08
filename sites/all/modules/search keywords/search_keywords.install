@@ -1,0 +1,41 @@
+<?php
+function search_keywords_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {search_keywords_log} (
+                aid int(10) NOT NULL auto_increment,
+                title varchar(255) default NULL,
+                path varchar(255) default NULL,
+                url varchar(255) default NULL,
+                hostname varchar(128) default NULL,
+                search_engine varchar(255) default NULL,
+                keywords varchar(255) default NULL,
+                timestamp int(11) unsigned NOT NULL default '0',
+                KEY search_keywords_log_timestamp (timestamp),
+                PRIMARY KEY (aid)
+              ) TYPE=MyISAM
+              /*!40100 DEFAULT CHARACTER SET utf8 */ ;");
+      break;
+    case 'pgsql':
+      db_query("CREATE SEQUENCE {search_keywords_log_aid_seq};");
+      db_query("CREATE TABLE {search_keywords_log} (
+                aid integer NOT NULL DEFAULT nextval( 'search_keywords_log_aid_seq' ),
+                title varchar(255) default NULL,
+                path varchar(255) default NULL,
+                url varchar(255) default NULL,
+                hostname varchar(128) default NULL,
+                search_engine varchar(255) default NULL,
+                keywords varchar(255) default NULL,
+                timestamp integer NOT NULL default '0',
+                PRIMARY KEY (aid)
+              )");
+      db_query("CREATE INDEX {search_keywords_log_timestamp_idx} ON search_keywords_log (timestamp);");
+      break;
+  }
+}
+
+function search_keywords_uninstall() {
+  db_query("DROP TABLE {search_keywords_log}");
+}
+?>

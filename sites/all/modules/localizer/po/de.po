@@ -1,0 +1,379 @@
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# No version information was available in the source files.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Localizer\n"
+"POT-Creation-Date: 2007-01-29 10:51+0100\n"
+"PO-Revision-Date: 2007-04-21 10:21+0100\n"
+"Last-Translator: Alexander Hass\n"
+"Language-Team: Alexander Hass\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"X-Poedit-Language: German\n"
+
+#: localizer.module:262
+#: ;292 modules/localizeruser.module:78
+msgid "Languages"
+msgstr "Sprachen"
+
+#: localizer.module:270
+#: modules/localizeruser.module:85
+msgid "When switching user interface locale, switch also the content locale"
+msgstr "Beim Umschalten der Interfacesprache auch die Inhaltssprache wechseln"
+
+#: localizer.module:271
+#: modules/localizeruser.module:86
+msgid "Keep separated user interface and content locale"
+msgstr "Behalte das Benutzerinterface und die Inhaltslokale separiert"
+
+#: localizer.module:277
+#: ;302 modules/localizeruser.module:92
+msgid "User interface and content locale switch"
+msgstr "Umschaltung des Benutzerinterface und der Inhaltslokale"
+
+#: localizer.module:379
+#: ;387;543 modules/localizernode.module:243
+msgid "Language"
+msgstr "Sprache"
+
+#: modules/localizerblock.module:19
+#: modules/localizernode.module:147
+msgid "Locale"
+msgstr "Lokale"
+
+#: modules/localizermenu.module:60
+msgid "Home"
+msgstr "Startseite"
+
+#: modules/localizeruser.module:69
+msgid "Multilingual content"
+msgstr "Mehrsprachiger Inhalt"
+
+#: modules/localizeruser.module:87
+msgid "Use global options"
+msgstr "Globale Optionen verwenden"
+
+#: localizer.module:36
+msgid "Localizer switch ui locale"
+msgstr "Sprachumschaltung der Benutzeroberfläche durch Lokalisierer"
+
+#: localizer.module:43
+msgid "Localizer switch admin locale"
+msgstr "Sprachumschaltung der Benutzeroberfläche durch Lokalisierer"
+
+#: localizer.module:50
+#: localizer.info:0
+#: ;0 modules/localizerblock.info:0
+#: modules/localizermenu.info:0
+#: modules/localizernode.info:0
+#: modules/localizertaxonomy.info:0
+#: modules/localizeruser.info:0
+#: modules/localizervariable.info:0
+#: modules/localizerviews.info:0
+msgid "Localizer"
+msgstr "Lokalisierer"
+
+#: localizer.module:51
+msgid "Configure multilingual support"
+msgstr "Mehrsprachige Unterstützung konfigurieren"
+
+#: localizer.module:66
+msgid "Locale switching block"
+msgstr "Umschaltblock für die Lokale"
+
+#: localizer.module:74
+msgid "Hide the current locale"
+msgstr "Verstecke die aktuelle Lokale"
+
+#: localizer.module:80
+#: ;207
+msgid "Show language name"
+msgstr "Name der Sprache anzeigen"
+
+#: localizer.module:86
+#: ;213
+msgid "Show flags"
+msgstr "Flaggen anzeigen"
+
+#: localizer.module:92
+#: ;219
+msgid "Flag and language separator"
+msgstr "Trennzeichen zwischen Flagge und Sprache"
+
+#: localizer.module:101
+#: ;228
+msgid "Flag icons path"
+msgstr "Pfad zu den Flaggen"
+
+#: localizer.module:110
+#: ;237
+msgid "Flag icons size"
+msgstr "Bildgröße der Flaggen"
+
+#: localizer.module:119
+msgid "Locale initial detection options"
+msgstr "Optionen für die initiale Erkennung der Lokale"
+
+#: localizer.module:127
+msgid "Detect through browser's locale"
+msgstr "Erkennung über die Browserlokale"
+
+#: localizer.module:134
+msgid "Locale switching options"
+msgstr "Optionen für die Umschaltung der Lokale"
+
+#: localizer.module:142
+msgid "Redirect front page to the localized version"
+msgstr "Hauptseite auf die lokalisierte Version umleiten"
+
+#: localizer.module:149
+msgid "Switch by locale parameter"
+msgstr "Umschaltung über den Lokaleparameter"
+
+#: localizer.module:156
+msgid "Switch by node's locale"
+msgstr "Umschaltung über die Lokale der Node"
+
+#: localizer.module:163
+msgid "Switch by url's locale prefix"
+msgstr "Umschaltung über die Lokale am Anfang der URL"
+
+#: localizer.module:170
+msgid "By hostname"
+msgstr "Über den Hostnamen"
+
+#: localizer.module:177
+msgid "Switch by hostname"
+msgstr "Umschaltung über den Hostnamen"
+
+#: localizer.module:185
+msgid "@hostname hostname"
+msgstr "Hostname für @hostname"
+
+#: localizer.module:191
+msgid "Multilingual content support"
+msgstr "Unterstützung für mehrsprachigen Inhalt"
+
+#: localizer.module:199
+msgid "Multilingual content block"
+msgstr "Mehrsprachiger Inhaltsblock"
+
+#: localizer.module:246
+msgid "Multilingual content display options"
+msgstr "Optionen für mehrsprachigen Inhalt"
+
+#: localizer.module:254
+msgid "Authenticated users"
+msgstr "Angemeldete Benutzer"
+
+#: localizer.module:284
+msgid "Anonymous users"
+msgstr "Gäste"
+
+#: localizer.module:310
+msgid "Support for different contents types"
+msgstr "Unterstützung für unterschiedliche Inhaltstypen"
+
+#: localizer.module:318
+msgid "Types"
+msgstr "Typen"
+
+#: localizer.module:327
+msgid "Support for external modules"
+msgstr "Unterstützung für externe Module"
+
+#: localizer.module:335
+msgid "Views global support"
+msgstr "Globale Unterstützung für Ansichten"
+
+#: localizer.module:342
+msgid "Default locale options"
+msgstr "Standard Sprachoptionen"
+
+#: localizer.module:349
+msgid "Do not pre-select a language for new contents."
+msgstr "Für neue Inhalte sollte keine Sprache vorausgewählt werden."
+
+#: localizer.module:351
+msgid "If this is enabled, the option \"Any\" is always pre-selected for new contents. If this is disabled, the current locale is pre-selected."
+msgstr "Sobald aktiviert, wird die Option „Jede“ immer für neue Inhalte vorausgewählt. Wenn deaktiviert, wird die aktuelle Sprache vorausgewählt."
+
+#: localizer.module:381
+#: ;391
+msgid "Content languages"
+msgstr "Inhaltssprachen"
+
+#: localizer.module:545
+#: ;602
+msgid "Change"
+msgstr "Ändern"
+
+#: localizer.module:18
+msgid "access localizer"
+msgstr "Zugriff auf Lokalisierer"
+
+#: localizer.module:18
+msgid "administer localizer"
+msgstr "Lokalisierer verwalten"
+
+#: localizer.info:0
+msgid "Provides multilingual support"
+msgstr "Ermöglicht mehrsprachige Unterstützung"
+
+#: localizer.info:0
+#: modules/localizerblock.info:0
+#: modules/localizermenu.info:0
+#: modules/localizernode.info:0
+#: modules/localizertaxonomy.info:0
+#: modules/localizeruser.info:0
+#: modules/localizervariable.info:0
+#: modules/localizerviews.info:0
+msgid "localizer"
+msgstr "Lokalisierer"
+
+#: modules/localizernode.module:23
+msgid "Translations"
+msgstr "Übersetzungen"
+
+#: modules/localizernode.module:242
+msgid "Current translations"
+msgstr "Aktuelle Übersetzungen"
+
+#: modules/localizernode.module:243
+msgid "Title"
+msgstr "Titel"
+
+#: modules/localizernode.module:243
+msgid "Options"
+msgstr "Optionen"
+
+#: modules/localizernode.module:252
+msgid "Not translated"
+msgstr "Nicht übersetzt"
+
+#: modules/localizernode.module:253
+msgid "create translation"
+msgstr "Übersetzung erstellen"
+
+#: modules/localizernode.module:255
+msgid "select node"
+msgstr "Node auswählen"
+
+#: modules/localizernode.module:265
+#: ;294
+msgid "Remove"
+msgstr "Entfernen"
+
+#: modules/localizernode.module:265
+msgid "Remove node from this translation set"
+msgstr "Entferne Node von der Übersetzungsauswahl"
+
+#: modules/localizernode.module:289
+#: ;332
+msgid "Save"
+msgstr "Speichern"
+
+#: modules/localizernode.module:318
+msgid "No nodes available in @language"
+msgstr "Keine Nodes verfügbar in @language"
+
+#: modules/localizernode.module:328
+msgid "Select translation for @language"
+msgstr "Übersetzung für @language auswählen"
+
+#: modules/localizernode.module:342
+msgid "The translation has been saved"
+msgstr "Die Übersetzung wurde gespeichert"
+
+#: modules/localizerviews.module:23
+msgid "Text without flag"
+msgstr "Text ohne Flaggen"
+
+#: modules/localizerviews.module:24
+msgid "Text with flag"
+msgstr "Text mit Flaggen"
+
+#: modules/localizerviews.module:25
+msgid "Only flag"
+msgstr "Nur Flaggen"
+
+#: modules/localizerviews.module:38
+#: ;44
+msgid "is"
+msgstr "ist"
+
+#: modules/localizerviews.module:46
+msgid "Active"
+msgstr "Aktiv"
+
+#: modules/localizerviews.module:46
+msgid "Inactive"
+msgstr "Inaktiv"
+
+#: modules/localizerviews.module:59
+#: ;67;72
+msgid "@language"
+msgstr "@language"
+
+#: modules/localizerblock.info:0
+msgid "Localizer block"
+msgstr "Lokalisierer für Blöcke"
+
+#: modules/localizerblock.info:0
+msgid "Provides multilingual support for block module"
+msgstr "Ermöglicht mehrsprachige Unterstützung im Block Modul"
+
+#: modules/localizermenu.info:0
+msgid "Localizer menu"
+msgstr "Lokalisierer für Menüs"
+
+#: modules/localizermenu.info:0
+msgid "Provides multilingual support for menu module"
+msgstr "Ermöglicht mehrsprachige Unterstützung im Menü Modul"
+
+#: modules/localizernode.info:0
+msgid "Localizer node"
+msgstr "Lokalisierer für Nodes"
+
+#: modules/localizernode.info:0
+msgid "Provides multilingual support for node module"
+msgstr "Ermöglicht mehrsprachige Unterstützung im Node Modul"
+
+#: modules/localizertaxonomy.info:0
+msgid "Localizer taxonomy"
+msgstr "Lokalisierer für Taxonomie"
+
+#: modules/localizertaxonomy.info:0
+msgid "Provides multilingual support for taxonomy module"
+msgstr "Ermöglicht mehrsprachige Unterstützung im Taxonomie Modul"
+
+#: modules/localizeruser.info:0
+msgid "Localizer user"
+msgstr "Lokalisierer für Benutzer"
+
+#: modules/localizeruser.info:0
+msgid "Provides multilingual support for user module"
+msgstr "Ermöglicht mehrsprachige Unterstützung im Benutzer Modul"
+
+#: modules/localizervariable.info:0
+msgid "Localizer variable"
+msgstr "Lokalisierer für Variablen"
+
+#: modules/localizervariable.info:0
+msgid "Provides multilingual support for variables"
+msgstr "Ermöglicht mehrsprachige Unterstützung für Variablen"
+
+#: modules/localizerviews.info:0
+msgid "Localizer views"
+msgstr "Lokalisierer für Ansichten"
+
+#: modules/localizerviews.info:0
+msgid "Provides multilingual support for views module"
+msgstr "Ermöglicht mehrsprachige Unterstützung im Ansichten Modul"
+

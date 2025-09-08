@@ -1,0 +1,11 @@
+; $I$
+name = Hierarchical Select Taxonomy Subscriptions
+description = Use Hierarchical Select for Taxonomy Subscriptions.
+dependencies = hierarchical_select subscriptions_taxonomy hs_taxonomy
+package = Form Elements
+
+; Information added by drupal.org packaging script on 2010-04-06
+version = "5.x-3.1"
+project = "hierarchical_select"
+datestamp = "1270586710"
+

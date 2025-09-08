@@ -1,0 +1,772 @@
+<?php
+// $Id: localizer.module,v 1.9.2.30 2008/09/10 16:45:50 robertogerola Exp $
+
+/**
+ * Localizer module.
+ * @author Roberto Gerola, 2006-2008, http://www.speedtech.it
+ */
+
+function localizer_perm() {
+  $perm[] = 'Localizer strings: administer translations';
+  $perm[] = 'Localizer strings: delete translations';
+  $perm[] = 'Localizer content: administer translations';
+  $perm[] = 'Localizer content: access translations';
+  $perm[] = 'Localizer content: create translations';
+  $perm[] = 'Localizer content: disconnect translations';
+  $perm[] = 'Localizer content: view all available translations';
+  $perm[] = 'Localizer content: view own available translations';
+  $perm[] = 'Localizer content: change the language';
+  $perm[] = 'Localizer translation management: all';
+
+  foreach (localizer_supported_languages_all() as $l => $n) {
+    $perm[] = 'Localizer translation management: '. $n;
+  }
+  return $perm;
+}
+
+function _localizer_protect_directoryandfile($directoryname, $filename) {
+  $r = TRUE;
+  if (!drupal_verify_install_file($directoryname, FILE_EXIST|FILE_READABLE|FILE_NOT_WRITABLE|FILE_EXECUTABLE)) {
+    drupal_set_message(st('All necessary changes to %directory have been made, so you should now remove write permissions to this directory. Failure to remove write permissions to this directory is a security risk.', array('%directory' => $directoryname)), 'error');
+    $r = FALSE;
+  }
+  if (!drupal_verify_install_file($filename, FILE_EXIST|FILE_READABLE|FILE_NOT_WRITABLE)) {
+    drupal_set_message(st('All necessary changes to %file have been made, so you should now remove write permissions to this file. Failure to remove write permissions to this file is a security risk.', array('%file' => $filename)), 'error');
+    $r = FALSE;
+  }
+  return $r;
+}
+
+function localizer_enable() {
+  $dirname = 'sites/all/modules/localizer/taxonomy';
+  $fileorig = $dirname .'/taxonomy.module.off';
+  $filedest = $dirname .'/taxonomy.module';
+  if (file_exists($fileorig) && !file_exists($filedest)) {
+    if (!is_writeable($fileorig)) {
+      $msg = t('Localizer : to complete the module activation you should rename the file %fileorig to %filedest or
+          grant writing privileges to the directory %dirname and to the file %fileorig and disabling and enabling the module again.', array('%dirname' => $dirname, '%fileorig' => $fileorig, '%filedest' => $filedest));
+      drupal_set_message($msg, 'error');
+    }
+    else {
+      rename($fileorig, $filedest);
+      if (_localizer_protect_directoryandfile($dirname, $filedest)) {
+        drupal_set_message(st('Localizer: all necessary changes to %file have been made. It has been set to read-only for security.', array('%file' => $filedest)));
+      }
+    }
+  }
+  $dirname = 'sites/all/modules/localizer/menu';
+  $fileorig = $dirname .'/menu.module.off';
+  $filedest = $dirname .'/menu.module';
+  if (file_exists($fileorig) && !file_exists($filedest)) {
+    if (!is_writeable($fileorig)) {
+      $msg = t('Localizer : to complete the module activation you should rename the file %fileorig to %filedest or
+          grant writing privileges to the directory %dirname and to the file %fileorig and disabling and enabling the module again.', array('%dirname' => $dirname, '%fileorig' => $fileorig, '%filedest' => $filedest));
+      drupal_set_message($msg, 'error');
+    }
+    else {
+      rename($fileorig, $filedest);
+      if (_localizer_protect_directoryandfile($dirname, $filedest)) {
+        drupal_set_message(t('Localizer: all necessary changes to %file have been made. It has been set to read-only for security.', array('%file' => $filedest)));
+      }
+    }
+  }
+  $msg = t('Localizer: to complete the module activation you need now to append this line %line at the end of your settings.php file, before the closure tag.', array('%line' => "include_once('sites/all/modules/localizer/localizer_settings.php');"));
+  drupal_set_message($msg, 'status');
+}
+
+function localizer_disable() {
+  $dirname = 'sites/all/modules/localizer/taxonomy';
+  $fileorig = $dirname .'/taxonomy.module';
+  $filedest = $dirname .'/taxonomy.module.off';
+  if (file_exists($fileorig) && !file_exists($filedest)) {
+    if (!is_writeable($fileorig)) {
+      $msg = t('Localizer : to complete the module deactivation you should rename the file %fileorig to %filedest or
+          grant writing privileges to the directory %dirname and to the file %fileorig and disabling and enabling the module again.', array('%dirname' => $dirname, '%fileorig' => $fileorig, '%filedest' => $filedest));
+      drupal_set_message($msg, 'error');
+    }
+    else {
+      rename($fileorig, $filedest);
+      if (_localizer_protect_directoryandfile($dirname, $filedest)) {
+        drupal_set_message(t('Localizer: all necessary changes to %file have been made. It has been set to read-only for security.', array('%file' => $filedest)));
+      }
+    }
+  }
+  $dirname = 'sites/all/modules/localizer/menu';
+  $fileorig = $dirname .'/menu.module';
+  $filedest = $dirname .'/menu.module.off';
+  if (file_exists($fileorig) && !file_exists($filedest)) {
+    if (!is_writeable($fileorig)) {
+      $msg = t('Localizer : to complete the module deactivation you should rename the file %fileorig to %filedest or
+          grant writing privileges to the directory %dirname and to the file %fileorig and disabling and enabling the module again.', array('%dirname' => $dirname, '%fileorig' => $fileorig, '%filedest' => $filedest));
+      drupal_set_message($msg, 'error');
+    }
+    else {
+      rename($fileorig, $filedest);
+      if (_localizer_protect_directoryandfile($dirname, $filedest)) {
+        drupal_set_message(t('Localizer: all necessary changes to %file have been made. It has been set to read-only for security.', array('%file' => $filedest)));
+      }
+    }
+  }
+}
+
+function _localizer_access_translation($language) {
+  if (user_access('Localizer translation management: all')) return TRUE;
+  if (user_access('Localizer translation management: '. $language)) return TRUE;
+  return FALSE;
+}
+
+function localizer_init() {
+  $scriptname = basename($_SERVER['SCRIPT_NAME']);
+  if ($scriptname!='index.php') return;
+  if (function_exists('drupal_get_path')) {
+    if (variable_get('localizer_default_language', 'en') != localizer_get_language()) {
+      variable_set('localizer_default_language', localizer_get_default_language());
+    }
+    _localizer_change_language();
+    if (localizer_is_front_page() && localizer_exists_localized_content($_GET['q'], localizer_get_language())) {
+      $path = localizer_get_localized_path($_GET['q'], localizer_get_language());
+      $apath = drupal_lookup_path('source', $path);
+      $path = $apath? $apath : $path;
+      $_GET['q'] = $path;
+    }
+  }
+}
+
+/**
+ * Set the initial language in the order : session, user preferences or browser detect
+ */
+if (module_exists('localizer')) {
+  function i18n_get_lang() {
+    global $user;
+
+    require_once(drupal_get_path('module', 'localizer') .'/includes/localizer.inc');
+    if (isset($_SESSION['current_locale'])) {
+      localizer_set_language($_SESSION['current_locale']);
+    }
+    else if ($user->uid) {
+      localizer_set_language($user->language);
+    }
+    else if (variable_get('localizer_detect_browser', TRUE)) {
+      localizer_set_language(localizer_get_browser_lang());
+    }
+    else {
+      localizer_set_language(localizer_get_default_language());
+    }
+    return localizer_get_language();
+  }
+}
+
+function localizer_form_alter($form_id, &$form) {
+  if ($form_id=='user_login' || $form_id=='user_login_block') {
+    $path = localizer_path_without_language($_GET['q']);
+
+    $destination = drupal_get_destination();
+    if ($destination) $destination = localizer_path_without_language($destination);
+    if (array_key_exists('#action', $form)) {
+      $form['#action'] = url($path, $destination);
+    }
+  }
+}
+
+function localizer_menu($may_cache) {
+  $items = array();
+
+  if (!$may_cache) {
+    if (function_exists('drupal_set_content')) {
+      require_once(drupal_get_path('module', 'localizer') .'/models/localizertranslation.php');
+      require_once(drupal_get_path('module', 'localizer') .'/includes/localizer.inc');
+
+      if (arg(0)=='admin' && arg(1)=='content' && arg(2)=='localizer' && arg(3)=='strings') {
+        require_once(drupal_get_path('module', 'localizer') .'/localizer.admin.inc');
+      }
+    }
+
+    if (is_numeric(arg(5))) {
+      $items[] = array(
+        'path' => 'admin/content/localizer/strings/delete',
+        'title' => t('Delete the translation string'),
+        'callback' => 'localizer_strings_delete',
+        'callback arguments' => array(arg(5)),
+        'access' => user_access('Localizer strings: delete translations'),
+        'type' => MENU_CALLBACK,
+      );
+    }
+  }
+  else {
+    $items[] = array(
+      'path' => 'admin/settings/localizer',
+      'title' => t('Localizer'),
+      'description' => t('Configure multilingual support'),
+      'callback' => 'drupal_get_form',
+      'callback arguments' => 'localizer_admin_settings',
+      'access' => user_access('administer site configuration'),
+      'type' => MENU_NORMAL_ITEM);
+
+    $items[] = array(
+      'path' => 'admin/content/localizer/strings',
+      'title' => t('Localizer strings translation'),
+      'description' => t('Manage Localizer strings translations'),
+      'callback' => 'localizer_strings',
+      'access' => user_access('Localizer strings: administer translations'),
+      'weight' => 18,
+      'type' => MENU_NORMAL_ITEM);
+  }
+  return $items;
+}
+
+function localizer_admin_settings() {
+  $languages = localizer_supported_languages();
+
+  $form['languageswitchblock'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Language switching block'),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+  );
+
+  $form['languageswitchblock']['localizer_switchblock_hidecurrentlanguage'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Hide the current language'),
+    '#default_value' => variable_get('localizer_switchblock_hidecurrentlanguage', TRUE),
+  );
+
+  $form['languageswitchblock']['localizer_switchblock_showlangname'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show the language name'),
+    '#default_value' => variable_get('localizer_switchblock_showlangname', TRUE),
+  );
+
+  $form['languageswitchblock']['localizer_switchblock_showflags'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show flag'),
+    '#default_value' => variable_get('localizer_switchblock_showflags', TRUE),
+  );
+
+  $form['languageswitchblock']['localizer_switchblock_flagseparator'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Flag and language name separator'),
+    '#default_value' => variable_get('localizer_switchblock_flagseparator', ' '),
+    '#size' => 5,
+    '#maxlength' => 10,
+    '#description' => t('Token separating the flag and the language name.'),
+  );
+
+  $form['languageswitchblock']['localizer_switchblock_flagspath'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Flag icons path'),
+    '#default_value' => variable_get('localizer_switchblock_flagspath', drupal_get_path('module', 'localizer') .'/flags/*.png'),
+    '#size' => 50,
+    '#maxlength' => 180,
+    '#description' => t('Path for flag icons, relative to Drupal installation. \'*\' is a placeholder for language code.'),
+  );
+
+  $form['languageswitchblock']['localizer_switchblock_flagsize'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Flag icons size'),
+    '#default_value' => variable_get('localizer_switchblock_flagsize', '16x11'),
+    '#size' => 10,
+    '#maxlength' => 10,
+    '#description' => t('Image size for flags, in the form "width x height".'),
+  );
+
+  $form['languagedetect'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Language initial detection options'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $form['languagedetect']['localizer_detect_browser'] = array(
+    '#type' => 'checkbox',
+    '#title' => t("Detect through browser's language"),
+    '#default_value' => variable_get('localizer_detect_browser', TRUE),
+  );
+
+  $form['languageswitch'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Language switching options'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $form['languageswitch']['byhostname'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('By hostname'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+  );
+  $form['languageswitch']['byhostname']['localizer_switch_byhostname'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Switch by hostname'),
+    '#default_value' => variable_get('localizer_switch_byhostname', FALSE),
+    '#description' => t('If this option is active all the other switching options will be ignored.'),
+  );
+  foreach ($languages as $l => $n) {
+    $form['languageswitch']['byhostname']['localizer_switch_hostname_'. $l] = array(
+      '#type' => 'textfield',
+      '#default_value' => variable_get('localizer_switch_hostname_'. $l , $l .'.'. localizer_get_domain()),
+      '#title' => t('@hostname hostname', array('@hostname' => $n)),
+    );
+  }
+
+  $form['languageprefix'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Language prefix'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $form['languageprefix']['localizer_default_no_prefix'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Do not add language prefix on the site default language'),
+    '#default_value' => variable_get('localizer_default_no_prefix', true),
+  );
+
+  $form['languageprefix']['localizer_content_language_prefix'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Automatically append language prefix to all content (node) pages'),
+    '#default_value' => variable_get('localizer_content_language_prefix', true),
+  );
+
+  $form['languageprefix']['localizer_language_prefix_on_translation'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Append language prefix on new content (node) translations'),
+    '#default_value' => variable_get('localizer_language_prefix_on_translation', false),
+  );
+
+  $options = array(
+    0 => t('Apply on every page except the listed pages.'),
+    1 => t('Apply on only the listed pages.'),
+    2 => t('Show if the following PHP code returns TRUE (PHP-mode, experts only).')
+  );
+  $description = t("Enter one page per line as Drupal paths. The '*' character is a wildcard. Example paths are %blog for the blog page and %blog-wildcard for every personal blog. %front is the front page.", array('%blog' => 'blog', '%blog-wildcard' => 'blog/*', '%front' => '<front>'));
+  $description .= ' '. t('If the PHP-mode is chosen, enter PHP code between %php. Note that executing incorrect PHP-code can break your Drupal site.', array('%php' => '<?php ?>'));
+  
+  $form['languageprefix']['localizer_language_prefix_options'] = array(
+    '#type' => 'radios',
+    '#title' => t('Append language prefix on specific pages'),
+    '#options' => $options,
+    '#default_value' => variable_get('localizer_language_prefix_options', 0),
+  );
+  
+  $form['languageprefix']['localizer_language_prefix_pages'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Pages'),
+    '#default_value' => variable_get('localizer_language_prefix_pages', ''),
+    '#description' => $description,
+  );
+
+  $form['content'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Content settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $form['content']['localizer_contents_types'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Content types'),
+    '#default_value' => variable_get('localizer_contents_types', array('page' => 'page', 'story' => 'story')),
+    '#options' => node_get_types('names'),
+    '#description' => t('Localizer support is enabled for each content type checked.')
+  );
+
+  $form['content']['localizer_fallback_support'] = array(
+    '#type' => 'checkbox',
+    '#title' => t("Activate content language fallback support"),
+    '#default_value' => variable_get('localizer_fallback_support', TRUE),
+  );
+
+  $form['content']['fallback'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Fallback languages order'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#theme' => 'localizer_fallback_languages',
+  );
+
+  $i=0;
+  foreach ($languages as $l => $n) {
+    $language_weight = variable_get("localizer_language_fallback_weight_" . $l, $i);
+    $form['content']['fallback']["localizer_language_fallback_weight_" . $l] = array(
+      '#title' => $n,
+      '#default_value' => $language_weight,
+      '#type' => 'weight',
+    );
+    $i++;
+  }
+
+  return system_settings_form($form);
+}
+
+function theme_localizer_fallback_languages($form) {
+  $header = array('language' => t('Language'), 'weight' => t('Weight'));
+  $rows = array();
+  foreach (element_children($form) as $key) {
+    if (substr($key, 0, 35)=='localizer_language_fallback_weight_') {
+      $title = $form[$key]['#title'];
+      unset($form[$key]['#title']);
+      $rows[] = array(
+        $title,
+        drupal_render($form[$key])
+      );
+    }
+  }
+  $attributes = array(
+    'style' => 'width: auto;',
+  );
+  $o = theme('table', $header, $rows, $attributes);
+  return $o;
+}
+
+/**
+ * Generate HTML for the localizer block
+ * @param op the operation from the URL
+ * @param delta offset
+ * @returns block HTML
+ */
+function localizer_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $block[0]['info'] = t('Language');
+      break;
+    case 'view':
+      if ($delta == 0) {
+        $block['subject'] = t('Language');
+        $block['content'] = localizer_block_switch_language();
+      }
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Generate HTML for language change
+ * @out prints HTML code on standard output
+ * @returns HTML code
+ */
+function localizer_block_switch_language($out=FALSE) {
+  $links = theme('localizer_block_switch_language_links', variable_get('localizer_switchblock_showflags', TRUE), variable_get('localizer_switchblock_showlangname', TRUE), variable_get('localizer_switchblock_flagseparator', ' '));
+  $output = theme('localizer_block_switch_language', $links);
+  if ($out) {
+    echo $output;
+  }
+  else {
+    return $output;
+  }
+}
+
+/**
+ * Create the links for the switching language block
+ * @param showflags shows the languages flags
+ * @param shownames shows the languages names
+ * @param separator text to use as separator between the flag and the name
+ * @returns links in HTML format
+ */
+function theme_localizer_block_switch_language_links($showflags=TRUE, $shownames=TRUE, $separator = ' ', $setcurrentactive=FALSE) {
+  global $base_path;
+  $languages = localizer_supported_languages();
+
+  foreach ($languages as $l => $n) {
+    if (variable_get('localizer_switchblock_hidecurrentlanguage', TRUE) && $l == localizer_get_language()) continue;
+
+    $langname_title = $shownames ? t($n): '';
+    $flag = $showflags ? localizer_flag($l, 'localizer_switchblock', array('alt' => $n)) : '' ;
+    $separator = ($langname_title != '' && $flag != '') ? $separator : '';
+    $query = drupal_query_string_encode($_GET, array('q', 'language'));
+
+    if (variable_get('localizer_switch_byhostname', FALSE)) {
+      global $base_path;
+      $host = variable_get('localizer_switch_hostname_'. $l, $l .'.'. localizer_get_domain());
+      $path = localizer_get_localized_path($_GET['q'], $l);
+      
+      if (strtolower(substr($_SERVER['SERVER_PROTOCOL'],0, 5))=='https') {
+        $protocol = 'https://';
+      }
+      else {
+        $protocol = 'http://';
+      }
+
+      if (variable_get('clean_url', 0)) {
+        $url = $protocol . $host . $base_path . $path ;
+        if ($query) $url .= '?'. $query;
+      }
+      else {
+        $url = $protocol . $host . $base_path .'?q='. $path;
+        if ($query) $url .= '&'. $query;
+      }
+    }
+    else {
+      $path = $_GET['q'];
+      $is_content = false;
+      if (arg(0)=='node' && arg(1) && is_numeric(arg(1))) {
+        $is_content = true;
+      }
+      
+      if (localizer_is_front_page()){
+        if ($l==variable_get('localizer_default_language', 'en') &&
+          variable_get('localizer_default_no_prefix', true)) {
+          $path = '';
+        }
+        else {
+          $path = $l;
+        }
+      }
+      else {
+        if ($is_content) {
+          $path = localizer_get_localized_path($path, $l);
+        }
+        if (!$is_content || variable_get('localizer_content_language_prefix', true) ||
+          $is_content && !localizer_exists_localized_content($path, $l)) {
+          if (_localizer_append_language_prefix($_REQUEST['q'])) {
+            if($l==variable_get('localizer_default_language', 'en') &&
+              variable_get('localizer_default_no_prefix', true)) {
+            }
+            else {
+              $path = $l .'/'. $path;
+            }
+          }
+          else {
+            if ($query) $query .= '&';
+            $query .= 'language='. $l;
+          }
+        }
+      }
+
+      if (variable_get('clean_url', 0)) {
+        $url = $base_path . $path ;
+        if ($query) $url .= '?'. $query;
+      }
+      else {
+        $url = $base_path .'?q='. $path;
+        if ($query) $url .= '&'. $query;
+      }
+    }
+    if ($l==localizer_get_language() && $setcurrentactive) {
+      $links[$l]= '<a href="'. $url .'" class="currentuilanguage active" >'. $flag . $separator . $langname_title .'</a>';
+    }
+    else {
+      $links[$l]= '<a href="'. $url .'" class="uilanguage" >'. $flag . $separator . $langname_title .'</a>';
+    }
+}
+  return $links;
+}
+
+/**
+ * Create the HTML a language's flag
+ * @param lang the language of the flag
+ * @param attribs additional attributes
+ * @returns HTML code
+ */
+function localizer_flag($lang, $block='', $attribs = array()) {
+  if ($path = variable_get($block .'_flagspath', drupal_get_path('module', 'localizer') .'/flags/*.png')) {
+    $src = base_path() . str_replace('*', $lang, $path);
+    list($width, $height) = explode('x', variable_get($block .'_flagsize', '16x11'));
+    $attribs = array_merge(array('class' => 'localizer-flag', 'width' => $width, 'height' => $height, 'alt' => $lang), $attribs);
+    $html = "<img src=\"$src\" ". drupal_attributes($attribs) ." />";
+    return $html;
+  }
+}
+
+function _localizer_change_language() {
+  $old_language = localizer_get_language();  
+  
+  if (variable_get('localizer_switch_byhostname', FALSE)) {
+    $currenthost = $_SERVER['HTTP_HOST'];
+    $languagebyhostname = localizer_language_by_hostname($currenthost);
+    if (localizer_isvalid_language($languagebyhostname)) {
+      localizer_set_language($languagebyhostname);
+    }
+    return;
+  }
+
+  $is_content = false;
+  if (arg(0)=='node' && arg(1) && is_numeric(arg(1))) {
+    if (module_exists('localizernode')) {
+      $content_language = localizernode_get_content_language($_GET['q']);
+      if (localizer_isvalid_language($content_language)) {
+        localizer_set_language($content_language);
+      }
+    }
+    $is_content = true;
+  }
+
+  $language_in_path = localizer_language_in_path($_REQUEST['q']);
+  if (localizer_isvalid_language($language_in_path)) {
+    localizer_set_language($language_in_path);
+  }
+  if (!$language_in_path  && (localizer_get_language()==$old_language)) {
+    localizer_set_language(localizer_get_default_language());
+  }
+
+  if (array_key_exists('language', $_GET) && localizer_isvalid_language($_GET['language'])) {
+    localizer_set_language($_GET['language']);
+  }
+ 
+  if ((variable_get('localizer_content_language_prefix', true) ||
+  localizer_is_front_page() || !$is_content) && !$language_in_path &&
+  $_SERVER['REQUEST_METHOD']=='GET') {
+    if(localizer_get_language()==variable_get('localizer_default_language', 'en') &&
+       variable_get('localizer_default_no_prefix', true)) {
+    }
+    else {
+      if (_localizer_append_language_prefix($_REQUEST['q'])) _localizer_redirect_with_language();
+    }
+  }
+}
+
+function _localizer_redirect_with_language() {
+  global $base_path;
+  
+  $query = drupal_query_string_encode($_GET, array('q'));
+      
+  $path = localizer_path_without_language($_REQUEST['q']);
+  if ($path) {
+    $path = localizer_get_language() .'/'. $path;
+  }
+  else {
+    $path = localizer_get_language();
+  }
+      
+  if (variable_get('clean_url', 0)) {
+    $destination = $base_path . $path ;
+    if ($query) $destination .= '?'. $query;
+  }
+  else {
+    $destination = $base_path .'?q='. $path ;
+    if ($query) $destination .= '&'. $query;
+  }
+    
+  module_invoke_all('exit', $destination);
+  session_write_close();
+  header('Location: '. $destination, TRUE, 302);
+  exit();
+}
+
+function _localizer_append_language_prefix($path, $append_language=true) {
+  $pages = variable_get('localizer_language_prefix_pages', '');
+  if ($pages) {
+    $visibility = variable_get('localizer_language_prefix_options', 0);
+    if ($visibility < 2) {
+      $regexp = '/^('. preg_replace(array('/(\r\n?|\n)/', '/\\\\\*/', '/(^|\|)\\\\<front\\\\>($|\|)/'), array('|', '.*', '\1'. preg_quote(variable_get('site_frontpage', 'node'), '/') .'\2'), preg_quote($pages, '/')) .')$/';
+      // Compare with the internal and path alias (if any).
+      $page_match = preg_match($regexp, $path);
+      if ($path != $_GET['q']) {
+        $page_match = $page_match || preg_match($regexp, $_GET['q']);
+      }
+      // When $block->visibility has a value of 0, the block is displayed on
+      // all pages except those listed in $block->pages. When set to 1, it
+      // is displayed only on those pages listed in $block->pages.
+      $page_match = !($visibility xor $page_match);
+    }
+    else {
+      $page_match = drupal_eval($pages);
+    }
+    return $page_match;
+  }
+  else {
+    return $append_language;
+  }
+}
+
+function theme_localizer_block_switch_language($links) {
+  return theme('item_list', $links);
+}
+
+/**
+ * Return the language contained in the path
+ */
+function localizer_language_in_path($path) {
+  $exploded_path = explode('/', $path);
+  $languageinpath = $exploded_path[0];
+  if (localizer_isvalid_language($languageinpath)) {
+    return $languageinpath;
+  }
+  else {
+    return '';
+  }
+}
+
+function localizer_language_by_hostname($hostname) {
+  $languagebyhostname = '';
+  foreach (localizer_supported_languages() as $lang => $language) {
+    $localizer_hostname = variable_get('localizer_switch_hostname_'. $lang, $lang .'.'. localizer_get_domain());
+    if ($hostname == $localizer_hostname) {
+      $languagebyhostname = $lang;
+      break;
+    }
+  }
+  return $languagebyhostname;
+}
+
+function localizer_hostname_without_language($host) {
+  $exploded_host = explode('.', $host);
+  $languageinhost = $exploded_host[0];
+  if (localizer_isvalid_language($languageinhost) || ($languageinhost == 'www')) {
+    array_shift($exploded_host);
+    return implode(".", $exploded_host);
+  }
+  else {
+    return $host;
+  }
+}
+
+function localizer_get_host() {
+  static $host;
+
+  if (!isset($host)) {
+    global $base_url;
+    $parts = parse_url($base_url);
+    $host = ($parts['host']);
+  }
+  return $host;
+}
+
+function localizer_get_domain() {
+  static $domain;
+
+  if (!isset($domain)) {
+    $host_parts = explode('.', localizer_get_host());
+    $host_parts = array_reverse($host_parts);
+    if ($host_parts[1]) {
+      $domain = $host_parts[1] .'.'. $host_parts[0];
+    }
+    else {
+      return $host_parts[0];
+    }
+  }
+
+  return $domain;
+}
+
+function localizer_get_browser_lang() {
+  $languages = localizer_supported_languages();
+
+  // Code taken from Drupal 6
+  // Specified by the user via the browser's Accept Language setting
+  // Samples: "hu, en-us;q=0.66, en;q=0.33", "hu,en-us;q=0.5"
+  $browser_langs = array();
+
+  if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+    $browser_accept = explode(",", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+    for ($i = 0; $i < count($browser_accept); $i++) {
+      // The language part is either a code or a code with a quality.
+      // We cannot do anything with a * code, so it is skipped.
+      // If the quality is missing, it is assumed to be 1 according to the RFC.
+      if (preg_match("!([a-z-]+)(;q=([0-9\\.]+))?!", trim($browser_accept[$i]), $found)) {
+        $browser_langs[$found[1]] = (isset($found[3]) ? (float) $found[3] : 1.0);
+      }
+    }
+  }
+
+  // Order the codes by quality
+  arsort($browser_langs);
+
+  // Try to find the first preferred language we have
+  foreach ($browser_langs as $langcode => $q) {
+    if (array_key_exists($langcode, $languages)) return $langcode;
+  }
+
+  return localizer_get_default_language();
+}
+

@@ -1,0 +1,41 @@
+<?php
+// $Id: nodetemplate.install,v 1.2.4.4 2007/07/29 17:59:14 motou Exp $
+
+/**
+ * Implementation of hook_install()
+ */
+function nodetemplate_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {node_template} (
+          nid int(10) unsigned NOT NULL,
+          is_template tinyint(1) NOT NULL default '0',
+          shared tinyint(1) NOT NULL default '0',
+          PRIMARY KEY (nid)
+      ) TYPE=MyISAM /*!40100 DEFAULT CHARACTER SET utf8 */;");  
+      break;
+    case 'pgsql':
+      db_query("CREATE TABLE {node_template} (
+          nid serial CHECK (nid >= 0),
+          is_template integer NOT NULL default '0' CHECK (is_template >= 0),
+          shared integer NOT NULL default '0' CHECK (shared >= 0),
+          PRIMARY KEY (nid)
+        )");
+
+      // Pgsql requires keys and indexes to be defined separately.
+      // It's important to name the index as {tablename}_fieldname_idx
+      // (the trailing _idx!) so update scripts can be written easily
+      db_query("CREATE INDEX {node_template}_nid_idx
+                ON {node_template} (nid)");
+      break;
+  }
+  drupal_set_message(t('node template has created the required tables.'));
+}
+
+/**
+ * Updates
+ */
+function nodetemplate_update_1() {
+  return _system_update_utf8(array('nodetemplate'));
+}

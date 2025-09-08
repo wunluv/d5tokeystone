@@ -1,0 +1,173 @@
+<?php
+/**
+ * @file
+ * Views-enables aggregation.module.
+ * mostly ripped from simplefeed
+ */
+
+/**
+ * Implementation of hook_views_tables().
+ */
+function aggregation_views_views_tables() {
+  $voc->vid=2;
+
+  $tables['aggregation_item'] = array(
+    'name' => 'aggregation_item',
+    'join' => array(
+      'left' => array(
+        'table' => 'node',
+        'field' => 'nid'
+      ),
+      'right' => array(
+        'field' => 'nid'
+      )
+    ),
+    'fields' => array(
+      'original_author' => array(
+        'name' => t('Aggregation: original author'),
+        'sortable' => TRUE,
+        'help' => t('original author of feed item.')
+      ),
+      'url' => array(
+        'name' => t('Aggregation: URL'),
+        'help' => t('The URL to the original page for this feed item.')
+      )
+    ),
+    'sorts' => array(
+      'original_author' => array(
+        'name' => t('Aggregation: Original Author'),
+        'help' => t('Sort by the original author')
+	)
+    ),
+    'filters' => array(
+      'original_author' => array(
+        'name' => t('Aggregation: Original Author'),
+        'operator' => 'views_handler_operator_like',
+        'handler' => 'views_handler_filter_like',
+        'help' => t('This allows feed items to be filtered by their original author.'),
+      ),
+      'fid' => array(
+        'name' => t('Aggregation: Parent Feed'),
+	'value-type' => 'array',
+	'value' => array('#type' => 'select',
+			 '#options' => '_aggregation_views_feeds_list',
+			 '#multiple' => true
+			 ),
+	
+        'operator' => 'views_handler_operator_andor',
+        'help' => t('This allows feed items to be filtered by their parent feed.'),
+      ),
+    )    
+  );          
+   
+  // reference the node table using an alias table name
+  $tables['aggregation_feed_parent_node'] = array(
+    'name' => 'node',
+    'provider' => 'internal',
+    'join' => array(
+      'left' => array(
+        'table' => 'aggregation_item',
+        'field' => 'fid'
+      ),
+      'right' => array(
+        'field' => 'nid'
+      )
+    ),
+    'fields' => array(
+      'title' => array(
+        'name' => t('Aggregation: Parent Feed Title'),
+        'handler' => array(
+          'aggregation_views_handler_field_feed_parent_title'    => t('As Link'),
+          'aggregation_views_handler_field_feed_parent_title_nl' => t('Without Link'),
+        ),
+        'addlfields' => array('nid'),
+        'help' => t('Display the title of the parent feed node.'),
+      ),
+    ),
+    'sorts' => array(
+      'title' => array(
+        'name' => t('Aggregation: Parent Feed Title'),
+        'help' => t('Sort by the title of the parent feed node.'),
+      ),
+    ),
+  );
+  
+  return $tables;
+}
+   
+       
+/**
+ * Implementation of hook_views_arguments().
+ */
+function aggregation_views_views_arguments() {
+  $arguments = array(
+    'aggregation_feed_parent' => array(
+      'name' => t('Aggregation: Parent Feed Node ID'),
+      'handler' => 'aggregation_views_handler_arg_feed_parent',
+      'help' => t('This argument will find all feed items for the specified feed node id.'),
+    ),
+  );
+  return $arguments;
+}
+
+
+/**
+ * Pass in a URL argument to find all feed items for a specific feed node id.
+ */
+function aggregation_views_handler_arg_feed_parent($op, &$query, $a1, $a2 = '') {
+  switch ($op) {                                                
+    case 'summary':
+      $query->ensure_table('aggregation_feed_parent_node');
+      $query->add_field('nid');
+      $query->add_field('fid', 'aggregation_item');
+      $query->add_field('title', 'aggregation_feed_parent_node');
+      $query->add_field('nid', 'aggregation_feed_parent_node', 'fpnid');
+      $query->add_where('aggregation_feed_parent_node.nid IS NOT NULL');
+      $fieldinfo['field'] = 'aggregation_feed_parent_node.title';
+      return $fieldinfo;
+    case 'sort':
+      $query->add_orderby('aggregation_feed_parent_node', 'title', $a1);
+      break;
+    case 'filter':
+      $query->ensure_table('aggregation_item');
+      $query->add_where('aggregation_item.fid = %d', $a2);
+      $query->add_where('aggregation_item.nid = node.nid');
+      break;
+    case 'link':
+      $query->num_nodes .= format_plural($query->num_nodes, ' item', ' items');
+      return l($query->title, "$a2/$query->fpnid");
+    case 'title':   
+      if ($query) {
+        $title = db_result(db_query('SELECT title FROM {node} WHERE nid = %d', $query));
+        return check_plain($title);
+      }
+  }
+}    
+
+
+/*
+ * Format a field as a link to the book parent node
+ */
+function aggregation_views_handler_field_feed_parent_title($fieldinfo, $fielddata, $value, $data) {
+  return l($value, "node/$data->aggregation_feed_parent_node_nid");
+}
+
+function aggregation_views_handler_field_feed_parent_title_nl($fieldinfo, $fielddata, $value, $data) {
+  return check_plain($value);
+}              
+
+
+/**
+ * option list to filter feed items based on parent feed.
+ */
+function _aggregation_views_feeds_list() {
+  $options = array();
+  $result = db_query("SELECT nid,title FROM {node} WHERE type='aggregation_feed' ORDER BY title");
+  while ($obj = db_fetch_object($result)) { 
+    $options[$obj->nid] = "$obj->title";
+  }
+  return $options;
+}
+
+
+

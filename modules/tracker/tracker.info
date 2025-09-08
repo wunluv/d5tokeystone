@@ -1,0 +1,11 @@
+name = Tracker
+description = Enables tracking of recent posts for users.
+dependencies = comment
+package = Core - optional
+version = VERSION
+
+; Information added by drupal.org packaging script on 2013-09-30
+version = "5.23+3-dev"
+project = "drupal"
+datestamp = "1380570434"
+

@@ -1,0 +1,10 @@
+; $Id: session_expire.info,v 1.1 2007/11/05 14:17:49 kbahey Exp $
+name = Session Expire
+description = Expires rows from the session table older than a certain time.
+
+
+; Information added by drupal.org packaging script on 2008-03-08
+version = "5.x-1.0"
+project = "session_expire"
+datestamp = "1205004910"
+

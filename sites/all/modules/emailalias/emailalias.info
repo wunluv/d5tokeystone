@@ -1,0 +1,6 @@
+; $Id: emailalias.module,v 0.0.0.1 2008/07/16 08:13:00 dagmar Exp $
+name = Email Alias
+description = Allows users to define a email alias to the emails that sends the drupal site
+package = Other
+version = "5.x-0.1"
+

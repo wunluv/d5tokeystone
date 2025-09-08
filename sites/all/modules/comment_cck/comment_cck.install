@@ -1,0 +1,33 @@
+<?php
+// $Id: comment_cck.install,v 1.1 2007/09/08 17:54:45 dmitrig01 Exp $
+
+/**
+ * Implementation of hook_install().
+ */
+function comment_cck_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {comment_cck_revisions} (
+        cid int NOT NULL,
+        vid int NOT NULL,
+        nid int NOT NULL,
+        previous_vid int NOT NULL,
+        PRIMARY KEY (vid)
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
+      
+      break;
+
+    case 'pgsql':
+      // TODO: write this
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function comment_cck_uninstall() {
+  db_query('DROP TABLE {comment_cck_revisions}');
+  variable_del('comment_cck_block_author_fields');
+}

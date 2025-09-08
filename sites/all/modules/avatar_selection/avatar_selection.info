@@ -1,0 +1,11 @@
+; $Id: avatar_selection.info,v 1.1.2.2.2.1 2008/07/07 12:35:51 snpower Exp $
+name = Avatar Selection
+description = "Manages configuration of a default list of avatar icons that a
+user can use instead of uploading a picture."
+dependencies = jquery_update
+
+; Information added by drupal.org packaging script on 2009-07-22
+version = "5.x-2.9"
+project = "avatar_selection"
+datestamp = "1248252903"
+

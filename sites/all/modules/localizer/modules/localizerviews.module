@@ -1,0 +1,119 @@
+<?php
+// $Id
+
+include_once(drupal_get_path('module', 'localizer') .'/includes/localizer.inc');
+
+function localizerviews_views_tables() {
+  $tables['localizernode'] = array(
+    "name" => "localizernode",
+    "join" => array(
+      "left" => array(
+        "table" => "node",
+        "field" => "nid"
+      ),
+      "right" => array(
+        "field" => "nid"
+      ),
+    ),
+    "fields" => array(
+      "language" => array(
+        'name' => "Node : Language",
+        'handler' => 'views_handler_localizer_language',
+        'option' => array(
+          '#type' => 'select',
+          '#options' => array(
+             'text_without_flag' => t('Text without flag'),
+             'text_with_flag' => t('Text with flag'),
+             'only_flag' => t('Only flag')
+          ),
+        ),
+        'sortable' => true,
+        'addlfields' => array("language")
+      ),
+    ),
+    "sorts" => array(
+      "name" => array('language' => "Node : Language")
+    ),
+    "filters" => array(
+      "language" => array(
+        'name' => "Node : Language",
+        'operator' => array('is' => t('is')),
+        'list' => "localizer_supported_languages",
+        'handler' => "views_handler_localizer_filter_languages",
+      ),
+      "localizer_support" => array(
+        'name' => "Localizer : activate generic support",
+        'operator' => array('is' => t('is')),
+        'handler' => "views_handler_localizer_generic_support",
+        'list' => array('active' => t('Active'), 'inactive' => t('Inactive')),
+        'list-type' => 'select',
+      ),
+      "localizer_fallback" => array(
+        'name' => "Localizer : fallback support",
+        'operator' => array('is' => t('is')),
+        'handler' => "views_handler_localizer_fallback",
+        'list' => array('active' => t('Active'), 'inactive' => t('Inactive')),
+        'list-type' => 'select',
+      )
+    )
+  );
+  return $tables;
+}
+
+function views_handler_localizer_language($fieldinfo, $fielddata, $value, $data) {
+  $languages = localizer_supported_languages();
+  if ($fielddata['options'] == 'text_with_flag') {
+    $lang = $value;
+    $langname=t('@language', array('@language' => $languages[$value]));
+    $separator = variable_get('localizer_switchblock_flagseparator', ' ');
+    $flag = localizer_flag($lang, 'localizer_switchblock', array('alt' => $langname));
+    $separator = ($langname != '' && $flag != '') ? $separator : '';
+    return $flag . $separator . $langname;
+  }
+  else if ($fielddata['options'] == 'only_flag') {
+    $lang = $value;
+    $langname=t('@language', array('@language' => $languages[$value]));
+    $flag = localizer_flag($lang, 'localizer_switchblock', array('alt' => $langname));
+    return $flag;
+  }
+  else {
+    return t('@language', array('@language' => $languages[$value]));
+  }
+}
+
+function views_handler_localizer_filter_languages($op, $filter, $filterinfo, &$query) {
+  $languages_assql = '';
+  if ($filter['value']) {
+    if (is_array($filter['value'])) {
+      $values = $filter['value'];
+    }
+    else if (is_string($filter['value'])) {
+      $values = explode(',', $filter['value']);
+    }
+    foreach ($values as $key => $value) {
+      if ($languages_assql) $languages_assql .= ',';
+      $languages_assql .= "'$value'";
+    }
+  }
+
+  if ($languages_assql) {
+    $query->ensure_table("localizernode");
+    $query->add_where("localizernode.language IN (". $languages_assql .",'-') OR localizernode.language IS NULL");
+  }
+}
+
+function views_handler_localizer_generic_support($op, $filter, $filterinfo, &$query) {
+  if ($filter['value'] == 'active') {
+    $query->add_where("'applylocalizer'='applylocalizer'");
+  }
+}
+
+function views_handler_localizer_fallback($op, $filter, $filterinfo, &$query) {
+  if ($filter['value'] == 'active') {
+  }
+  else {
+    $query->add_where("'localizer_no_fallback'='localizer_no_fallback'");
+  }
+}
+
+

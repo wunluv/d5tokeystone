@@ -1,0 +1,12 @@
+; $Id $
+
+name = Classified Ads
+description = Add simple, text-based classified ads to your site.
+dependencies = taxonomy
+
+version = "$Name: DRUPAL-5--1-5 $"
+
+; Information added by drupal.org packaging script on 2007-02-26
+version = "5.x-1.5"
+project = "ed_classified"
+

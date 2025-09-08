@@ -1,0 +1,151 @@
+<?php
+// $Id: localizeruser.module,v 1.5.2.5 2008/07/15 13:58:20 robertogerola Exp $
+
+include_once(drupal_get_path('module', 'localizer') .'/includes/localizer.inc');
+include_once(drupal_get_path('module', 'localizer') .'/models/localizeruser.php');
+
+function localizeruser_user($op, &$edit, &$account, $category = NULL) {
+  if (function_exists('localizeruser_user_'. $op) && $category=='account') {
+    return call_user_func('localizeruser_user_'. $op, $edit, $account, $category);
+  }
+}
+
+function localizeruser_user_delete(&$edit, &$account, $category = NULL) {
+  localizeruser_delete($account->uid);
+}
+
+function localizer_user_insert(&$edit, &$account, $category = NULL) {
+  if (is_array($edit) && $edit['languages']) {
+    $fallbacklangorder = array();
+    foreach ($edit as $key => $value) {
+      if (substr($key, 0, 17)=='fallbacklangorder') {
+        $lang = substr($key, -2);
+        $fallbacklangorder[$lang] = $value;
+      }
+    }
+
+    $edit['languages'] = localizer_clear_languagesarray($edit['languages']);
+    $localizeruser = array('uid' => $account->uid, 'fallbacklangorder' => serialize($fallbacklangorder), 'languages' => serialize($edit['languages']));
+    localizeruser_save($localizeruser);
+
+    $account->fallbacklangorder = $fallbacklangorder;
+    $account->languages = $edit['languages'];
+  }
+
+  if ($edit['language']) {
+    global $user;
+    $languages = localizer_supported_languages();
+    if ($languages[$edit['language']] && ($user->uid==$account->uid)) {
+      localizer_set_language($edit['language']);
+    }
+  }
+}
+
+function localizeruser_user_update(&$edit, &$account, $category = NULL) {
+  if (is_array($edit) && $edit['languages']) {
+    global $user;
+    $fallbacklangorder = array();
+    foreach ($edit as $key => $value) {
+      if (substr($key, 0, 17)=='fallbacklangorder') {
+        $lang = substr($key, -2);
+        $fallbacklangorder[$lang] = $value;
+      }
+    }
+
+    $edit['languages'] = localizer_clear_languagesarray($edit['languages']);
+    $localizeruser = array('uid' => $account->uid, 'fallbacklangorder' => serialize($fallbacklangorder), 'languages' => serialize($edit['languages']));
+    localizeruser_save($localizeruser);
+
+    $account->fallbacklangorder = $fallbacklangorder;
+    $account->languages = $edit['languages'];
+
+    if ($account->uid == $user->uid) {
+      $user->fallbacklangorder = $fallbacklangorder;
+      $user->languages = $edit['languages'];
+    }
+  }
+
+  global $user;
+  if ($edit['language']) {
+    $languages = localizer_supported_languages();
+    if ($languages[$edit['language']] && ($user->uid==$account->uid)) {
+      localizer_set_language($edit['language']);
+    }
+  }
+}
+
+function localizeruser_user_login(&$edit, &$account, $category = NULL) {
+  $languages = localizer_supported_languages();
+  global $user;
+  if ($languages[$user->language]) {
+    localizer_set_language($user->language);
+  }
+}
+
+function localizeruser_user_load(&$edit, &$account, $category = NULL) {
+  $localizeruser = localizeruser_findbyuid($account->uid);
+  $account->fallbacklangorder = unserialize($localizeruser['fallbacklangorder']);
+  $account->languages = unserialize($localizeruser['languages']);
+}
+
+function localizeruser_user_form(&$edit, &$account, $category = NULL) {
+  $account->languages = localizer_clear_languagesarray($account->languages);
+  $languages = localizer_supported_languages_all();
+  $default_languages = array_keys($languages);
+
+  $form['locale']['languages'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Enabled languages'),
+    '#description' => 'Languages that should be available through the website',
+    '#options' => $languages,
+    '#default_value' => $account->languages? $account->languages: $default_languages,
+    '#weight' => 10,
+  );
+
+  if (variable_get('localizer_fallback_support', TRUE)) {
+    $form['locale']['localizer_fallback'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Content fallback languages order'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#theme' => 'localizeruser_fallback_languages',
+      '#weight' => 11,
+    );
+
+    if ($account->languages) $languages = array_intersect_key($languages, $account->languages);
+    foreach ($languages as $l => $n) {
+      if (array_key_exists($l, $languages)) {
+        $form['locale']['localizer_fallback']['fallbacklangorder_'. $l] = array(
+          '#prefix' => '<div class="container-inline">',
+          '#title' => $n,
+          '#type' => 'weight',
+          '#default_value' => $account->fallbacklangorder[$l],
+          '#suffix' => '</div>',
+        );
+      }
+    }
+  }
+  return $form;
+
+}
+
+function theme_localizeruser_fallback_languages($form) {
+  $header = array('title' => '', 'weight' => '');
+  $rows = array();
+  foreach (element_children($form) as $key) {
+    if (substr($key, 0, 18)=='fallbacklangorder_') {
+      $title = $form[$key]['#title'];
+      unset($form[$key]['#title']);
+      $rows[] = array(
+        $title,
+        drupal_render($form[$key])
+      );
+    }
+  }
+  $attributes = array(
+    'style' => 'width: auto;',
+  );
+  $o = theme('table', $header, $rows, $attributes);
+  return $o;
+}
+

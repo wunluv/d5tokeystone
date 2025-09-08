@@ -1,0 +1,292 @@
+# $Id: el.po,v 1.1.2.2 2007/08/02 00:09:53 goofyx Exp $
+# Greek translation of Drupal (gsitemap.module)
+# Copyright Vasileios Lourdas <lourdas_v@yahoo.gr>, 2007.
+# Generated from files:
+#  gsitemap.module,v 1.56.2.58 2007/05/07 02:22:23 darrenoh
+#  gsitemap.info,v 1.3.2.5 2007/05/06 16:31:34 darrenoh
+#
+# msgid ""
+msgstr ""
+"Project-Id-Version: el\n"
+"POT-Creation-Date: 2007-05-07 11:29-0400\n"
+"PO-Revision-Date: 2007-08-02 03:06+0300\n"
+"Last-Translator: Vasileios Lourdas <lourdas_v@yahoo.gr>\n"
+"Language-Team: Greek <el@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: gsitemap.module:16
+msgid "The following options allow you to alter the behavior of the XML Sitemap module. Your site map can be found at !url."
+msgstr "Οι παρακάτω επιλογές σάς επιτρέπουν να αλλάξετε τη συμπεριφορά της μονάδας XML Sitemap. Ο χάρτης ιστοτόπου σας υπάρχει στη διεύθυνση !url."
+
+#: gsitemap.module:37 gsitemap.info:0
+msgid "XML Sitemap"
+msgstr "XML Sitemap"
+
+#: gsitemap.module:38
+msgid "Adjust the settings used to generate your site map."
+msgstr "Διευθέτηση των ρυθμίσεων που χρησιμοποιούνται για τη δημιουργία του χάρτη ιστοτόπου σας."
+
+#: gsitemap.module:45
+msgid "Settings"
+msgstr "Ρυθμίσεις"
+
+#: gsitemap.module:50
+msgid "Additional links"
+msgstr "Πρόσθετοι σύνδεσμοι"
+
+#: gsitemap.module:51
+msgid "Specify additional pages to add to your site map."
+msgstr "Ορίστε πρόσθετες σελίδες που θέλετε να προσθέσετε στο χάρτη ιστοτόπου σας."
+
+#: gsitemap.module:59;558
+msgid "Site map index"
+msgstr "Κατάλογος χάρτη ιστοτόπου"
+
+#: gsitemap.module:67
+msgid "Google verification page"
+msgstr "Σελίδα επαλήθευσης του Google"
+
+#: gsitemap.module:78
+msgid "Site map !number"
+msgstr "Χάρτης ιστοτόπου !number"
+
+#: gsitemap.module:104
+msgid "XML Sitemap settings"
+msgstr "Ρυθμίσεις XML Sitemap"
+
+#: gsitemap.module:111
+msgid "Priority override"
+msgstr "Υπέρβαση προτεραιότητας"
+
+#: gsitemap.module:115
+msgid "Optionally override the site map priority for this post. The lowest priority is 0.0; the highest priority is 1.0. A priority of -1 will prevent this post from appearing in the site map."
+msgstr "Προαιρετικά υπέρβαση της προτεραιότητας του χάρτη ιστοτόπου για αυτή την καταχώριση. Η χαμηλότερη προτεραιότητα είναι 0.0· η υψηλότερη είναι 1.0. Προτεραιότητα με τιμή -1 θα προκαλέσει τη μη εμφάνιση αυτής της καταχώρισης στο χάρτη ιστοτόπου."
+
+#: gsitemap.module:205
+msgid "Priority must be a number between 0.0 and 1.0, inclusive, or -1 to prevent this node from appearing in the site map."
+msgstr "Η προτεραιότητα θα πρέπει να είναι αριθμός μεταξύ 0.0 και 1.0, συμπεριλαμβανομένων, ή -1 ώστε αυτός ο κόμβος να μην εμφανίζεται στο χάρτη ιστοτόπου."
+
+#: gsitemap.module:247
+msgid "Priority settings"
+msgstr "Ρυθμίσεις προτεραιότητας"
+
+#: gsitemap.module:252
+msgid "Front page priority"
+msgstr "Προτεραιότητα αρχικής σελίδας"
+
+#: gsitemap.module:256
+msgid "This is the absolute priority for the front page. Values can range between 0.0 and 1.0."
+msgstr "Αυτή είναι η απόλυτη προτεραιότητα για την αρχική σελίδα. Οι τιμές κυμαίνονται μεταξύ 0.0 και 1.0."
+
+#: gsitemap.module:260
+msgid "Promotion adjustment"
+msgstr "Διευθέτηση προβιβασμού"
+
+#: gsitemap.module:264
+msgid "This number will be added to the priority of each node that is promoted to the front page."
+msgstr "Αυτός ο αριθμός θα προστίθεται στην προτεραιότητα κάθε κόμβου που είναι προβιβασμένος στην αρχική σελίδα."
+
+#: gsitemap.module:268
+msgid "Comment ratio weight"
+msgstr "Βάρος λόγου σχολίου"
+
+#: gsitemap.module:272
+msgid "This number will be multiplied with the ratio of the number of comments on the node over the number of comments on the node with the most comments, i.e., this number will be added to the priority of the node with the most comments."
+msgstr "Αυτός ο αριθμός θα πολλαπλασιάζεται με το λόγο του αριθμού των σχολίων του κόμβου και του αριθμού των σχολίων του κόμβου με τα περισσότερα σχόλια. Ο αριθμός θα προστίθεται στην προτεραιότητα του κόμβου με τα περισσότερα σχόλια."
+
+#: gsitemap.module:275
+msgid "You can enter -1 in any of the following fields to prevent nodes of that type from appearing in the site map."
+msgstr "Μπορείτε να εισάγετε -1 σε οποιοδήποτε από τα παρακάτω πεδία για να αποτρέψετε τους κόμβους αυτού του τύπου να εμφανίζονται στο χάρτη ιστοτόπου."
+
+#: gsitemap.module:280
+msgid "%name adjustment"
+msgstr "Διευθέτηση %name"
+
+#: gsitemap.module:284
+msgid "This number will be added to the priority of nodes of type %name."
+msgstr "Αυτός ο αριθμός θα προστίθεται στην προτεραιότητα των κόμβων του τύπου %name."
+
+#: gsitemap.module:290
+msgid "Search engines"
+msgstr "Μηχανές αναζήτησης"
+
+#: gsitemap.module:296
+msgid "Google"
+msgstr "Google"
+
+#: gsitemap.module:300
+msgid "Submit site map to Google."
+msgstr "Υποβολή του χάρτη ιστοτόπου στο Google."
+
+#: gsitemap.module:305;326;341
+msgid "Submission URL"
+msgstr "Διεύθυνση URL υποβολής"
+
+#: gsitemap.module:307;328;343
+msgid "The URL to submit the site map to."
+msgstr "Η διεύθυνση URL που θα υποβληθεί ο χάρτης ιστοτόπου."
+
+#: gsitemap.module:311
+msgid "Verification link"
+msgstr "Σύνδεσμος επαλήθευσης"
+
+#: gsitemap.module:313
+msgid "In order to show statistics, Google will ask you to verify that you control this site by creating a page with a certain name. Enter that name here and the XML Sitemap module will hook that filename. Note that this will only work if you have clean URLs enabled."
+msgstr "Για την εμφάνιση στατιστικών, το Google θα σας ζητήσει να επιβεβαιώσετε ότι ελέγχετε τον ιστοτόπο σας με τη δημιουργία μιας σελίδας με ένα συγκεκριμένο όνομα. Εισάγετε εδώ το όνομα αυτό και η μονάδα του XML Sitemap θα προσθέσει το αρχείο αυτό. Πρέπει να σημειωθεί ότι αυτό θα δουλέψει μόνο αν έχετε καθαρές διευθύνσεις URL."
+
+#: gsitemap.module:317
+msgid "Yahoo"
+msgstr "Yahoo"
+
+#: gsitemap.module:321
+msgid "Submit site map to Yahoo."
+msgstr "Υποβολή του χάρτη ιστοτόπου στο Yahoo."
+
+#: gsitemap.module:332
+msgid "Ask.com"
+msgstr "Ask.com"
+
+#: gsitemap.module:336
+msgid "Submit site map to Ask.com."
+msgstr "Υποβολή του χάρτη ιστοτόπου στο Ask.com."
+
+#: gsitemap.module:347
+msgid "Submit site map when updated."
+msgstr "Υποβολή του χάρτη ιστοτόπου όταν ενημερώνεται."
+
+#: gsitemap.module:349
+msgid "If enabled, search engines will be notified of changes to the site map each time it is updated."
+msgstr "Αν είναι ενεργοποιημένο, οι μηχανές αναζήτησης θα ενημερώνονται για τις αλλαγές στο χάρτη ιστοτόπου όταν αυτός ενημερώνεται."
+
+#: gsitemap.module:353
+msgid "Submit site map on cron run."
+msgstr "Υποβολή του χάρτη ιστοτόπου κατά την εκτέλεση του cron."
+
+#: gsitemap.module:355
+msgid "If enabled, search engines will be notified of changes to the site map each time cron is run."
+msgstr "Αν είναι ενεργοποιημένο, οι μηχανές αναζήτησης θα ενημερώνονται για τις αλλαγές στο χάρτη ιστοτόπου όταν εκτελείται το cron."
+
+#: gsitemap.module:359
+msgid "Log accesses."
+msgstr "Καταγραφή των προσπελάσεων."
+
+#: gsitemap.module:361
+msgid "If enabled, a watchdog entry will be made each time the site map is accessed, containing information about the requestor."
+msgstr "Αν είναι ενεργοποιημένο, θα εισάγεται μια εγγραφή στο φύλακα κάθε φορά που προσπελαύνεται ο χάρτης ιστοτόπου και θα περιέχει πληροφορίες σχετικά με τον αιτών."
+
+#: gsitemap.module:366
+msgid "Other settings"
+msgstr "Άλλες ρυθμίσεις"
+
+#: gsitemap.module:372
+msgid "Chunk size"
+msgstr "Μέγεθος κομματιού"
+
+#: gsitemap.module:376
+msgid "This is the number of links to send at one time. Values can range between 1 and 50,000."
+msgstr "Αυτός είναι ο αριθμός των παραπομπών που θα αποστέλλονται μία φορά. Οι τιμές κυμαίνονται μεταξύ 1 και 50000."
+
+#: gsitemap.module:380
+msgid "Count comments in change date and frequency"
+msgstr "Καταμέτρηση των σχολίων στις ημερομηνίες αλλαγής και τη συχνότητα"
+
+#: gsitemap.module:382
+msgid "If enabled, the frequency of comments on a node will affect its change frequency and last modification date."
+msgstr "Αν είναι ενεργοποιημένο, η συχνότητα των σχολίων ενός κόμβου θα επηρεάζει τη συχνότητα αλλαγής του κόμβου και την ημερομηνία τελευταίας τροποποίησής του."
+
+#: gsitemap.module:386
+msgid "Include links to taxonomy term pages"
+msgstr "Συμπερίληψη των συνδέσμων στις σελίδες όρων ταξινομίας"
+
+#: gsitemap.module:388
+msgid "If enabled, links to taxonomy term pages will be included in the site map."
+msgstr "Αν είναι ενεργοποιημένο, θα συμπεριλαμβάνονται στο χάρτη ιστοτόπου οι σύνδεσμοι για τις σελίδες όρων ταξινομίας."
+
+#: gsitemap.module:392
+msgid "Include links to user profile pages"
+msgstr "Συμπερίληψη των συνδέσμων στις σελίδες των προφίλ χρηστών"
+
+#: gsitemap.module:394
+msgid "If enabled, links to user profile pages will be included in the site map (requires anonymous users to have \"access user profiles\" permission)."
+msgstr "Αν είναι ενεργοποιημένο, θα συμπεριλαμβάνονται στο χάρτη ιστοτόπου οι σύνδεσμοι για τις σελίδες των προφίλ χρηστών (απαιτεί την άδεια \"πρόσβαση σε προφίλ χρηστών\" για τους ανώνυμους χρήστες)."
+
+#: gsitemap.module:404
+msgid "Cannot send more than 50,000 links at one time."
+msgstr "Δεν είναι δυνατή η αποστολή περισσότερων από 50000 συνδέσμων σε μία φορά."
+
+#: gsitemap.module:428
+msgid "Pages"
+msgstr "Σελίδες"
+
+#: gsitemap.module:430
+msgid "Enter one page per line as Drupal paths. For example, if the URL is <em>http://example.com/node/1</em>, enter <em>node/1</em>."
+msgstr "Εισάγετε μία σελίδα ανά γραμμή ως διαδρομές του Drupal. Για παράδειγμα, αν η διεύθυνση URL είναι η <em>http://example.com/node/1</em>, εισάγετε <em>node/1</em>."
+
+#: gsitemap.module:436
+msgid "Additional links priority"
+msgstr "Προτεραιότητα πρόσθετων συνδέσμων"
+
+#: gsitemap.module:440
+msgid "This is the absolute priority for additional links. Values can range between 0.0 and 1.0. The default priority is 0.5."
+msgstr "Αυτή είναι η απόλυτη προτεραιότητα για τους πρόσθετους συνδέσμους. Οι τιμές κυμαίνονται μεταξύ 0.0 και 1.0. Η εξ' ορισμού προτεραιότητα είναι 0.5."
+
+#: gsitemap.module:447
+msgid "Priority must be between 0.0 and 1.0."
+msgstr "Η προτεραιότητα πρέπει να είναι μεταξύ 0.0 και 1.0."
+
+#: gsitemap.module:554
+msgid "Site map @chunk"
+msgstr "Χάρτης ιστοτόπου @chunk"
+
+#: gsitemap.module:574
+msgid "!sitemap downloaded by @user-agent at @address."
+msgstr "!sitemap λήφθηκε από @user-agent στη διεύθυνση @address."
+
+#: gsitemap.module:577
+msgid "!sitemap downloaded by Google."
+msgstr "!sitemap λήφθηκε από το Google."
+
+#: gsitemap.module:582
+msgid "Unable to load site map. Make sure your temporary directory exists and is writable by Drupal."
+msgstr "Δεν ήταν δυνατή η φόρτωση του χάρτη ιστοτόπου. Σιγουρευτείτε ότι υπάρχει ο προσωρινός κατάλογος και ότι είναι εγγράψιμος από το Drupal."
+
+#: gsitemap.module:1074
+msgid "Site map successfully submitted to Google."
+msgstr "Ο χάρτης ιστοτόπου υποβλήθηκε με επιτυχία στο Google."
+
+#: gsitemap.module:1077
+msgid "Error occurred submitting site map to Google: @code"
+msgstr "Σφάλμα κατά την υποβολή του χάρτη ιστοτόπου στο Google: @code"
+
+#: gsitemap.module:1083
+msgid "Site map successfully submitted to Yahoo."
+msgstr "Ο χάρτης ιστοτόπου υποβλήθηκε με επιτυχία στο Yahoo."
+
+#: gsitemap.module:1086
+msgid "Error occurred submitting site map to Yahoo: @code"
+msgstr "Σφάλμα κατά την υποβολή του χάρτη ιστοτόπου στο Yahoo: @code"
+
+#: gsitemap.module:1092
+msgid "Site map successfully submitted to Ask.com."
+msgstr "Ο χάρτης ιστοτόπου υποβλήθηκε με επιτυχία στο Ask.com."
+
+#: gsitemap.module:1095
+msgid "Error occurred submitting site map to Ask.com: @code"
+msgstr "Σφάλμα κατά την υποβολή του χάρτη ιστοτόπου στο Ask.com: @code"
+
+#: gsitemap.module:574;577;1074;1077;1083;1086;1092;1095;0
+msgid "gsitemap"
+msgstr "gsitemap"
+
+#: gsitemap.module:24
+msgid "override node priority"
+msgstr "υπέρβαση της προτεραιότητας του κόμβου"
+
+#: gsitemap.info:0
+msgid "Creates an XML site map in accordance with the sitemaps.org specification."
+msgstr "Δημιουργεί ένα χάρτη ιστοτόπου σε XML σύμφωνα με την προδιαγραφή του sitemaps.org."
+

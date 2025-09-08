@@ -1,0 +1,19 @@
+Requirements
+------------
+
+- Drupal 4.7.0 or higher
+
+
+Installation
+------------
+
+- Create a new directory "search_keywords" in your "modules" directory
+
+- Copy the following files to this directory:
+  search_keywords.module
+
+- Enable the module by navigating to administer -> modules
+
+- Grant the proper access to user accounts under administer -> access control
+
+- Navigate to administer -> logs -> keywords to view the statistics

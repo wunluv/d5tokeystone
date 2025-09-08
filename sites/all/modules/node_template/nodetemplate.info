@@ -1,0 +1,9 @@
+; $Id $
+name = Node Template
+description = "Allows users to duplicate an existing node and set it as a template."
+
+; Information added by drupal.org packaging script on 2007-09-03
+version = "5.x-1.9"
+project = "node_template"
+datestamp = "1188815713"
+

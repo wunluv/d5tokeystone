@@ -1,0 +1,37 @@
+<?php
+// $Id: views_bulk_operations.install,v 1.1.4.1 2008/08/05 13:06:09 kratib Exp $
+
+function views_bulk_operations_install() {
+  switch ($GLOBALS['db_type']) {
+  case 'mysql':
+  case 'mysqli':
+    db_query("CREATE TABLE {vbo_settings} (
+      name varchar(48) NOT NULL,
+      value longtext NOT NULL,
+      PRIMARY KEY (name)
+    ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
+    break;
+  }
+}
+
+function views_bulk_operations_update_1() {
+  $ret = array();
+  switch($GLOBALS['db_type']) {
+  case 'mysql':
+  case 'mysqli':
+    $ret[] = update_sql("CREATE TABLE {vbo_settings} (
+      name varchar(48) NOT NULL,
+      value longtext NOT NULL,
+      PRIMARY KEY (name)
+    ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
+    $ret[] = update_sql("INSERT INTO {vbo_settings} (name, value) SELECT {variable}.name, {variable}.value FROM {variable} WHERE {variable}.name LIKE 'views_bulk_operations%'");
+    $ret[] = update_sql("DELETE FROM {variable} WHERE name LIKE 'views_bulk_operations%'");
+    break;
+  }
+  return $ret;
+}
+
+function views_bulk_operations_uninstall() {
+  db_query("DROP TABLE {vbo_settings}");
+}
+

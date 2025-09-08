@@ -1,0 +1,6 @@
+; $Id: smileys.info,v 1.1.2.1 2006/11/25 20:11:15 Gurpartap Exp $
+name = Smileys
+description = Replaces smileys inside posts with images.
+package = Smileys
+; version added by drupal.org packaging script on 2006-11-25
+version = "5.x-1.1"

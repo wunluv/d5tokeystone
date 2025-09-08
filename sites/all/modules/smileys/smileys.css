@@ -1,0 +1,30 @@
+/* $Id: smileys.css,v 1.1 2006/11/16 08:24:20 Gurpartap Exp $ */
+
+#smileys {
+	position: relative;
+	padding: 6px 10px 6px 10px;
+}
+
+#smileys strong {
+	position: absolute;
+	left: 25px;
+	top: 6px;
+}
+
+#smileys span {
+	float: left;
+	width: 32px;
+	height: 28px;
+	text-align: center;
+}
+
+#smileys span span {
+	display: block;
+	float: none;
+	margin: 0 auto;
+	height: 22px;
+}
+
+.smiley-class {
+ cursor: pointer;
+}

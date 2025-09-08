@@ -1,0 +1,226 @@
+<?php
+// $Id: hs_menu.module,v 1.6.2.3 2008/11/29 22:57:06 wimleers Exp $
+
+/**
+ * @file
+ * Implementation of the Hierarchical Select API for the Menu module.
+ */
+
+
+//----------------------------------------------------------------------------
+// Drupal core hooks.
+
+/**
+ * Implementation of hook_menu().
+ */
+function hs_menu_menu($may_cache) {
+  $items = array();
+
+  if ($may_cache) {
+    $items[] = array(
+      'path'               => 'admin/settings/hierarchical_select/menu',
+      'title'              => t('Menu'),
+      'description'        => t('Hierarchical Select configuration for Menu'),
+      'callback'           => 'drupal_get_form',
+      'callback arguments' => array('hs_menu_admin_settings'),
+      'type'               => MENU_LOCAL_TASK,
+    );
+  }
+  return $items;
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function hs_menu_form_alter($form_id, &$form) {
+  if (isset($form['type']) && $form['type']['#value'] .'_node_form' == $form_id) {
+    // Content authoring form settings: "Restrict parent items to" setting.
+    $parent_mid = variable_get('menu_parent_items', 0);
+
+    _hs_menu_apply($form['menu']['pid'], NULL, $parent_mid);
+  }
+  
+  if ($form_id == 'menu_edit_item_form') {
+    $mid = (isset($form['mid'])) ? $form['mid']['#value'] : NULL;
+    _hs_menu_apply($form['pid'], $mid, NULL);
+  }
+}
+
+//----------------------------------------------------------------------------
+// Menu callbacks.
+
+/**
+ * Form definition; admin settings.
+ */
+function hs_menu_admin_settings() {
+  $form['hs_menu_resizable'] = array(
+    '#type' => 'radios',
+    '#title' => t('Resizable'),
+    '#description' => t(
+      "When enabled, a handle appears below the Hierarchical Select to allow
+      the user to dynamically resize it. Double clicking will toggle between
+      the smallest and a sane 'big size'."
+    ),
+    '#options' => array(
+      0 => t('Disabled'),
+      1 => t('Enabled'),
+    ),
+    '#default_value' => variable_get('hs_menu_resizable', 1),
+  );
+
+  return system_settings_form($form);
+}
+
+
+//----------------------------------------------------------------------------
+// Hierarchical Select hooks.
+
+/**
+ * Implementation of hook_hierarchical_select_params().
+ */
+function hs_menu_hierarchical_select_params() {
+  $params = array(
+    'mid',        // The mid of the given item. This item and its children will be excluded from the hierarchy.
+    'parent_mid', // The parent mid, if any. 0 for the entire hierarchy.
+  );
+  return $params;
+}
+
+/**
+ * Implementation of hook_hierarchical_select_root_level().
+ */
+function hs_menu_hierarchical_select_root_level($params) {
+  return hs_menu_hierarchical_select_children(0, $params);
+}
+
+/**
+ * Implementation of hook_hierarchical_select_children().
+ */
+function hs_menu_hierarchical_select_children($parent, $params) {
+  $children = array();
+  $mid = $params['mid'];
+  $pid = $parent;
+  $parent_mid = $params['parent_mid'];
+
+  if (!($parent_item = menu_get_item($pid))) {
+    return $children;
+  }
+  // Stop processing if there aren't any children.
+  else if (!isset($parent_item['children'])) {
+    return $children;
+  }
+
+  foreach ($parent_item['children'] as $child_mid) {
+    // Don't include the given item in the hierarchy!
+    if ($child_mid == $params['mid']) {
+      continue;
+    }
+
+    $child = menu_get_item($child_mid);
+    if ($child['type'] & (MENU_MODIFIABLE_BY_ADMIN | MENU_IS_ROOT)) {
+      $title = $child['title'];
+      if (!($child['type'] & MENU_VISIBLE_IN_TREE)) {
+        $title .= ' ('. t('disabled') .')';
+      }
+      $children[$child_mid] = $title;
+    }
+  }
+
+  // If this is the root level, it might contain the menu to which menu
+  // items are restricted. If it does contain it, remove all other menus.
+  if (isset($children[$parent_mid])) {
+    foreach ($children as $child_mid => $child) {
+      if ($child_mid != $parent_mid) {
+        unset($children[$child_mid]);
+      }
+    }
+  }
+
+  return $children;
+}
+
+/**
+ * Implementation of hook_hierarchical_select_lineage().
+ */
+function hs_menu_hierarchical_select_lineage($item, $params) {
+  $lineage = array($item);
+
+  while (TRUE) {
+    $pid = db_result(db_query("SELECT pid FROM {menu} WHERE mid = %d", $item));
+
+    // 0 is the root menu item, so if $pid == 0, the lineage is complete!
+    if ($pid == 0) {
+      break;
+    }
+
+    array_unshift($lineage, $pid);
+    $item = $pid;
+  }
+
+  return $lineage;
+}
+
+/**
+ * Implementation of hook_hierarchical_select_valid_item().
+ */
+function hs_menu_hierarchical_select_valid_item($item, $params) {
+  if (!is_numeric($item) || $item < 1) {
+    return FALSE;
+  }
+
+  $type = db_result(db_query("SELECT type FROM {menu} WHERE mid = %d", $item));
+
+  // mid 1 corresponds to the hardcoded "Navigation" menu.
+  return (($item == 1) || ($type & (MENU_MODIFIABLE_BY_ADMIN | MENU_IS_ROOT)));
+}
+
+/**
+ * Implementation of hook_hierarchical_select_item_get_label().
+ */
+function hs_menu_hierarchical_select_item_get_label($item, $params) {
+  static $labels = array();
+
+  if (!isset($labels[$item])) {
+    $labels[$item] = t(db_result(db_query("SELECT title FROM {menu} WHERE mid = %d", $item)));
+  }
+
+  return $labels[$item];
+}
+
+/**
+ * Implementation of hook_hierarchical_select_implementation_info().
+ */
+function hs_menu_hierarchical_select_implementation_info() {
+  return array(
+    'hierarchy type' => t('Menu'),
+    'entity type'    => t('N/A'),
+  );
+}
+
+
+//----------------------------------------------------------------------------
+// Private functions.
+
+function _hs_menu_apply(&$form, $mid, $parent_mid) {
+  unset($form['#options']);
+  $form['#type'] = 'hierarchical_select';
+  $form['#config'] = array(
+    'module' => 'hs_menu',
+    'params' => array(
+      'mid'        => $mid,
+      'parent_mid' => $parent_mid,
+    ),
+    'save_lineage'    => 0,
+    'enforce_deepest' => 0,
+    'resizable'       => variable_get('hs_menu_resizable', 1),
+    'level_labels' => array(
+      'status' => 0,
+    ),
+    'dropbox' => array(
+      'status' => 0,
+    ),
+    'editability' => array(
+      'status' => 0,
+    ),
+  );
+}

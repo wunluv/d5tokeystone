@@ -1,0 +1,122 @@
+<?php
+// $Id: localizer.install,v 1.7.2.6 2008/08/20 12:58:40 robertogerola Exp $
+
+function localizer_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {localizertranslation} (
+        tid INT(10) UNSIGNED NOT NULL,
+        object_key VARCHAR(100) NOT NULL,
+        object_name VARCHAR(700) NOT NULL,
+        object_field VARCHAR(100) NOT NULL,
+        translation VARCHAR(700) NOT NULL,
+        language VARCHAR(10) NOT NULL,
+        settings VARCHAR(100) NULL,
+        PRIMARY KEY (tid)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+    break;
+    case 'pgsql':
+      db_query("CREATE TABLE {localizertranslation} (
+        tid int4 NOT NULL ,
+        object_key VARCHAR(100) NOT NULL,
+        object_name VARCHAR(700) NOT NULL,
+        object_field VARCHAR(100) NOT NULL,
+        translation VARCHAR(700) NOT NULL,
+        language VARCHAR(10) NOT NULL,
+        settings VARCHAR(100) NULL,
+        PRIMARY KEY (tid)
+      );");
+      db_query("CREATE SEQUENCE localizertranslation_tid_seq");
+    break;
+  }
+  db_query("UPDATE {system} SET weight = -10 WHERE name = 'localizer'");
+}
+
+function localizer_update_1() {
+  $items = array();
+  $items[] = update_sql("UPDATE {variable} SET name='localizer_usernodeslocales' WHERE name='localizer_usernodeslocale'");
+  $items[] = update_sql("UPDATE {variable} SET name='localizer_anonymousnodeslocales' WHERE name='localizer_anonymousnodeslocale'");
+  return $items;
+}
+
+function localizer_update_2() {
+  $items = array();
+  $items[] = update_sql("UPDATE {variable} SET name='localizer_usercontentlocales' WHERE name='localizer_usernodeslocales'");
+  $items[] = update_sql("UPDATE {variable} SET name='localizer_anonymouscontentlocales' WHERE name='localizer_anonymousnodeslocales'");
+  return $items;
+}
+
+function localizer_update_3() {
+  $items = array();
+
+  $items[] = update_sql("ALTER TABLE {localizertranslation} CHANGE tid tid INT(10) UNSIGNED NOT NULL");
+
+  $max_id = db_result(db_query("SELECT MAX(tid) FROM {localizertranslation}"));
+  if ($max_id) {
+    if (db_result(db_query("SELECT COUNT(*) FROM {sequences} WHERE name='localizertranslation_tid'")) > 0) {
+      $items[] = update_sql("UPDATE {sequences} SET id=%d WHERE name='localizertranslation_tid'", $max_id);
+    }
+    else {
+      $items[] = update_sql("INSERT INTO {sequences} (id, name) VALUES(%d, 'localizertranslation_tid')", $max_id);
+    }
+  }
+  return $items;
+}
+
+function localizer_update_4() {
+  $msg = t('Localizer: to complete the module activation you need now to append this line %line at the end of your settings.php file, before the closure tag.', array('%line' => "include_once('sites/all/modules/localizer/localizer_settings.php');"));
+  drupal_set_message("<div style='background-color: #6BBA70; padding: 5px;'>". $msg ."</div>", 'status');
+
+  $items = array();
+  $items[] = update_sql("DELETE FROM {variable} WHERE name LIKE 'localizer%'");
+  switch ($GLOBALS['db_type']) {
+  case 'mysql':
+  case 'mysqli':
+    $items[] = update_sql("ALTER TABLE {localizertranslation} CHANGE locale language VARCHAR(10)");
+    $items[] = update_sql("ALTER TABLE {localizertranslation} DROP INDEX localizertranslation_idx1");
+    $items[] = update_sql("ALTER TABLE {localizertranslation} CHANGE object_name object_name VARCHAR(700)");
+    $items[] = update_sql("ALTER TABLE {localizertranslation} CHANGE translation translation VARCHAR(700)");
+  break;
+  case 'pgsql':
+    $items[] = update_sql("ALTER TABLE {localizertranslation} RENAME COLUMN locale TO language");
+    $items[] = update_sql("ALTER TABLE {localizertranslation} RENAME COLUMN object_name TO object_name_old");
+    $items[] = update_sql("ALTER TABLE {localizertranslation} ADD COLUMN object_name VARCHAR(700)");
+    $items[] = update_sql("UPDATE {localizertranslation} SET object_name = CAST(object_name_old AS VARCHAR(700))");
+    $items[] = update_sql("ALTER TABLE {localizertranslation} ALTER COLUMN object_name SET NOT NULL");
+    $items[] = update_sql("ALTER TABLE {localizertranslation} DROP COLUMN object_name_old;");
+    $items[] = update_sql("ALTER TABLE {localizertranslation} RENAME COLUMN translation TO translation_old");
+    $items[] = update_sql("ALTER TABLE {localizertranslation} ADD COLUMN translation VARCHAR(700)");
+    $items[] = update_sql("UPDATE {localizertranslation} SET translation = CAST(translation_old AS VARCHAR(700))");
+    $items[] = update_sql("ALTER TABLE {localizertranslation} ALTER COLUMN translation SET NOT NULL");
+    $items[] = update_sql("ALTER TABLE {localizertranslation} DROP COLUMN translation_old");
+  break;
+  }
+
+  $items[] = update_sql("UPDATE {system} SET filename='modules/block/block.module' WHERE name LIKE 'block'");
+  $items[] = update_sql("UPDATE {system} SET weight = -10 WHERE name = 'localizer'");
+  return $items;
+}
+
+function localizer_update_5() {
+  $items = array();
+  $items[] = update_sql("ALTER TABLE {localizertranslation} ADD COLUMN settings VARCHAR(100) NULL");
+  return $items;
+}
+
+function localizer_uninstall() {
+  if (file_exists('sites/all/modules/localizer/taxonomy/taxonomy.module')) {
+    rename('sites/all/modules/localizer/taxonomy/taxonomy.module', 'sites/all/modules/localizer/taxonomy/taxonomy.module.off');
+  }
+  if (file_exists('sites/all/modules/localizer/menu/menu.module')) {
+    rename('sites/all/modules/localizer/menu/menu.module', 'sites/all/modules/localizer/menu/menu.module.off');
+  }
+
+  db_query("DROP TABLE IF EXISTS {localizertranslation}");
+  db_query("DROP TABLE IF EXISTS {localizernode}");
+  db_query("DELETE FROM {variable} WHERE name LIKE 'localizer%'");
+  db_query("DELETE FROM {system} WHERE name LIKE 'localizer%'");
+  db_query("UPDATE {system} SET filename='modules/taxonomy/taxonomy.module' WHERE name LIKE 'taxonomy'");
+  db_query("UPDATE {system} SET filename='modules/menu/menu.module' WHERE name LIKE 'menu'");
+}
+

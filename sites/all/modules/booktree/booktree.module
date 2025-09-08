@@ -1,0 +1,129 @@
+<?php
+// $Id: booktree.module,v 1.10 2007/09/30 20:48:24 uccio Exp $
+
+
+function booktree_help($section) {
+  switch ($section) {
+    case 'admin/modules#description':
+      // This description is shown in the listing at admin/modules.
+      return t('This module create a tree rappresentation of one book');
+    case 'booktree':
+      // Here is some help text for a custom page.
+      return t('A tree index of book.');
+  }
+}
+
+
+function booktree_perm() {
+  return array('access booktree');
+}
+
+
+function booktree_menu($may_cache) {
+  $items = array();
+
+  if ($may_cache) {
+    $items[] = array('path' => 'booktree', 'title' => t('booktree'),
+      'callback' => 'booktree_indice',
+      'access' => user_access('access booktree'));
+        
+    $items[] = array('path' => 'admin/settings/booktree',
+      'title' => t('Settings of BookTree'),
+      'type' => MENU_NORMAL_ITEM,
+	  'description' => t('Manage the tree-view of book.'),
+	  'callback' => 'drupal_get_form',
+      'callback arguments' => array('booktree_configure'),
+      'access' => user_access('administer site configuration'),
+      'weight' => 2,
+    );  
+ 	}
+	else {
+      $stylesheet = drupal_get_path('module','booktree') .'/booktree.css';
+      drupal_add_css($stylesheet);
+    }
+
+  return $items;
+}
+
+
+function booktree_configure() {
+  $form = array();
+  $form['booktree_start'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Root Node ID'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('booktree_start', 5),
+    '#description' => t('Start point of the tree (the root).')
+   
+  );
+  
+  $form['booktree_deep'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Deep Max'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('booktree_deep', 5),
+    '#description' => t('Max deep of the tree with the root.')
+   
+  );
+  $form['booktree_trim'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Trimmer'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('booktree_trim', 45),
+    '#description' => t('Max lenght of title.')
+   
+  );
+  return system_settings_form($form);
+ 
+}
+
+
+/*
+ * This will output the book from the start point specified in the
+ * arguments, or take the default in the configuration
+ * The arguments are in the order: start node/depth/max title length
+ * If only two arguments are present then the max title length is set to 256
+ */
+
+function booktree_indice() {
+
+  if (arg(1)) {
+    $booktree_start = arg(1);
+    arg(2) ? $maxricursione = arg(2)+2 : $maxricursione=variable_get('booktree_deep', 5)+2;
+    arg(3) ? $trimval = arg(3) : $trimval = 256;
+    }
+  else {
+    $booktree_start = variable_get('booktree_start', 1);
+    $maxricursione=variable_get('booktree_deep', 5)+2;
+    $trimval=variable_get('booktree_trim', 35);
+    }
+
+  $node = node_load(array('nid' => $booktree_start));
+  drupal_set_title($node->title);
+  $content = "<p>$node->body</p>";
+  $ricursione=1;
+  $content .= booktree_mostra_figli($node->nid,$node->title,$ricursione,$maxricursione,$trimval,$booktree_start);
+  print theme('page', $content);
+  
+ 
+    
+  }
+  
+function booktree_mostra_figli( $nid,$tit,$ricursione,$maxricursione,$trimval,$booktree_start ) {
+	if ($ricursione<$maxricursione)
+		{
+		$children = db_query(db_rewrite_sql('SELECT distinct n.nid, b.weight, n.title FROM {node} n INNER JOIN {book} b ON n.nid = b.nid and n.vid = b.vid WHERE b.parent = %d ORDER BY b.weight, n.title'), $nid);
+    if ($nid != $booktree_start) {
+    		  $content .= "<li class=\"booktree\">" . l(truncate_utf8($tit, $trimval, TRUE, TRUE),'node/'.$nid , $attributes = array(), $query = NULL, $fragment = NULL, $absolute = FALSE, $html = FALSE ) ."</li>";
+    		  }
+  		$content .="<ul class=\"booktree\">\n";
+  		$ricursione++;
+  		while ($child = db_fetch_object($children)) {
+  			  	$content .= booktree_mostra_figli($child->nid,$child->title,$ricursione,$maxricursione,$trimval,$booktree_start);}
+  		$content .="</ul>\n";
+		return $content;}
+	else {
+		 return '';
+		 }
+	}
+?>

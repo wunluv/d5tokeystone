@@ -1,0 +1,61 @@
+<?php
+// $Id: InsertNode.module,v 1.3 2009/10/23 11:21:59 markfoodyburton Exp $
+// Author: Mark Burton
+
+
+function _InsertNode_replacer($matches) {
+  if (is_numeric($matches[1])) {
+    $nid=$matches[1];
+  } else {
+    $path=explode("/",drupal_get_normal_path(rtrim(ltrim($matches[1],"/"),"/")));
+    if ($path && ($path[0]=='node') && is_numeric($path[1])) {
+      $nid=$path[1];
+    } else {
+      return "<em>".t("Can't find @s to include!</em>",array("@s"=>$matches[1]))."</em>";
+    }
+  }
+  
+  $node=node_load(array('nid'=>$nid));
+  if ($nid && node_access('view',$node)) {
+    switch ($matches[2]) {
+      case 'body':
+        return check_markup($node->body, $node->format, FALSE);
+      case 'teaser':
+        return check_markup($node->teaser, $node->format, FALSE);
+      case 'link':
+        return l($node->title, "node/$node->nid");
+      case 'collapsed':
+        return theme('fieldset', array('#collapsible'=>true, '#collapsed'=>true, '#title'=>$node->title, '#value'=>$node->body));
+      default:
+        return node_view($node);
+    }
+  } else {
+    return '';
+  }
+  
+}
+
+
+function InsertNode_filter($op, $delta = 0, $format = -1, $text = '') {
+    switch ($op) {
+    case 'list':
+        return array(0 => t('Include/link node by ID or path'));
+    case 'description':
+        return t('Include/link node by ID or path (Keep last in filter order)');
+    case 'prepare':
+        return $text;
+    case "process":
+        $text = preg_replace_callback('/\[node:([^\s\]]+)(?:\s+(body|link|collapsed|teaser))?\]/', '_InsertNode_replacer', $text);
+        return $text;
+    default:
+        return $text;
+    }
+}
+
+
+function InsertNode_filter_tips($delta, $format, $long = false) {
+//      if ($long) {
+  return t('[node:123] - insert full text (themed by theme(\'node\'))<br> [node:123 body] - insert node\'s body<br> [node:123 teaser] - insert node\'s teaser<br> [node:123 link] - insert link to node<br> [node:123 collapsed] - insert collapsed node\'s body');
+}
+
+?>

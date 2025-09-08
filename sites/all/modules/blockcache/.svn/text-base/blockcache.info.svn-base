@@ -1,0 +1,9 @@
+name = Block Cache
+description = Allows caching of blocks with configurable refresh settings.
+dependencies = block
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "5.x-1.x-dev"
+project = "blockcache"
+datestamp = "1298618888"
+

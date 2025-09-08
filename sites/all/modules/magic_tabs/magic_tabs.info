@@ -1,0 +1,9 @@
+; $Id: magic_tabs.info,v 1.1 2008/05/24 05:27:38 yhager Exp $
+name = Magic Tabs
+description = Display nice ajax based tabs, that degrade gracefully
+
+; Information added by drupal.org packaging script on 2008-08-08
+version = "5.x-1.2"
+project = "magic_tabs"
+datestamp = "1218183617"
+

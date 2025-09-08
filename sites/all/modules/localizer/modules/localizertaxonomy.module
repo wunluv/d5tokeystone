@@ -1,0 +1,64 @@
+<?php
+// $Id: localizertaxonomy.module,v 1.6.2.4 2008/07/15 13:58:20 robertogerola Exp $
+
+include_once(drupal_get_path('module', 'localizer') .'/models/localizertranslation.php');
+include_once(drupal_get_path('module', 'localizer') .'/includes/localizer.inc');
+
+function localizertaxonomy_form_alter($form_id, &$form) {
+  if ($form_id == 'taxonomy_form_vocabulary') {
+    $form['#submit']['localizertaxonomy_form_vocabulary_submission'] = array();
+  }
+  else if ($form_id == 'taxonomy_form_term') {
+    $tid = $form['tid']['#value'];
+    $form['#submit']['localizertaxonomy_form_term_submission'] = array();
+  }
+  elseif ($form_id == 'taxonomy_vocabulary_confirm_delete') {
+    $form['#submit']['localizertaxonomy_delete_confirm'] = array();
+  }
+}
+
+function localizertaxonomy_form_vocabulary_submission($form_id, $form_values) {
+  $translation = array(
+    'tid' => '',
+    'object_name' => 'taxonomy_vocabulary',
+    'object_key' => $form_values['vid'],
+    'object_field' => 'name',
+    'language' => localizer_get_default_language(),
+    'translation' => $form_values['name']
+  );
+  localizertranslation_save($translation);
+
+  $translation['object_field'] = 'description';
+  $translation['translation'] = $form_values['description'];
+  localizertranslation_save($translation);
+
+  $translation['object_field'] = 'help';
+  $translation['translation'] = $form_values['help'];
+  localizertranslation_save($translation);
+}
+
+function localizertaxonomy_form_term_submission($form_id, $form_values) {
+  $translation = array(
+    'object_name' => 'taxonomy_term',
+    'object_key' => $form_values['tid'],
+    'object_field' => 'name',
+    'language' => localizer_get_default_language(),
+    'translation' => $form_values['name']
+  );
+  localizertranslation_save($translation);
+
+  $translation['object_field'] = 'description';
+  $translation['translation'] = $form_values['description'];
+  localizertranslation_save($translation);
+
+  $translation['object_field'] = 'synonyms';
+  $translation['translation'] = $form_values['synonyms'];
+  localizertranslation_save($translation);
+}
+
+function localizertaxonomy_delete_confirm($form_id, $form_values) {
+  if ($form_values['type'] && $form_values['tid']) {
+    localizertranslation_deleteall("object_name='vocabulary' AND object_key='". $form_values['vid'] ."'");
+  }
+}
+

@@ -1,0 +1,11 @@
+name = Image Gallery
+description = Allows sorting and displaying of image galleries based on categories.
+package = Image
+dependencies = image taxonomy
+
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "5.x-2.x-dev"
+project = "image"
+datestamp = "1298619410"
+

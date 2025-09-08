@@ -1,0 +1,84 @@
+<?php
+// $Id: form_markup.module,v 1.5.2.2 2007/07/18 07:50:33 mh86 Exp $
+
+/**
+ *@file 
+ * Adds prefix/suffix values for cck widgets
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function form_markup_help($section) {
+  switch ($section) {
+    case 'admin/modules#description':
+      return t('Adds prefix/suffix attributes for CCK fields. Requires the <em>Content.module</em>.');
+  }
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function form_markup_form_alter($form_id, &$form) {
+
+  if (isset($form['type']) && $form['type']['#value'] .'_node_form' == $form_id) {   
+    $info = _content_type_info();
+    $content_typ = $info['content types'][$form['type']['#value']];
+
+    if (is_array($content_typ['fields'])) {
+      foreach ($content_typ['fields'] as $field_name => $field_values) {
+        if (is_array($form[$field_name]) && is_array($field_values['widget'])) {
+          if ($field_values['widget']['prefix']) {
+            $form[$field_name]['#prefix'] =  $field_values['widget']['prefix'] . $form[$field_name]['#prefix'];
+          }
+          if ($field_values['widget']['suffix']) {
+            $form[$field_name]['#suffix'] .= $field_values['widget']['suffix'];
+          }
+        }
+      } 
+    }     
+  }
+  else if ($form_id == '_content_admin_field') {
+      $form['widget']['markup'] = array(
+        '#type' => 'fieldset',
+        '#tree' => TRUE,
+        '#title' => t('Markup'),
+        '#collapsible' => TRUE,
+      );
+      $form['widget']['markup']['prefix'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Prefix'),
+        '#size' => 60,
+        '#default_value' => _form_markup_get_default_value($form['type_name']['#value'], $form['field_name']['#value'], 'prefix'),
+      );
+      $form['widget']['markup']['suffix'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Suffix'),
+        '#size' => 60,
+        '#default_value' => _form_markup_get_default_value($form['type_name']['#value'], $form['field_name']['#value'], 'suffix'),
+      );
+      $form['#submit']['form_markup_submit'] = array();
+  }
+}
+
+function form_markup_submit($form_id, $form_values) {
+  if (!empty($form_values['markup']['prefix']) || !empty($form_values['markup']['suffix'])) {
+    $info = _content_type_info();
+    $widget_settings = $info['content types'][$form_values['type_name']]['fields'][$form_values['field_name']]['widget'];
+    if (!empty($form_values['markup']['prefix'])) $widget_settings['prefix'] = $form_values['markup']['prefix'];
+    if (!empty($form_values['markup']['suffix'])) $widget_settings['suffix'] = $form_values['markup']['suffix'];
+    
+    db_query("UPDATE {node_field_instance} SET widget_settings = '%s'
+      WHERE type_name = '%s' AND field_name = '%s'", serialize($widget_settings), $form_values['type_name'], $form_values['field_name']); 
+    content_clear_type_cache();
+  }
+}
+
+
+function _form_markup_get_default_value($type_name, $field_name, $value) {
+  $info = _content_type_info();
+  return $info['content types'][$type_name]['fields'][$field_name]['widget'][$value];
+}
+
+
+?>

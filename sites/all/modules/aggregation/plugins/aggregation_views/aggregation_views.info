@@ -1,0 +1,10 @@
+name = Aggregation Views
+description = Views integration for Aggregation
+package = "Feed Parser"
+dependencies = aggregation views
+
+; Information added by drupal.org packaging script on 2009-01-01
+version = "5.x-4.8"
+project = "aggregation"
+datestamp = "1230841203"
+

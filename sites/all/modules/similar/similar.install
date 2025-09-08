@@ -1,0 +1,15 @@
+<?php
+// $Id: similar.install,v 1.3 2006/11/06 20:27:19 deekayen Exp $
+
+/**
+ * Add FULLTEXT index to MySQL MyISAM tables.
+ * Module does not support InnoDB or PostgreSQL, so no changes for it
+ */
+function similar_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query('ALTER TABLE {node_revisions} ENGINE = MYISAM');
+      db_query('ALTER TABLE {node_revisions} ADD FULLTEXT(title, body)');
+  }
+}

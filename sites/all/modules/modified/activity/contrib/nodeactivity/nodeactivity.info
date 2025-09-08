@@ -1,0 +1,10 @@
+name = Node activity
+description = Enable activity notifications for content creation.
+dependencies = activity
+package = Activity
+
+; Information added by drupal.org packaging script on 2013-09-30
+version = "5.x-4.x-dev"
+project = "activity"
+datestamp = "1380552491"
+

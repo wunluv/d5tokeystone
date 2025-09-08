@@ -1,0 +1,174 @@
+<?php
+// $Id: path_redirect.install,v 1.2.2.18 2009/01/27 23:47:58 davereid Exp $
+
+/**
+ * @file
+ * Install and uninstall schema and functions for the path_redirect module.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function path_redirect_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {path_redirect} (
+        rid int NOT NULL auto_increment,
+        path varchar(255) NOT NULL,
+        redirect varchar(255) NOT NULL,
+        query varchar(255),
+        fragment varchar(50),
+        type smallint NOT NULL,
+        PRIMARY KEY (rid),
+        UNIQUE KEY path (path)
+        ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+      break;
+    case 'pgsql':
+      db_query("CREATE TABLE {path_redirect} (
+        rid serial,
+        path varchar(255) NOT NULL,
+        redirect varchar(255) NOT NULL,
+        query varchar(255),
+        fragment varchar(50),
+        type smallint NOT NULL,
+        PRIMARY KEY (rid),
+        UNIQUE (path)
+        );");
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function path_redirect_uninstall() {
+  // Remove tables and sequences.
+  db_query('DROP TABLE {path_redirect}');
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("DELETE FROM {sequences} WHERE name = '{path_redirect}_rid'");
+      break;
+  }
+
+  // Remove variables.
+  variable_del('path_redirect_allow_bypass');
+  variable_del('path_redirect_nodeapi_enabled');
+  variable_del('path_redirect_redirect_warning');
+}
+
+/**
+ * Allow longer values for path and redirect. Add a unique key on rid.
+ */
+function path_redirect_update_1() {
+  $ret = array();
+
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {path_redirect} MODIFY path VARCHAR(255)");
+      $ret[] = update_sql("ALTER TABLE {path_redirect} MODIFY redirect VARCHAR(255)");
+      $ret[] = update_sql("ALTER TABLE {path_redirect} ADD UNIQUE (rid)");
+      break;
+  }
+
+  return $ret;
+}
+
+/**
+ * Convert the type column to an integer to only store the status code.
+ */
+function path_redirect_update_2() {
+  $ret = array();
+
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("UPDATE {path_redirect} SET type = '300' WHERE type = 'HTTP/1.0 300 Multiple Choices'");
+      $ret[] = update_sql("UPDATE {path_redirect} SET type = '301' WHERE type = 'HTTP/1.0 301 Moved Permanently'");
+      $ret[] = update_sql("UPDATE {path_redirect} SET type = '302' WHERE type = 'HTTP/1.0 302 Found'");
+      $ret[] = update_sql("UPDATE {path_redirect} SET type = '303' WHERE type = 'HTTP/1.0 303 See Other'");
+      $ret[] = update_sql("UPDATE {path_redirect} SET type = '304' WHERE type = 'HTTP/1.0 304 Not Modified'");
+      $ret[] = update_sql("UPDATE {path_redirect} SET type = '305' WHERE type = 'HTTP/1.0 305 Use Proxy'");
+      $ret[] = update_sql("UPDATE {path_redirect} SET type = '307' WHERE type = 'HTTP/1.0 307 Temporary Redirect'");
+      $ret[] = update_sql("ALTER TABLE {path_redirect} MODIFY type int(10) NOT NULL");
+      break;
+  }
+
+  return $ret;
+}
+
+/**
+ * Fix a typo that could have caused the code 306 to be used mistakenly.
+ */
+function path_redirect_update_3() {
+  $ret = array();
+
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {path_redirect} MODIFY type int(10) NOT NULL");
+      $ret[] = update_sql("UPDATE {sequences} SET name = '{path_redirect}_rid' WHERE name = '{path_redirect}'");
+      break;
+    case 'pgsql':
+      db_change_column($ret, 'path_redirect', 'type', 'type', 'smallint');
+      break;
+  }
+
+  $ret[] = update_sql("UPDATE {path_redirect} SET type = 307 WHERE type = 306");
+
+  return $ret;
+}
+
+/**
+ * Allow longer values for query strings fix the primary and unique keys.
+ */
+function path_redirect_update_4() {
+  $ret = array();
+
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {path_redirect} MODIFY query varchar(255) NOT NULL");
+      $ret[] = update_sql("ALTER TABLE {path_redirect} DROP PRIMARY KEY");
+      $ret[] = update_sql("ALTER TABLE {path_redirect} DROP KEY rid");
+      $ret[] = update_sql("ALTER TABLE {path_redirect} ADD PRIMARY KEY (rid)");
+      $ret[] = update_sql("ALTER TABLE {path_redirect} ADD UNIQUE KEY (path)");
+      break;
+    case 'pgsql':
+      db_change_column($ret, 'path_redirect', 'query', 'query', 'varchar(255)');
+      $ret[] = update_sql("ALTER TABLE {path_redirect} DROP CONSTRAINT {path_redirect}_pkey");
+      $ret[] = update_sql("ALTER TABLE {path_redirect} DROP CONSTRAINT {path_redirect}_rid_key");
+      $ret[] = update_sql("ALTER TABLE {path_redirect} ADD PRIMARY KEY (rid)");
+      $ret[] = update_sql("ALTER TABLE {path_redirect} ADD UNIQUE (path)");
+      break;
+  }
+
+  return $ret;
+}
+
+/**
+ * Backporting schema for successful upgrades to 6.x.
+ */
+function path_redirect_update_5100() {
+  $ret = array();
+
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {path_redirect} MODIFY rid int NOT NULL auto_increment");
+      $ret[] = update_sql("ALTER TABLE {path_redirect} MODIFY query varchar(255)");
+      $ret[] = update_sql("ALTER TABLE {path_redirect} MODIFY fragment varchar(50)");
+      $ret[] = update_sql("ALTER TABLE {path_redirect} MODIFY type smallint NOT NULL");
+      break;
+    case 'pgsql':
+      db_change_column($ret, 'path_redirect', 'query', 'query', 'varchar(255)');
+      db_change_column($ret, 'path_redirect', 'fragment', 'fragment', 'varchar(50)');
+      db_change_column($ret, 'path_redirect', 'type', 'type', 'smallint', array('not null' => TRUE));
+      break;
+  }
+
+  return $ret;
+}
+

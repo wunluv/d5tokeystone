@@ -1,0 +1,10 @@
+; $Id: simplefeed_item.info,v 1.3 2007/10/01 20:56:42 m3avrck Exp $
+name = SimpleFeed Item
+description = A feed item node type.
+package = SimpleFeed
+
+; Information added by drupal.org packaging script on 2007-11-16
+version = "5.x-1.0"
+project = "simplefeed"
+datestamp = "1195240505"
+

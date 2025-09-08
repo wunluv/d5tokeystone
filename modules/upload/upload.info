@@ -1,0 +1,10 @@
+name = Upload
+description = Allows users to upload and attach files to content.
+package = Core - optional
+version = VERSION
+
+; Information added by drupal.org packaging script on 2013-09-30
+version = "5.23+3-dev"
+project = "drupal"
+datestamp = "1380570434"
+

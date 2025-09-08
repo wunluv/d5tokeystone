@@ -1,0 +1,111 @@
+<?php
+
+/**
+ * Activity definition file
+ *
+ * This defines what hooks activity module should use
+ */
+function views_bookmarkactivity_activity_info() {
+  $types = views_bookmark_get_bookmarks();
+  foreach ($types as $type) {
+    $type_admin_name = preg_replace('/\s/', '_', drupal_strtolower($type->title));
+    $token_types[$type_admin_name] = $type->title;
+  }
+  return array(
+    'ops' => array('mark' => t('Mark'), 'unmark' => t('Unmark')),
+    'types' => $token_types,
+    'roles' => array(
+      'author' => array(
+        '#name' => t('Author'),
+        '#description' => t('The person who bookmarked the node.'),
+        '#default' => t('[author] [operation]ed the [node-type] [node-link]'),
+      ),
+      'all' => array(
+        '#name' => t('All'),
+        '#description' => t('The general public.'),
+        '#default' => t('[author-all] [operation]ed the [node-type] [node-link]'),
+      ),
+    ),
+  );
+}
+
+/** 
+ * Implementation of hook_activityapi().
+ */
+function views_bookmarkactivity_activityapi(&$activity, $op) {
+  if ($op == 'load') {
+    if ($activity['data']['module'] == 'views_bookmarkactivity' && !node_access('view', node_load($activity['data']['node-id']))) {
+      $activity = array();
+    }
+  }
+}
+
+/**
+ * Token module integration. Defines available default tokens.
+ */
+function views_bookmarkactivity_token_list($type = 'all') {
+  if ($type == 'views_bookmarkactivity') {
+    $tokens['views_bookmarkactivity'] = array(
+      'node-type' 	=> t('The node type of the node that was bookmarked'),
+      'node-id'  	=> t('Id of the node that was bookmarked'),
+      'node-title' 	=> t('Title of the node that was bookmarked'),
+      'node-link' 	=> t('Link to the node that was bookmarked'),
+    );
+    return $tokens;
+  }
+}
+
+/**
+ * Token module integration. Defines available default token values.
+ */
+function views_bookmarkactivity_token_values($type, $data = NULL, $options = array()) {
+  if ($type == 'views_bookmarkactivity' && !empty($data)) {
+    $data['node-type'] = theme('activity_node_type', $data['node-type']);
+    $data['node-link'] = l($data['node-title'], 'node/'. $data['node-id']);
+    return $data;
+  }
+}
+
+/**
+ * Implementation of hook_views_bookmark_api().
+ * @param $vb_name
+ *   bookmark type name
+ * @param $vbid
+ *   id of the bookmark type
+ * @param $vb_uid
+ *   user id who marked
+ * @param $nid
+ *   node id that was bookmarked
+ */
+function views_bookmarkactivity_views_bookmark_api($vb_name, $vbid, $vb_uid, $nid) {
+  $node = node_load($nid);
+  $types = views_bookmark_get_bookmarks();
+  $type = preg_replace('/\s/', '_', drupal_strtolower($types[$vbid]->title));
+
+  // Check if both type and operation are
+  // enabled for activity. If not then stop here
+  if (!in_array($type, variable_get('views_bookmarkactivity_token_types', array($type)), TRUE) || 
+    !in_array($vb_name, variable_get('views_bookmarkactivity_op_types', array($vb_name)), TRUE)) {
+    return FALSE;
+  }
+
+  // Privacy setting check
+  $user = user_load(array('uid' => $vb_uid, 'status' => 1));
+  if (activity_user_privacy_optout($user)) {
+    return FALSE;
+  }
+
+  $data = array(
+    'operation' 	=> $vb_name,
+    'node-id' 		=> $node->nid,
+    'node-title' 	=> $node->title,
+    'node-type' 	=> $node->type,
+  );
+
+  $target_users_roles = array(
+    ACTIVITY_ALL => 'all',
+    $vb_uid => 'author' 
+  );
+
+  activity_insert($vb_uid, 'views_bookmarkactivity', $type, $vb_name, $data, $target_users_roles);
+}

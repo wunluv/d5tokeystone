@@ -1,0 +1,9 @@
+; $Id: user_register_notify.info,v 1.1.2.1 2008/09/09 16:20:25 rmiddle Exp $
+name = User registration notification
+description = Notifies administrator of new user registrations.
+
+; Information added by drupal.org packaging script on 2009-01-22
+version = "5.x-1.10"
+project = "user_register_notify"
+datestamp = "1232588447"
+

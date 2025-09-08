@@ -1,0 +1,122 @@
+<?php
+
+/**
+ * Implementation of hook_install().
+ */
+function user_stats_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+    case 'pgsql':
+      db_query("DELETE FROM {profile_fields} WHERE name IN ('user_post_count', 'user_ip_address', 'user_login_count')");
+      db_query("INSERT INTO {profile_fields} (
+        title, name, explanation, category, page, type, weight, required, register, visibility, options) VALUES
+        ('Post Count', 'user_post_count', '', 'Statistics', '', 'textfield', 0, 0, 0, %d, '')", PROFILE_HIDDEN);
+      db_query("INSERT INTO {profile_fields} (
+        title, name, explanation, category, page, type, weight, required, register, visibility, options) VALUES
+        ('IP Address', 'user_ip_address', '', 'Statistics', '', 'textfield', 0, 0, 0, %d, '')", PROFILE_HIDDEN);
+      db_query("INSERT INTO {profile_fields} (
+        title, name, explanation, category, page, type, weight, required, register, visibility, options) VALUES
+        ('Login Count', 'user_login_count', '', 'Statistics', '', 'textfield', 0, 0, 0, %d, '')", PROFILE_HIDDEN);
+      break;
+  }
+  variable_set('user_stats_postcount_profile_field', 'user_post_count');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function user_stats_uninstall() {
+  $post_count_profile_field = variable_get('user_stats_postcount_profile_field', 'user_post_count');
+  variable_del('user_stats_rebuild_stats');
+  variable_del('user_stats_last_cron_check');
+  variable_del('user_stats_included_content_types');
+  variable_del('user_stats_reset_count');
+  variable_del('user_stats_user_per_cron');
+  variable_del('user_stats_count_posts');
+  variable_del('user_stats_count_logins');
+  variable_del('user_stats_postcount_profile_field');
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+    case 'pgsql':
+      db_query("DELETE FROM {profile_values}
+        WHERE fid IN (SELECT fid FROM {profile_fields}
+        WHERE name IN ('%s', 'user_ip_address', 'user_login_count'))", $post_count_profile_field);
+      db_query("DELETE FROM {profile_fields}
+        WHERE name IN ('%s', 'user_ip_address', 'user_login_count')", $post_count_profile_field);
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_update()
+ */
+function user_stats_update_1() {
+  $ret = array();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      // We use 4 instead of PROFILE_HIDDEN as this constant is not available during updates
+      $ret[] = update_sql("INSERT IGNORE INTO {profile_fields} (
+        title, name, explanation, category, page, type, weight, required, register, visibility, options) VALUES
+        ('IP Address', 'user_ip_address', '', 'Statistics', '', 'textfield', 0, 0, 0, 4, '')");
+      break;
+  }
+
+  return $ret;
+}
+
+/**
+ * Implementation of hook_update()
+ */
+function user_stats_update_2() {
+  $ret = array();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("UPDATE {profile_fields} SET register=0 WHERE
+        (name='user_post_count' OR name='user_ip_address')");
+      break;
+  }
+
+  return $ret;
+}
+
+/**
+ * Implementation of hook_update()
+ */
+function user_stats_update_3() {
+  $ret = array();
+  // We use 4 instead of PROFILE_HIDDEN as this constant is not available during updates
+  $ret[] = update_sql("INSERT INTO {profile_fields} (
+    title, name, explanation, category, page, type, weight, required, register, visibility, options) VALUES
+    ('Login count', 'user_login_count', '', 'Statistics', '', 'textfield', 0, 0, 0, 4, '')");
+
+  return $ret;
+}
+
+/**
+ * Implementation of hook_update()
+ */
+function user_stats_update_4() {
+  $ret = array();
+  variable_set('user_stats_postcount_profile_field', 'user_post_count');
+  $ret[] = update_sql("UPDATE {profile_fields} SET title = 'Login Count'
+    WHERE title = 'Login count'");
+
+  return $ret;
+}
+
+/**
+ * Implementation of hook_update().
+ */
+function user_stats_update_5() {
+  $ret = array();
+  // Making variable names consistent: 'postcount' becomes 'post_count'.
+  $post_count_field = variable_get('user_stats_postcount_profile_field', 'user_post_count');
+  variable_set('user_stats_post_count_profile_field', $post_count_field);
+  variable_del('user_stats_postcount_profile_field');
+
+  return $ret;
+}
