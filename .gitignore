@@ -7,3 +7,4 @@ sites/*
 .htaccess
 settings.php
 .env
+**/.svn/
