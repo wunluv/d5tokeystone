@@ -9,3 +9,9 @@ settings.php
 .env
 files/*
 **/.svn/
+
+# Node modules and external libraries
+node_modules/
+
+# Sensitive configuration files
+.roo/mcp.json
