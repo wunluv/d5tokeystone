@@ -1,256 +1,143 @@
-# Orchestrator Mode Roadmap - Heavenletters GraphQL API
+# Orchestrator Mode Roadmap - Heavenletters Migration Keystone + Astro
 
-## 🎯 **Mission Statement**
-Coordinate the completion of the Heavenletters GraphQL API project by managing multiple specialized modes to restart the server, validate functionality, and ensure all components work together seamlessly.
+Version 2.0 Updated 2025-09-29. Replaces legacy GraphQL restart steps with a migration plan aligned to [PROJECT_ROADMAP.md](heavenletters-next-stack/docs/PROJECT_ROADMAP.md).
 
-## 📋 **Executive Summary**
-- **Current State**: GraphQL server running but needs restart to pick up schema fixes
-- **Critical Blocker**: Server restart required before any testing can proceed
-- **Success Target**: Fully functional GraphQL API serving Heavenletters data
-- **Timeline**: Immediate action required (server restart is blocking all progress)
+## Mission
+Coordinate safe migration from Drupal 5 to KeystoneJS backend and AstroJS frontend, enforcing DB preservation, SEO permalink continuity, and a simple MVP UI. Use agents to execute phase-gated tasks and stop changes that threaten data integrity.
 
-## 🗺️ **Phase-by-Phase Roadmap**
+## Current State Snapshot
+- Direction fixed in [PROJECT_ROADMAP.md](heavenletters-next-stack/docs/PROJECT_ROADMAP.md) v3.0.
+- Vision documented in [VMA.md](heavenletters-next-stack/docs/VMA.md). Godwriting workshop is out of scope for this migration.
+- Legacy GraphQL adapter documented in [CURRENT_STATUS.md](heavenletters-next-stack/docs/CURRENT_STATUS.md) is complete and may be used for parity checks only.
+- Development DB runs at 192.168.8.103 3306 as described in [DEVELOPMENT.md](heavenletters-next-stack/docs/DEVELOPMENT.md). Credentials must be moved to environment variables.
 
-### **PHASE 1: CRITICAL SERVER OPERATIONS** ⚠️
-**Status**: BLOCKING - Must complete before any other work
-**Estimated Time**: 5-10 minutes
-**Assigned Mode**: Code Mode
+## Architecture Path
+- Backend KeystoneJS builds new ks_ tables in the existing heaven database without altering Drupal tables.
+- AstroJS generates static pages with path based i18n and preserves canonical permalink patterns.
+- Future LLM features are prepared in schema fields but not activated in MVP.
 
-#### Tasks:
-1. **Stop Current GraphQL Server**
-   - Terminate process in Terminal 18
-   - Ensure clean shutdown
-   - Clear any cached schema
+## System View
+```mermaid
+flowchart TD
+D5[Drupal 5 DB heaven] --> SYNC[Read only sync]
+SYNC --> KS[Keystone ks_ tables]
+KS --> GQL[Keystone GraphQL]
+GQL --> ASTRO[Astro build]
+ASTRO --> CDN[CDN plus redirects]
+CDN --> USERS[Readers]
+```
 
-2. **Restart GraphQL Server**
-   - Navigate to `heavenletters-next-stack/graphql-api`
-   - Execute `npm start`
-   - Verify server starts without errors
-   - Confirm GraphiQL interface loads at expected URL
+## Agent Responsibilities
+- Backend Agent
+  - Install and configure KeystoneJS.
+  - Define Prisma schema for ks_ tables and run safe pushes.
+  - Build the sync pipeline from Drupal to ks_ tables.
+- Data Safety Agent
+  - Enforce least privilege DB users and backups.
+  - Verify no ALTER or DROP on legacy tables.
+  - Approve phase gates that touch data.
+- Frontend Agent
+  - Initialize AstroJS and implement routes, components, search.
+  - Integrate with Keystone GraphQL.
+- QA Agent
+  - Parity checks against legacy.
+  - E2E tests for routes and accessibility.
+- Release Agent
+  - CI CD, infra, redirects, monitoring.
 
-3. **Validate Server Health**
-   - Check server logs for errors
-   - Verify database connection is maintained
-   - Confirm GraphiQL interface is accessible
+## Phase Gates and Handoffs
+- Gate A Safety Preflight required before any write access.
+- Gate B Backend Data Model complete before sync.
+- Gate C Frontend routes aligned to URL spec before integration.
+- Gate D Test suite pass before deployment.
+- Gate E Launch checklist signoff by Architect and Data Safety.
 
-**Success Criteria**:
-- [ ] Server restarts successfully
-- [ ] No schema errors in logs
-- [ ] GraphiQL interface loads
-- [ ] Ready to accept queries
+## Phase 0 Safety Preflight
+Assigned Data Safety Agent
+- Create or rotate DB users to remove plaintext secrets from [DEVELOPMENT.md](heavenletters-next-stack/docs/DEVELOPMENT.md).
+- Provision a restricted MySQL user for Keystone with CREATE INSERT UPDATE SELECT INDEX on ks_ tables only.
+- Take a fresh full backup and verify restore.
+- Approve .env usage and secret storage policy.
+- Outcome Proof of backup, user privileges, and secret policy committed.
 
----
+## Phase 2 Backend KeystoneJS
+Assigned Backend Agent with Data Safety gate approvals
+- 2.1 Keystone install and DB connection
+  - Configure to use 192.168.8.103 3306 heaven via environment variables.
+  - Prohibit direct connections to local DB during development.
+  - Success Keystone boots and reads remote DB.
+- 2.2 Prisma schema and safe push
+  - Define ks_ prefixed models for Heavenletter and related lists only.
+  - Run prisma db push with accept data loss set to false.
+  - Success New ks_ tables exist. No change to legacy tables.
+- 2.3 Sync pipeline
+  - Read only queries from Drupal tables and upsert into ks_ tables.
+  - Generate unique English slugs and map translations.
+  - Optional store tags and embeddings fields without invoking external models.
+  - Success 6,620 records present and linked, with audit logs.
+- 2.4 GraphQL exposure
+  - Queries by slug, locale, publish number, and lists for archives.
+  - Success GraphQL returns expected data from ks_ tables.
 
-### **PHASE 2: DATABASE INSPECTION COMPLETION**
-**Status**: IN PROGRESS - Terminal 19 running
-**Estimated Time**: 5 minutes
-**Assigned Mode**: Code Mode
+## Phase 3 Frontend AstroJS
+Assigned Frontend Agent
+- 3.1 Project initialization with Tailwind and MDX.
+- 3.2 Components for reader pages, archive, search box, language selector.
+- 3.3 Routes
+  - English canonical slug.html.
+  - Translations locale slash slug.html.
+- 3.4 Features RSS per locale and social meta.
+- Success All pages render cleanly with minimal JS and correct permalinks.
 
-#### Tasks:
-1. **Monitor Database Inspection**
-   - Check Terminal 19 status
-   - Capture output from `inspect-database.js`
-   - Document discovered schema structure
+## Phase 4 Integration and Testing
+Assigned QA Agent with support from Backend and Frontend
+- Content parity
+  - Stable sample across locales and eras.
+  - Verify body, dates, titles, numbers, and translations.
+- Routing and redirects
+  - Validate canonical paths and fallback redirects.
+- Accessibility and performance
+  - Contrast and semantics.
+  - Build size and load time goals.
+- Success Parity thresholds and quality bars met, original DB unchanged.
 
-2. **Schema Validation**
-   - Compare discovered schema with GraphQL definitions
-   - Identify any mismatches or missing fields
-   - Flag any required schema updates
+## Phase 5 Deployment and Launch
+Assigned Release Agent
+- Deploy Astro to hosting and Keystone to an app host.
+- Configure redirects from legacy to canonical.
+- Monitoring and error tracking enabled.
+- Success Live traffic served with preserved SEO and stable backend.
 
-**Success Criteria**:
-- [ ] Database inspection completes successfully
-- [ ] Schema structure is documented
-- [ ] Any discrepancies are identified
+## Decision Checkpoints
+- Slug policy choose whether to always append publish number to slugs for collision proofing.
+- Locale code mapping confirm ISO codes and mapping from legacy.
+- Redirect export method choose source of alias mapping and conflict handling.
 
----
+## Risk Controls and Rollback
+- Blockers detected by Data Safety stop gate approval until fixed.
+- Rollback means revert DNS or CDN rules and keep Drupal serving.
+- No destructive operations allowed on legacy.
 
-### **PHASE 3: BASIC FUNCTIONALITY TESTING**
-**Status**: WAITING - Depends on Phase 1 completion
-**Estimated Time**: 10-15 minutes
-**Assigned Mode**: Code Mode → Debug Mode (if issues found)
+## Communication Protocol
+- Orchestrator requires status after each phase and before any gate.
+- Update [PROJECT_ROADMAP.md](heavenletters-next-stack/docs/PROJECT_ROADMAP.md) when decisions impact scope or success criteria.
+- Document validation outputs in MIGRATION_VALIDATION.md and data safety steps in DATA_SAFETY_CHECKLIST.md.
 
-#### Tasks:
-1. **Execute Basic Query Test**
-   ```graphql
-   query {
-     heavenletters(limit: 3) {
-       nid
-       title
-       number
-       locale
-       created
-       author
-     }
-   }
-   ```
+## Progress Tracker
+| Phase | Status | Owner |
+| 0 Safety Preflight | Pending | Data Safety |
+| 2 Backend | Pending | Backend |
+| 3 Frontend | Pending | Frontend |
+| 4 Integration and Testing | Pending | QA |
+| 5 Deployment and Launch | Pending | Release |
 
-2. **Validate Response Structure**
-   - Verify all fields return expected data types
-   - Check for null/empty values
-   - Confirm data matches database content
+## Immediate Next Actions
+- Update secrets handling and rotate exposed password from [DEVELOPMENT.md](heavenletters-next-stack/docs/DEVELOPMENT.md).
+- Confirm slug and locale decisions and record them in URL_SPEC.md.
+- Kick off Phase 2.1 Keystone install once gate approvals are in place.
 
-3. **Test Single Record Query**
-   ```graphql
-   query {
-     heavenletter(nid: 1234) {
-       nid
-       title
-       number
-       body
-       locale
-       author
-     }
-   }
-   ```
-
-**Success Criteria**:
-- [ ] Basic queries execute without errors
-- [ ] Data structure matches expectations
-- [ ] All promised fields return appropriate values
-
----
-
-### **PHASE 4: ADVANCED FEATURE TESTING**
-**Status**: FUTURE - Depends on Phase 3 success
-**Estimated Time**: 15-20 minutes
-**Assigned Mode**: Code Mode → Debug Mode (if issues found)
-
-#### Tasks:
-1. **Translation Query Testing**
-   ```graphql
-   query {
-     heavenletterTranslations(nid: 890) {
-       nid
-       title
-       locale
-       language
-     }
-   }
-   ```
-
-2. **Edge Case Testing**
-   - Test with invalid nid values
-   - Test with large limit values
-   - Test with missing translations
-
-3. **Performance Validation**
-   - Measure query response times
-   - Test with various data sizes
-   - Identify any performance bottlenecks
-
-**Success Criteria**:
-- [ ] Translation queries work correctly
-- [ ] Error handling is graceful
-- [ ] Performance is acceptable
-
----
-
-### **PHASE 5: DOCUMENTATION & FINALIZATION**
-**Status**: FUTURE - Final phase
-**Estimated Time**: 10-15 minutes
-**Assigned Mode**: Architect Mode
-
-#### Tasks:
-1. **Update Documentation**
-   - Update CURRENT_STATUS.md with final results
-   - Document all successful queries
-   - Record any limitations or known issues
-
-2. **Create API Usage Guide**
-   - Document available queries
-   - Provide example requests/responses
-   - Include error handling guidance
-
-**Success Criteria**:
-- [ ] All documentation is current
-- [ ] API is ready for use
-- [ ] Handoff documentation is complete
-
-## 🚨 **Critical Decision Points**
-
-### **Decision Point 1: Server Restart Issues**
-**If server fails to restart:**
-- Switch to **Debug Mode**
-- Investigate error logs
-- Check for port conflicts or dependency issues
-- May need to kill processes or change ports
-
-### **Decision Point 2: Schema Mismatches**
-**If database schema differs from GraphQL schema:**
-- Switch to **Architect Mode** for design decisions
-- Update GraphQL schema or resolver mappings
-- May require **Code Mode** for implementation
-
-### **Decision Point 3: Query Failures**
-**If basic queries fail:**
-- Switch to **Debug Mode** immediately
-- Investigate resolver logic
-- Check database connections and queries
-- May need **Code Mode** for fixes
-
-## 📊 **Progress Tracking Matrix**
-
-| Phase | Status | Assigned Mode | Dependencies | Estimated Time |
-|-------|--------|---------------|--------------|----------------|
-| 1: Server Restart | ✅ COMPLETE | Code | None | 5-10 min |
-| 2: DB Inspection | ✅ COMPLETE | Code | None | 5 min |
-| 3: Basic Testing | ✅ COMPLETE | Code/Debug | Phase 1 | 10-15 min |
-| 4: Advanced Testing | ✅ COMPLETE | Code/Debug | Phase 3 | 15-20 min |
-| 5: Documentation | ✅ COMPLETE | Architect | Phase 4 | 10-15 min |
-
-## 🎯 **Mode Assignment Strategy**
-
-### **Primary Mode Responsibilities**
-- **Code Mode**: Server operations, testing, implementation
-- **Debug Mode**: Error investigation, troubleshooting
-- **Architect Mode**: Design decisions, documentation, planning
-
-### **Mode Switching Triggers**
-- **Code → Debug**: Any errors or unexpected behavior
-- **Code → Architect**: Schema changes or design decisions needed
-- **Debug → Code**: After identifying and planning fixes
-- **Any → Architect**: For final documentation and handoff
-
-## 📞 **Communication Protocol**
-
-### **Status Updates Required**
-- After each phase completion
-- When switching modes
-- When encountering blockers
-- Before final handoff
-
-### **Documentation Updates**
-- Update CURRENT_STATUS.md after each major milestone
-- Log all successful queries and their results
-- Document any issues and their resolutions
-
-## 🏁 **Final Success Criteria**
-
-### **Minimum Viable Product (MVP)**
-- [x] GraphQL server running without errors
-- [x] Basic `heavenletters` query functional
-- [x] Single `heavenletter` query functional
-- [x] All core fields returning data
-
-### **Full Feature Set**
-- [x] Translation queries working
-- [x] Error handling implemented
-- [x] Performance validated
-- [x] Complete documentation
-
----
-
-## 🚀 **IMMEDIATE NEXT ACTION**
-**Switch to Code Mode and execute Phase 1: Server Restart**
-
-The entire project is currently blocked on this single critical task. All other phases depend on successful completion of the server restart.
-
-**Command for Code Mode**:
-1. Stop Terminal 18 process
-2. Restart with `cd heavenletters-next-stack/graphql-api && npm start`
-3. Verify GraphiQL loads successfully
-4. Report back to Orchestrator Mode for Phase 2 coordination
-
----
-
-*This roadmap provides the strategic framework for completing the Heavenletters GraphQL API project through coordinated multi-mode execution.*
+References
+- [PROJECT_ROADMAP.md](heavenletters-next-stack/docs/PROJECT_ROADMAP.md)
+- [VMA.md](heavenletters-next-stack/docs/VMA.md)
+- [DEVELOPMENT.md](heavenletters-next-stack/docs/DEVELOPMENT.md)
+- [CURRENT_STATUS.md](heavenletters-next-stack/docs/CURRENT_STATUS.md)
