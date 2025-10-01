@@ -9,7 +9,8 @@ settings.php
 .env
 files/*
 **/.svn/
-
+*.sql
+*.db
 # Node modules and external libraries
 node_modules/
 
