@@ -58,5 +58,5 @@ Post-MVP
 
 Documentation hygiene and scope alignment
 - [ ] Create MIGRATION_VALIDATION.md (pre/post counts; alias uniqueness checks; deterministic sampling; content hash golden set; acceptance criteria)
-- [ ] Create GODWRITING_SCOPE.md and link from VMA.md and PROJECT_ROADMAP.md as separate initiative not in this migration scope
+- [ ] Create GODWRITING_SCOPE.md and link from VMA.md and PROJECT_ROADMAP.md as separate initiative not in migration scope
 - [ ] Locale mapping: confirm Drupal language codes to internal locale mapping and add a mapping section to URL_SPEC.md
