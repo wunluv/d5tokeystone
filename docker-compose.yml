@@ -1,0 +1,60 @@
+services:
+  web:
+            image: 'nginx:alpine'
+            container_name: web
+            restart: unless-stopped
+            ports:
+              - '80:80'
+              - '443:443'
+            volumes:
+              - '/home/wunluv/DEV/www:/etc/nginx/html'
+              - '/home/wunluv/DEV/.nginx/conf/nginx.conf:/etc/nginx/nginx.conf'
+              - '/home/wunluv/DEV/.nginx/conf/conf.d:/etc/nginx/conf.d'
+              - '/home/wunluv/DEV/.nginx/certs:/etc/nginx/ssl'
+              - '/home/wunluv/DEV/.nginx/conf/snippets:/etc/nginx/snippets'
+              - '/etc/localtime:/etc/localtime:ro'
+  # mailhog:
+  #  image: mailhog/mailhog
+  #  container_name: mailhog
+  # logging:
+  #   driver: none
+  #  ports:
+  #    - '1025:2015'
+  #    - '8025:8025'
+  php53:
+    image: satyadeep/php-53-fpm-alpine-3.4-with-ext
+    container_name: php53
+    restart: unless-stopped
+    volumes:
+      - '/home/wunluv/DEV/www/:/etc/nginx/html'
+      - '/etc/localtime:/etc/localtime:ro'
+      # php73:
+        #    image: satyadeep/php-73-fpm-alpine-3.9-with-ext
+        #    container_name: php7
+        #    restart: unless-stopped
+        #    volumes:
+        #      - '../www/:/etc/nginx/html'
+        #      - '/etc/localtime:/etc/localtime:ro'
+   # php81:
+   #   image: satyadeep/php-82-fpm-alpine-with-ext
+   #   image: satyadeep/php-81-fpm-alpine-with-ext
+    #    container_name: php81
+    #    restart: unless-stopped
+    #    volumes:
+    #      - '../www/:/etc/nginx/html'
+    #      - '/etc/localtime:/etc/localtime:ro'
+  db:
+    image: yobasystems/alpine-mariadb
+    container_name: db
+    ports:
+    - '3306:3306'
+    volumes:
+      - '/home/wunluv/DEV/.db_data:/var/lib/mysql'
+    environment:
+      MYSQL_USER: mojah
+      MYSQL_PASSWORD: mojah42
+      MYSQL_ROOT_PASSWORD: mojah42
+      MYSQL_DATABASE: mojah
+networks:
+  multi_php_nginx: null
+name: multi_php_nginx

@@ -2,7 +2,12 @@
 sites/*
 !sites/all/
 !sites/all/**
-
+!sites/heavenletters.org/
+sites/heavenletters.org/themes/
+!sites/heavenletters.org/themes/h/
+!sites/heavenletters.org/themes/h/**
+!sites/heavenletters.org/themes/h2/
+!sites/heavenletters.org/themes/h2/**
 # Ignore specific file patterns
 .htaccess
 settings.php
