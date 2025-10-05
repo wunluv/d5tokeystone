@@ -24,7 +24,8 @@ function h_breadcrumb($breadcrumb) {
  }
 
 function h_id_safe($string) {
-  if (is_numeric($string[0])) {
+  if (is_numeric($string{0})) {
+    
     $string = 'n'. $string;
   }
   return strtolower(preg_replace('/[^a-zA-Z0-9-]+/', '-', $string));
@@ -54,31 +55,30 @@ function phptemplate_forum_icon($new_posts, $num_posts = 0, $comment_mode = 0, $
   return $output;
 }
 function phptemplate_comment_wrapper($content) {
-  $var = 'expanded';
-  if (filter_input(INPUT_GET, 'com') == 'open') {
-    $var = 'expanded';
-  }
-  if (arg(0) == 'node' && is_numeric(arg(1))) {
-    $nodo = node_load(arg(1));
-    $empty = '';
-    if (empty($content)) {
-      $empty = '<a class="empty-text" href="comment/reply/'. $nodo->nid .'#comment-form">'. t('Be the first to post a comment') .'</a>';
-    }
-    if ($nodo->type != 'forum' && !empty($content)) {
-      $output = '<div id="comments"><form><fieldset class="collapsible '. $var . '"><legend>Read Comments</legend>'. $content .'</fieldset></form></div>';
-    }
-    else if ($nodo->type == 'forum' || empty($content)) {
-      $output = '<div id="comments">'. $empty . $content .'</div>';
-    }
-    else if (($nodo->type == 'heaven_news' || arg(1) == 4008) && !empty($content)) {
-      $output = '<div id="comments">'. $content .'</div>';
-    }
-    return $output;
-  }
+$var = 'expanded';
+if ($_GET['com'] == 'open') :
+$var = 'expanded';
+endif;
+if (arg(0) == node && is_numeric(arg(1))) :
+   $nodo = node_load(arg(1));
+$empty = '';
+if ($content == '') {
+$empty = '<a class= "empty-text" href="comment/reply/'. $nodo->nid .'#comment-form">'. t('Be the first to post a comment') .'</a>';
+}
+if ($nodo->type != 'forum' && $content != '') :
+ $output = '<div id="comments"><form><fieldset class="collapsible '. $var .'"><legend>Read Comments</legend>'. $content .'</fieldset></form></div>';
+endif;
+if ($nodo->type == 'forum' || $content == '') :
+ $output = '<div id="comments">'. $empty . $content .'</div>';
+endif;
+if (($nodo->type == 'heaven_news' || arg(1) == 4008) && $content != '') :
+ $output = '<div id="comments">'. $content .'</div>';
+endif;
+return $output;
+endif;
 }
 
-drupal_add_js(path_to_theme() . '/add_bookmark.js');
-drupal_add_js(path_to_theme() . '/google_analytics.js');
+drupal_add_js('sites/heavenletters.org/themes/h/add_bookmark.js');
 drupal_add_js('misc/collapse.js');
 
 
@@ -98,7 +98,7 @@ function phptemplate_filter_tips($tips, $long = FALSE, $extra = '') {
       if ($multiple) { 
         $output .= '<li>'; 
         $output .= '<strong>'. $name .'</strong>:<br />'; 
-      }
+      } 
 
       $tips = ''; 
       foreach ($tiplist as $tip) { 
@@ -107,7 +107,7 @@ function phptemplate_filter_tips($tips, $long = FALSE, $extra = '') {
 
       if ($tips) { 
         if (arg(0) != 'filter') {
-        $output .= '<fieldset class="collapsible collapsed"><legend>Formatting Options</legend><ul class="tips">' . $tips . '</ul></fieldset>'; 
+        $output .= '<fieldset class="collapsible collapsed"><legend>Formatting Options</legend><ul class=\"tips\">' . $tips . '</ul></fieldset>'; 
 		}
 	    if (arg(0) == 'filter') {
         $output .= '<div style="with:90%;" ><ul class="tips">' . $tips . '</ul></div>'; 
@@ -116,7 +116,7 @@ function phptemplate_filter_tips($tips, $long = FALSE, $extra = '') {
 
       if ($multiple) { 
         $output .= '</li>'; 
-      }
+      } 
     } 
     if ($multiple) { 
       $output .= '</ul>'; 
@@ -127,59 +127,54 @@ function phptemplate_filter_tips($tips, $long = FALSE, $extra = '') {
 }
 function _phptemplate_variables($hook, $vars = array()) {
   switch ($hook) {
-    case 'node':
-      if ($vars['node']->type == 'heavenletters') {
-        $alias = drupal_lookup_path('alias', 'node/' . $vars['node']->nid);
-        $vars['permalink'] = l(url($alias, array('absolute' => TRUE)), url($alias, array('absolute' => TRUE)));
-      }
-      $ajax = filter_input(INPUT_GET, 'page');
-      if ($ajax == 'ajax' || (arg(0) == 'node' && arg(1) == 11846)) {
-        $vars['links'] = '';
-      }
-      break;
-
+  	case 'node':
+		$ajax = $_GET['page'];
+		if($ajax == 'ajax' || arg(1) == 11846) {
+			 $vars['links'] = '';
+		}	
+	break;
+     
     case 'comment':
+      
       $node = node_load($vars['comment']->nid);
-      if ($node->type == 'heaven_news') {
-        $vars['template_file'] = 'comment-heaven_news';
-      }
-      $vars['author_comment'] = $vars['comment']->uid == $node->uid;
+   	if ($node->type == 'heaven_news') {
+     $vars['template_file'] = 'comment-heaven_news';   
+   	}
+      
+      
+      $vars['author_comment'] = $vars['comment']->uid == $node->uid ? TRUE : FALSE;
       break;
-
-    case 'page':
-      if (drupal_is_front_page()) {
-        $vars['frontpage_view'] = view_page_load(2, 2, "frontpage", '', '');
-        $vars['heavenletter_view'] = view_page_load(4, 1, '', 'teaser', 'embed');
-      }
-      if (filter_input(INPUT_GET, 'page')) {
-        $vars['head'] = str_replace('<meta name="robots" content="index,follow" />',
-          '<meta name="robots" content="noindex,follow" />', $vars['head']);
-      }
-      $ajax = filter_input(INPUT_GET, 'page');
-      if ($ajax == 'ajax' || (arg(0) == 'node' && arg(1) == 11846)) {
-        $vars['template_file'] = 'page_ajax';
-      }
-      if (module_exists('page_title')) {
-        $vars['head_title'] = page_title_page_get_title();
-      }
-      if (module_exists('javascript_aggregator') && !empty($vars['scripts'])) {
-        $vars['scripts'] = javascript_aggregator_cache($vars['scripts']);
-      }
-      if ((arg(0) == 'node' && arg(1) == 3895) || (isset($vars['node']) && $vars['node']->type == 'heavenletters')) {
-        $vars['template_file'] = 'page-heavenletters';
-      }
-      if (isset($vars['node']) && $vars['node']->type == 'forum') {
-        $vars['template_file'] = 'page-forum';
-      }
-      if (isset($vars['node']) && $vars['node']->type == 'heaven_sutras') {
-        $vars['template_file'] = 'page-heaven_sutras';
-      }
-      if (isset($vars['node']) && $vars['node']->type == 'simple_page') {
-        $vars['template_file'] = 'page-no_columns';
-      }
-      break;
+	
+	case 'page':
+	if (isset($_GET['page'])) {
+    $vars['head'] = str_replace('<meta name="robots" content="index,follow" />',
+    '<meta name="robots" content="noindex,follow" />', $vars['head']);
+	}
+	$ajax = $_GET['page'];
+	if($ajax == 'ajax' || arg(1) == 11846) {
+			 $vars['template_file'] = 'page_ajax';
+	}
+    if (module_exists('page_title')) {
+      $vars['head_title'] = page_title_page_get_title();
+    }
+    if(module_exists('javascript_aggregator') && $vars['scripts']) {
+      $vars['scripts'] = javascript_aggregator_cache($vars['scripts']);
+    }
+	if ((arg(0) == 'node' && arg(1) == 3895) || $vars['node']->type == 'heavenletters' ) {
+	    $vars['template_file'] = 'page-heavenletters';
+ 	}
+	if ($vars['node']->type == 'forum') {
+	    $vars['template_file'] = 'page-forum';	  
+	} 
+	if ($vars['node']->type == 'heaven_sutras') {
+	    $vars['template_file'] = 'page-heaven_sutras';	  
+	} 	
+	if ($vars['node']->type == 'simple_page') {
+	    $vars['template_file'] = 'page-no_columns';
+		}
+   break;
   }
-
+  
   return $vars;
 }
 
@@ -202,10 +197,10 @@ function phptemplate_views_filterblock($form) {
   foreach ($form as $field => $value) {
     if (preg_match('/(op|filter)([0-9]+)/', $field, $match)) {
       $curcount = $match[2];
-      $newform["fieldset$count"][$field] = $value;
+      $newform["fieldset$curcount"][$field] = $value;
 
-      if (!isset($newform["fieldset$count"]['#weight'])) {
-        $newform["fieldset$count"]['#weight'] = $value['#weight'];
+      if (!isset($newform["fieldset$curcount"]['#weight'])) {
+        $newform["fieldset$curcount"]['#weight'] = $value['#weight'];
       }
     }
     else {
@@ -313,3 +308,4 @@ function phptemplate_username($object) {
 
   return $output;
 }
+

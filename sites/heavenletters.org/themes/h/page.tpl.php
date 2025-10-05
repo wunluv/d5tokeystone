@@ -3,5 +3,17 @@
 print $sidebar_left; 
 ?></div><?php endif; ?><div id="main" class="column"><div id="squeeze"><?php if ($mission): ?><div id="mission"><?php print $mission; ?></div><?php endif; ?><?php if ($content_top):?><div id="content-top"><?php print $content_top; ?><div class="clear"></div></div><?php endif; ?><?php if ($tabs): ?><div class="tabs"><?php print $tabs; ?></div><?php endif; ?><?php if ($title): ?><h1 class="title"><?php print $title; ?></h1><?php endif; ?><?php print $help; ?><?php print $messages; ?><?php print $content; ?><?php print $feed_icons; ?><?php if ($content_bottom): ?><div id="content-bottom"><?php print $content_bottom; ?></div><?php endif; ?></div></div><?php if ($sidebar_right): ?><div id="sidebar-right" class="column sidebar"><?php print $sidebar_right; ?><div class="top"><a href="#"><img src="https://heavenletters.org/sites/heavenletters.org/themes/h/images/top.png" title="Back to the top" border="0" /></a></div> </div><?php endif; ?><div class="clear"></div></div><div id="footer-wrapper"><div id="footer"><?php print $footer_message; ?></div></div><?php print $scripts; ?><?php print $closure; ?></div>
 
+<script type="text/javascript">
 
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1694227-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
 </body></html>

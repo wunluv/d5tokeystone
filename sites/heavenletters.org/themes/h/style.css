@@ -1,6 +1,3 @@
-@import "layout.css";
-@import "icons.css";
-
 /* Heavenletters Theme v1 - designed by Mojahmedia.net April 2007*/
 
 
@@ -124,6 +121,15 @@ body.forum #squeeze {
     margin: 4em 0 0;
 }
 
+
+/*
+body.sidebar-right #footer {
+  margin-right: -210px;
+}
+
+body.both-sidebars #footer {
+  margin: 0 -210px;
+}
 /*
 ** icon styles
 */
@@ -142,6 +148,28 @@ body.forum #squeeze {
 /* Leaf, collapsed, and expanded icons used for navigation*/
 
 
+/* .block li.leaf, ul.menu li.leaf {
+  list-style-image: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/menu-leaf.gif);
+}
+
+.block li.collapsed, ul.menu li.collapsed {
+  list-style-image: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/menu-collapsed.gif);
+}
+
+.block li.expanded, ul.menu li.expanded {
+  list-style-image: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/menu-expanded.gif);
+}
+
+.block li a.active {
+  text-decoration: none;
+}
+
+.block ul li {
+  list-style-image: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/blue_bullet.gif);
+}
+*/
+
+
 /* Forum posts and recent blog posts */
 
 .block-forum ul li {
@@ -152,7 +180,7 @@ body.forum #squeeze {
     padding: 5px 0px 5px 20px;
     background-repeat: no-repeat;
     background-position: 0 .5em;
-    background: url(images/content_li_bullet.gif) 0 50% no-repeat;
+    background: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/content_li_bullet.gif) 0 50% no-repeat;
 }
 
 .block-blog ul li {
@@ -160,7 +188,7 @@ body.forum #squeeze {
     list-style-image: none;
     margin: 0;
     padding: 5px 0px 5px 20px;
-    background-image: url(images/blog.png);
+    background-image: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/blog.png);
     background-repeat: no-repeat;
     background-position: 0 .7em;
 }
@@ -176,30 +204,43 @@ body.forum #squeeze {
     padding: 5px 0px 5px 20px;
     background-repeat: no-repeat;
     background-position: 0 .5em;
-    background: url(images/bullet-block.gif) -10px -135px no-repeat;
+    background: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/bullet-block.gif) -10px -135px no-repeat;
 }
 
 
 /* Status and Error icons */
 
 div.status {
-    background-image: url(images/dialog-information_i.gif);
+    background-image: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/dialog-information_i.gif);
     background-repeat: no-repeat;
     background-position: .5em 50%;
 }
 
 div.error {
-    background-image: url(images/dialog-warning.gif);
+    background-image: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/dialog-warning.gif);
     background-repeat: no-repeat;
     background-position: .5em 50%;
 }
 
+
+/* Node links such as add comments, User's blog, etc */
+
+
+/*#main .node div.links {
+  padding:5px 0px 5px 13px;
+  background: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/links.gif) no-repeat 0 .93em;
+}
+*/
+
+
 /* Administration panel */
 
 .admin-panel h3 {
-    background: #6191C5 url(images/cog.png) no-repeat .5em .5em;
+    background: #6191C5 url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/cog.png) no-repeat .5em .5em;
 }
 
+x@import "layout.css";
+x@import "icons.css";
 html {
     font-size: 100%;
 }
@@ -247,6 +288,16 @@ body {
     /* 2x (left-side fullwidth + main padding) + right-side fullwidth */
 }
 
+#page {
+    /*width: 900px;  */
+    /* page width - optional */
+    /*margin: 0 auto;   */
+    /* center the page - optional */
+    /*border-left: 2px solid #AAA;*/
+    /*border-right: 2px solid #AAA;*/
+}
+
+
 /**
 *  OTHER STYLES
 *
@@ -283,7 +334,7 @@ li.leaf {
 
 #main ul.menu li {
     padding: 3px 0;
-    background: url(images/content_li_bullet.gif) 0 50% no-repeat;
+    background: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/content_li_bullet.gif) 0 50% no-repeat;
 }
 
 #main ul.menu a {
@@ -300,7 +351,7 @@ body {
 #page {
     font-family: Verdana, Arial, Helvetica, sans-serif;
     color: #111;
-    background: url(images/header_repeat_bg.jpg) 0 0 repeat-x;
+    background: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/header_repeat_bg.jpg) 0 0 repeat-x;
 }
 
 #container {
@@ -347,7 +398,7 @@ body.forum #sidebar-right .block .content ul.menu li.leaf a {
 }
 
 #outer_front {
-    background: #fff url(images/heaven_fpbg.png) 0 0 repeat-x;
+    background: #fff url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/heaven_fpbg.png) 0 0 repeat-x;
 }
 
 #main #front_views {
@@ -550,7 +601,7 @@ dl {
 
 #header {
     position: relative;
-    background: transparent url(images/header_central.jpg) 50% 0 no-repeat;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/header_central.jpg) 50% 0 no-repeat;
 }
 
 .lenguaje {
@@ -593,7 +644,7 @@ dl {
 }
 
 #block-search-0 .form-text {
-    background: transparent url(images/big_bg.gif) -920px 0 no-repeat;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -920px 0 no-repeat;
     padding: 11px 12px;
     width: 110px;
     font-size: 1.3em;
@@ -601,7 +652,7 @@ dl {
 }
 
 #block-search-0 .form-submit {
-    background: transparent url(images/big_bg.gif) -955px -40px no-repeat;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -955px -40px no-repeat;
     color: #fff;
     font-size: 1.3em;
 }
@@ -695,17 +746,17 @@ dl {
 #mission .boxer {
     width: 650px;
     margin: 0 auto 10px;
-    background: #fff url(images/bg.gif) -651px 0px no-repeat;
+    background: #fff url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/bg.gif) -651px 0px no-repeat;
 }
 
 #mission .boxer-body {
     padding: 0 15px;
-    background: #fff url(images/bg.gif) 0 0 repeat-y;
+    background: #fff url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/bg.gif) 0 0 repeat-y;
 }
 
 #mission .boxer-bottom {
     height: 20px;
-    background: #fff url(images/bg.gif) -1305px 0px no-repeat;
+    background: #fff url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/bg.gif) -1305px 0px no-repeat;
 }
 
 #mission .subscription {
@@ -868,7 +919,7 @@ ul.links li.first {
 }
 
 .links a.comment_add {
-    background: url(images/bullet-block.gif) -13px -198px no-repeat;
+    background: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/bullet-block.gif) -13px -198px no-repeat;
     padding-left: 19px;
 }
 
@@ -1051,7 +1102,7 @@ div.error {
     padding: 0 0 0 20px;
     float: left;
     width: 90%;
-    background: url(images/bullet-block.gif) -13px -198px no-repeat;
+    background: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/bullet-block.gif) -13px -198px no-repeat;
 }
 
 #main #block-views-comments_recent ul li .view-field,
@@ -1078,7 +1129,7 @@ div.error {
     font-family: georgia, arial, verdana;
     margin: 0;
     margin-top: 15px;
-    background: transparent url(images/footer_slice.png) 0 0 repeat-x;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/footer_slice.png) 0 0 repeat-x;
 }
 
 #footer {
@@ -1147,12 +1198,12 @@ div.error {
     margin: 15px auto 0;
     font-size: 1.1em;
     padding: 4px 0 4px 35px;
-    xbackground: transparent url(images/comment-bubble.gif) 0 50% no-repeat;
-    background: #fff url(images/bullet-block.gif) -5px 0 no-repeat;
+    xbackground: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/comment-bubble.gif) 0 50% no-repeat;
+    background: #fff url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/bullet-block.gif) -5px 0 no-repeat;
 }
 
 #comments legend a {
-    background: transparent url(images/comment-bubble.gif) 0 50% no-repeat;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/comment-bubble.gif) 0 50% no-repeat;
     padding: 5px 0 5px 35px;
 }
 
@@ -1297,16 +1348,17 @@ div.node div.content .book-navigation {
     padding: 0;
 }
 
-.content .book h1,
-.content .book h2,
-.content .book h3 {
+.content book h1,
+h2,
+h3,
+{
     font-family: georgia, arial, helvetica, sans-serif;
     font-weight: normal;
     margin: .5em 0 .5em 0;
     text-indent: .5em;
 }
 
-.content .book p:first-letter {
+.content book p:first-letter {
     font-size: 1.2em;
 }
 
@@ -1359,7 +1411,7 @@ span.submitted {
 }
 
 span.statistics_counter {
-    background: #fff url(images/bullet-block.gif) -13px -175px no-repeat;
+    background: #fff url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/bullet-block.gif) -13px -175px no-repeat;
     padding-left: 22px;
 }
 
@@ -1430,6 +1482,7 @@ span.statistics_counter {
 .view-content-heavenletters-page .node-heavenletters {
     margin: 0 0 20px;
     padding: .5em 1em;
+    //  border:1px #9dceff solid;
 }
 
 .view-content-heavenletters-page h2.title {
@@ -1461,7 +1514,7 @@ span.statistics_counter {
 .view-content-heavenletters-page .node-heavenletters .read-more-teaser a,
 #main .more-taxonomy a {
     padding: 15px 0 15px 46px;
-    background: transparent url(images/bullet-block.gif) 0 -44px no-repeat;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/bullet-block.gif) 0 -44px no-repeat;
 }
 
 #node-3895 .view-heavenletters-page .node-heavenletters .read-more a {
@@ -1599,7 +1652,7 @@ span.statistics_counter {
     list-style: none;
     margin: 0 0 3px;
     padding: 5px 0 5px 20px;
-    background: url(images/content_li_bullet.gif) 0 50% no-repeat;
+    background: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/content_li_bullet.gif) 0 50% no-repeat;
 }
 
 
@@ -1628,7 +1681,7 @@ span.statistics_counter {
 
 #main .node-heavenletters .content .rating-item {
     padding-top: 30px;
-    background: transparent url(images/rose_deco.gif) 50% top no-repeat;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/rose_deco.gif) 50% top no-repeat;
 }
 
 
@@ -1703,7 +1756,7 @@ span.statistics_counter {
 
 .book-navigation ul.menu li {
     padding-left: 20px;
-    background: url(images/content_li_bullet.gif) 0 50% no-repeat;
+    background: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/content_li_bullet.gif) 0 50% no-repeat;
 }
 
 .book-navigation ul.menu a {
@@ -1771,27 +1824,6 @@ span.statistics_counter {
     word-wrap: break-word;
 }
 
-.normal {
-clear:both;
-padding:5px 0;
-}
-legend {
-color:#B79715;
-font-size:1.2em;
-}
-.normal select,
-.normal label,
-.normal input {
-float:left;
-font-family:georgia,arial;
-font-size:1.2em;
-width:130px !important;
-}
-.normal input,
-.normal select {
-width:auto;
-margin:0 0 0 5px;
-}
 
 /**
  * Sidebar-left style.
@@ -1804,7 +1836,7 @@ margin:0 0 0 5px;
 
 #sidebar-left .god_said {
     height: 63px;
-    background: transparent url(images/page_img.gif) 50% -370px no-repeat;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/page_img.gif) 50% -370px no-repeat;
 }
 
 #sidebar-left a {
@@ -1817,14 +1849,14 @@ margin:0 0 0 5px;
     font-size: 1.1em;
     margin: 0;
     padding: 0 0 0 10px;
-    background: transparent url(images/big_bg.gif) -749px 0 repeat-y;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -749px 0 repeat-y;
     border-bottom: 1px #fff2dc solid;
 }
 
 #sidebar-left .block .content {
     margin: 0;
     padding: 0 5px 0 10px;
-    background: transparent url(images/big_bg.gif) -749px 0 repeat-y;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -749px 0 repeat-y;
 }
 
 #sidebar-left .block .content p {
@@ -1842,7 +1874,7 @@ margin:0 0 0 5px;
 }
 
 #sidebar-left .block .top-block {
-    background: transparent url(images/big_bg.gif) -409px -5px no-repeat;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -409px -5px no-repeat;
     height: 29px;
 }
 
@@ -1854,7 +1886,7 @@ margin:0 0 0 5px;
 #sidebar-left .block .bottom-body {
     *margin-top: -4px;
     height: 9px;
-    background: transparent url(images/big_bg.gif) -579px bottom no-repeat;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -579px bottom no-repeat;
 }
 
 #sidebar-left #block-views-random_quotes,
@@ -1882,25 +1914,25 @@ margin:0 0 0 5px;
 }
 
 #sidebar-left #block-views-random_quotes ul li {
-    background: transparent url(images/big_bg.gif) -409px -5px no-repeat;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -409px -5px no-repeat;
     margin: 0 0 20px;
     padding: 28px 0 0;
 }
 
 #sidebar-left #block-views-random_quotes li .view-field {
-    background: transparent url(images/big_bg.gif) no-repeat -581px bottom;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) no-repeat -581px bottom;
     padding-bottom: 12px;
     text-align: right;
 }
 
 #sidebar-left #block-views-random_quotes li .view-data-node-body {
     text-align: left;
-    background: transparent url(images/big_bg.gif) -749px 0 repeat-y;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -749px 0 repeat-y;
     padding: 0 10px;
 }
 
 #sidebar-left #block-views-random_quotes li .view-field .field-item {
-    background: transparent url(images/big_bg.gif) -749px 0 repeat-y;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -749px 0 repeat-y;
     margin: 0;
     padding: 0 7px 0 0;
 }
@@ -1931,23 +1963,23 @@ margin:0 0 0 5px;
 #sidebar-left #block-views li {
     margin: 0 0 10px;
     padding: 29px 0 0;
-    background: transparent url(images/big_bg.gif) -409px -5px no-repeat;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -409px -5px no-repeat;
 }
 
 #sidebar-left #block-views li .view-field {
-    background: transparent url(images/big_bg.gif) no-repeat -581px bottom;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) no-repeat -581px bottom;
     padding-bottom: 12px;
     text-align: right;
 }
 
 #sidebar-left #block-views li .view-data-node-body {
     text-align: left;
-    background: transparent url(images/big_bg.gif) -749px 0 repeat-y;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -749px 0 repeat-y;
     padding: 0 10px;
 }
 
 #sidebar-left #block-views li .view-field .field-item {
-    background: transparent url(images/big_bg.gif) -749px 0 repeat-y;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -749px 0 repeat-y;
     margin: 0;
     padding: 0 7px 0 0;
 }
@@ -1964,4 +1996,1229 @@ margin:0 0 0 5px;
 #sidebar-left #block-views-random_comments .content,
 #sidebar-left #block-views-random_comments .content ul {
     padding: 0;
+}
+
+#sidebar-left #block-views-random_comments .view-data-node-body {
+    margin: 0 0 0 -10px;
+}
+
+#sidebar-left #block-views-random_comments h2 {
+    border: none;
+}
+
+#sidebar-left #block-views-random_comments .view-header {
+    text-align: center;
+    background: #fff url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -409px 37px no-repeat;
+    *background: #fff url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -409px 50px no-repeat;
+    padding: 0 0 30px;
+    height: 40px;
+}
+
+#sidebar-left #block-views-random_comments .view-header .imagen {
+    height: 40px;
+    text-indent: -9999px;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/page_img.gif) 50% -631px no-repeat;
+}
+
+#sidebar-left .view-footer {
+    padding: 0 10px 4px 0;
+}
+
+#sidebar-left .view-random-comments .view-data-node-data-field-name-and-location-field-name-and-location-value {
+    font-size: 1em;
+    padding-right: 10px;
+    margin: 0 auto;
+    color: #b79715;
+}
+
+#sidebar-left .view-footer-random-comments {
+    text-align: right;
+}
+
+
+/**
+ * Sidebar-right style.
+ */
+
+#sidebar-right {
+    font-size: 1.4em;
+}
+
+#sidebar-right #block-block-1,
+#sidebar-right #block-block-2 {
+    overflow: hidden;
+}
+
+#sidebar-right #block-block-1 .content a,
+#sidebar-right #block-block-2 a {
+    display: block;
+    width: 99%;
+    height: 133px;
+    margin: 0 auto;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/page_img.gif) 50% 0 no-repeat;
+    padding: 0;
+}
+
+#sidebar-right #block-block-1 .content a.forum-link {
+    background: transparent url(pics/forum_angels.jpg) 50% 0 no-repeat;
+    height: 155px;
+}
+
+#sidebar-right #block-block-2 a {
+    height: 180px;
+    background-position: 50% -140px;
+}
+
+#sidebar-right .block .top-block {
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) 0 0 no-repeat;
+    height: 18px;
+}
+
+#sidebar-right .block .block-body {
+    position: relative;
+    padding: 0;
+}
+
+#sidebar-right .block h2,
+#sidebar-right .block .content {
+    margin: 0;
+    padding: 0 5px;
+    background: #fff url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -204px 0 repeat-y;
+}
+
+#sidebar-right .block h2 {
+    font: normal 1.1em Georgia, arial;
+    color: #b79715;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) -204px -13px repeat-y;
+    padding-left: 15px;
+}
+
+#sidebar-right .block .content {
+    padding-left: 15px;
+    padding-right: 10px;
+}
+
+ul li.expanded {
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/collapsed_bullet.png) no-repeat 97% 4px;
+}
+
+ul li.collapsed {
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/xpanded_bullet.png) no-repeat 97% 4px;
+}
+
+#sidebar-right ul li a {
+    text-decoration: none;
+    /*background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/nav_rgt.gif) no-repeat 20px bottom;*/
+    padding-bottom: 4px;
+    font-weight: bold;
+}
+
+#sidebar-right ul li.expanded ul li a {
+    font-weight: normal;
+    /*padding-bottom:4px;*/
+    text-decoration: none;
+}
+
+#sidebar-right ul li a:visited {
+    color: #06c;
+}
+
+#sidebar-right ul li.expanded li.leaf a {
+    background: none;
+}
+
+#sidebar-right ul,
+#sidebar-right ul li {
+    list-style-position: inherit;
+    list-style-image: none;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#sidebar-right ul li {
+    border: 1px #fff solid;
+}
+
+#sidebar-right ul li.expanded .submenu {
+    padding: 0 0 0 5px;
+}
+
+#sidebar-right ul li a {
+    font-weight: bold !important;
+}
+
+#sidebar-right ul li.expanded a {
+    color: #c39 !important;
+}
+
+#sidebar-right ul li.expanded .submenu a {
+    color: #06c !important;
+}
+
+#sidebar-right ul li.expanded .submenu a:hover {
+    color: #2492ff !important;
+}
+
+
+/*#sidebar-right ul li.expanded ul li.leaf a {
+  padding:0 0 0 5px;
+}*/
+
+#sidebar-right .block .bottom-body {
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/big_bg.gif) 0 bottom no-repeat;
+    height: 10px;
+}
+
+#sidebar-right #block-block-3 {
+    font-size: .75em;
+    margin-bottom: 0;
+}
+
+#sidebar-right #block-block-3 h2.title {
+    background: none;
+}
+
+#sidebar-right #block-block-3 .content {
+    border: 1px #fff dotted;
+}
+
+#sidebar-right #block-block-3 .top-block {
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/page_img.gif) 50% -488px no-repeat;
+    height: 73px;
+}
+
+#sidebar-right #block-block-3 .content p,
+#sidebar-right #block-block-2 .content p {
+    margin-bottom: 0;
+    padding-bottom: 1em;
+}
+
+
+/**
+ * Secondary block Style.
+ */
+
+#sidebar-right #block-secondary ul,
+#sidebar-right .block-menu ul,
+#sidebar-right .block-book ul {
+    padding: 0 5px;
+    border: none;
+}
+
+#sidebar-right #block-secondary ul li,
+#sidebar-right .block-menu ul li,
+#sidebar-right .block-book ul li {
+    display: block;
+    /*padding:2px 0 5px;
+  background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/nav_rgt.gif) no-repeat 20px bottom;*/
+    margin: 0;
+}
+
+#sidebar-right #block-secondary ul.links-menu li a,
+#sidebar-right .block-menu ul li a,
+#sidebar-right .block-book ul li a {
+    padding: 0;
+    background: none;
+}
+
+#sidebar-right #block-secondary ul.links-menu li a:hover,
+#sidebar-right .block-menu ul li a:hover,
+#sidebar-right .block-book ul li a:hover {
+    color: #2492ff;
+}
+
+#sidebar-right #block-block-4 .content ul,
+#sidebar-right #custom-book-0 .content ul {
+    padding: 0 5px;
+    border: none;
+}
+
+#sidebar-right #block-block-4 .content ul li,
+#sidebar-right #custom-book-0 .content ul li {
+    display: block;
+    padding: 2px 0 5px;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/nav_rgt.gif) no-repeat 20px bottom;
+    margin: 0;
+}
+
+#sidebar-right #block-block-4 .content ul li a,
+#sidebar-right #custom-book-0 .content ul li a {
+    padding: 0;
+    background: none;
+    border: none;
+}
+
+#sidebar-right #block-block-4 .content ul li a:hover,
+#sidebar-right #custom-book-0 .content ul li a:hover {
+    color: #2492ff;
+}
+
+
+/**
+ * Tabs block Style.
+ */
+
+#sidebar-right #block-tabs ul {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+#sidebar-right #block-tabs ul li a,
+#sidebar-right #block-tabs ul li {
+    display: block;
+    border: none;
+}
+
+#sidebar-right #block-tabs ul li {
+    padding: 0 0 5px;
+    margin: 0;
+}
+
+#sidebar-right #block-tabs ul li a {
+    padding: 0 0 2px 5px;
+}
+
+#sidebar-right #block-block-2 a {
+    text-align: center;
+    display: block;
+}
+
+
+/**
+ * godwriting block Style.
+ */
+
+#custom-book-0 .content {
+    font-size: .9em;
+}
+
+
+/**
+ * Status report colors.
+ */
+
+table.system-status-report tr.error,
+table.system-status-report tr.error th {
+    background-color: #fcc;
+    border-color: #ebb;
+    color: #200;
+}
+
+table.system-status-report tr.warning,
+table.system-status-report tr.warning th {
+    background-color: #ffd;
+    border-color: #eeb;
+}
+
+table.system-status-report tr.ok,
+table.system-status-report tr.ok th {
+    background-color: #dfd;
+    border-color: #beb;
+}
+
+
+/*
+** Table styles
+*/
+
+table tr.even {
+    background-color: #fff;
+}
+
+table tr.odd td.active,
+table tr.odd {
+    background-color: #edf5fa;
+}
+
+table tr.even td.active {
+    bprder: 1px #000 solid;
+    background-color: #e6f1f7;
+}
+
+
+/*
+** forum nodes styles
+*/
+
+body.forum #main #forum {}
+
+body.forum #forum table {
+    *width: 80% !important;
+    border-collapse: collapse;
+}
+
+h1.forum {
+    padding: 0 10px;
+    margin-bottom: 0;
+}
+
+#forum .submitted {
+    color: #b79715;
+}
+
+#forum .submitted span.taxonomy {
+    font-size: 1em;
+}
+
+#forum .node-forum .content {
+    padding: 10px 20px;
+}
+
+#forum .node-forum .content p {
+    padding: 0 0 1.6em;
+    margin: 0;
+}
+
+#forum #links_forum span.statistics_counter {
+    color: #b79715;
+    font-size: .8em;
+}
+
+#forum #links_forum a {
+    font-size: .8em;
+}
+
+body.forum .forum-topic-navigation {
+    font-size: .9em;
+    background: #f7fcfd;
+    border-bottom: 1px solid #cae8f9;
+    border-top: 1px solid #cae8f9;
+    clear: both;
+}
+
+#forum .comment h3.title a {
+    font-size: 1.1em;
+}
+
+#forum table {
+    font-family: verdana, arial;
+}
+
+#forum th a {
+    font-size: .8em;
+}
+
+#forum tr {
+    border: none;
+}
+
+#forum td.region,
+#forum td.module,
+#forum td.container {
+    background-color: #d4e7f3;
+    color: #455067;
+}
+
+#forum td a {
+    font-size: 1em;
+}
+
+#forum td.container .name a {
+    text-decoration: none;
+}
+
+#forum td.container .name a:visited {
+    color: #06c;
+}
+
+#forum td.forum a {
+    font-size: 1em;
+    text-decoration: none;
+}
+
+#forum td.forum a:visited {
+    color: #06c;
+}
+
+#forum td.views,
+#forum td.created,
+#forum td.replies,
+#forum td.topics,
+#forum td.posts {
+    font-size: .8em;
+}
+
+#forum td.views {
+    text-align: center;
+}
+
+#forum tr td.last-reply {
+    font-size: .8em;
+    padding-left: 40px;
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/comment-bubble.gif) 0 50% no-repeat;
+}
+
+#forum tr.odd td.last-reply {
+    background-color: #edf5fa;
+}
+
+#forum table td.icon {
+    width: 40px;
+}
+
+#forum td.icon .iconos {
+    height: 31px;
+    width: 31px;
+    background: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/icons-forum-block.gif) 0 0 no-repeat;
+}
+
+#forum td.icon .forum-sticky {
+    background-position: 0 -70px;
+}
+
+#forum td.icon .forum-hot {
+    background-position: 0 -104px;
+}
+
+#forum td.icon .forum-closed {
+    background-position: 0 -135px;
+}
+
+#forum td.icon .forum-new {
+    background-position: 0 -36px;
+}
+
+#forum td.icon .forum-hot-new {
+    background-position: 0 -167px;
+}
+
+#forum td.forum a {
+    font-weight: normal;
+}
+
+#forum .name a {
+    font-weight: bold;
+}
+
+#forum td.forum a:hover,
+#forum .name a:hover {
+    color: #2492ff;
+}
+
+
+/*
+** Pager styles
+*/
+
+.pager {
+    padding: 25px 0px 3px;
+}
+
+.view .pager {
+    clear: none;
+}
+
+.pager div {
+    padding: 0em;
+    display: inline;
+}
+
+.pager strong,
+.pager a {
+    padding: 5px 5px;
+    margin: 3px 0.25em 3px 0.25em;
+    border: 1px solid #90c2e1;
+    -moz-border-radius: 2px;
+}
+
+.pager strong,
+.pager a {
+    background: #fff;
+}
+
+.pager a:hover {
+    text-decoration: none;
+    background: #eef7fc;
+}
+
+.pager strong {
+    font: normal 1.2em verdana, arial;
+    background: #dfedf7;
+    color: #0c4465;
+}
+
+
+/*
+** Toc Modules styles
+*/
+
+#main .toc h3 {
+    font: normal 1.em verdana, arial;
+    margin-bottom: .2em;
+    color: #b79715;
+}
+
+#main .toc ul {
+    padding: 0;
+    margin: 0;
+}
+
+#main .toc ul li {
+    list-style: none;
+    padding: 2px 0 4px 17px;
+    background: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/content_li_bullet.gif) 0 50% no-repeat;
+}
+
+
+/*
+** Custom styles
+*/
+
+#sidebar-right .small_font,
+.small_font {
+    font-size: .75em;
+}
+
+.big_font {
+    font-size: 1.1em;
+}
+
+.bbig_font {
+    font-size: 1.2em;
+}
+
+.orange_font {
+    color: #f90;
+}
+
+.purple_font {
+    color: #939;
+}
+
+.gold_font,
+h1.c_h1 {
+    color: #b79715;
+}
+
+h1.c_h1,
+h2.c_h2,
+h3.c_h3,
+h4.c_h4 {
+    font-family: georgia, verdana, arial;
+}
+
+h3.c_h3,
+h4.c_h4 {
+    margin: 0 0 .1em;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.left_align {
+    float: left;
+}
+
+.right_align {
+    float: right;
+}
+
+.node .forum img {
+    float: left;
+    padding: 5px;
+    margin: 0 5px 3px 0;
+    background-color: #eaf5fd;
+    border: 1px #c9e8fa solid;
+}
+
+img.blue {
+    padding: 5px;
+    margin-bottom: 3px;
+    background-color: #eaf5fd;
+    border: 1px #c9e8fa solid;
+}
+
+img.gold {
+    padding: 5px;
+    margin-bottom: 3px;
+    background-color: #fff1da;
+    border: 1px #ffff84 solid;
+}
+
+#main .user_questions {
+    font-family: "trebuchet ms", verdana, arial;
+    color: #6d1428;
+    line-height: 1em;
+    font-size: 1.15em;
+    clear: both;
+}
+
+span.user_questions {
+    font-family: "trebuchet ms", verdana, arial;
+    clear: none;
+    font-size: 1.15em;
+    line-height: 1em;
+}
+
+#main .god_answer {
+    font-family: georgia, verdana, arial, sans;
+    color: #006;
+    font-size: 1.15em;
+    padding: 10px 0;
+}
+
+#main blockquote.user {
+    font: normal 1em "trebuchet ms", verdana, arial;
+    padding: 10px 20px;
+    font-style: italic;
+    color: #6d1428;
+}
+
+#main .user_author {
+    font-style: normal;
+    font-weight: bold;
+    font-size: 1.2em;
+    text-align: right;
+    padding-right: 10px;
+    color: #b79715;
+}
+
+#main blockquote.user p {
+    padding: 0 0 5px;
+    margin: 0;
+}
+
+#main blockquote.god {
+    padding: 0 30px;
+    font-style: italic;
+    color: #000066;
+    font: normal 1.2em georgia, arial, helvetica, sans-serif;
+    margin: 0;
+}
+
+.heavenletters .comment blockquote.god p {
+    font-size: .9em;
+    font-family: georgia, arial, verdana;
+    color: #0000a6;
+}
+
+div.image_left {
+    float: left;
+    padding-right: 5px;
+}
+
+div.image_right {
+    float: right;
+    padding-left: 5px;
+}
+
+#main .top {
+    text-align: right;
+}
+
+#main ul.tips,
+#main ul.tips li ul {
+    width: 90%;
+    padding: 0;
+    margin: 0;
+}
+
+#main ul.tips li {
+    list-style: none;
+    margin: 0 0 10px width: 90%;
+}
+
+#main ul.tips li blockquote {
+    padding: 0;
+    margin: 0;
+    width: 90%;
+}
+
+#main ul.tips li#filter-filter-0 {
+    width: 99%;
+    overflow: scroll;
+}
+
+
+/* Additional Module styles*/
+
+div.flags {
+    clear: both;
+    padding: 5px;
+    float: none: margin-bottom: 10px;
+}
+
+.flags img {
+    margin: 2px;
+}
+
+.flags span {
+    float: left;
+    padding: 2px;
+    font-weight: bold;
+}
+
+#block-views-sticky_forum_tops .item-list {
+    padding-bottom: 50px;
+}
+
+#block-views-sticky_forum_tops .item-list ul li,
+#block-views-sticky_forum_tops .item-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    clear: both;
+}
+
+#block-views-sticky_forum_tops .item-list ul li .view-field,
+#block-views-sticky_forum_tops .item-list ul li .view-label {
+    float: left;
+    padding-left: 5px;
+}
+
+#block-views-sticky_forum_tops .item-list ul li .view-label {
+    padding: 0 0 5px 10px;
+}
+
+.block-body h2.title {
+    clear: both;
+}
+
+
+/*alpha index style*/
+
+span.index {
+    color: #b79715;
+    font-weight: bold;
+}
+
+ul#alpha_index {
+    text-align: left;
+    width: auto;
+    padding-left: 5px;
+}
+
+ul#alpha_index li {
+    list-style: none;
+    background: none;
+    display: inline;
+    padding: 0;
+    margin: 10px 3px;
+}
+
+.view-new-forum-post,
+.view-comments-recent-heavenletters,
+.view-comments-recent {
+    font-size: .9em;
+}
+
+.view-content-new-forum-post table td,
+.view-comments-recent-heavenletters table td,
+.view-comments-recent table td {
+    padding: 3px 0 3px 5px;
+}
+
+.view-content-new-forum-post table th,
+.view-comments-recent-heavenletters table th,
+.view-comments-recent table th {
+    height: 33px;
+}
+
+.heavenletters p a {
+    color: #00006A;
+    text-decoration: none;
+}
+
+
+/**
+**Drupal Tabs style
+**/
+
+#node-10 .drupal-tabs ul.primary {
+    margin: 5px 0 10px 0;
+    padding-left: 5px;
+    font-size: 1.1em;
+}
+
+#node-10 .drupal-tabs ul.primary li a {
+    margin-right: .1em;
+    padding: 0.5em .2em;
+}
+
+#node-10 .drupal-tabs ul.primary li a,
+#node-10 .drupal-tabs .fragment table tr.odd {
+    background: #fff url(images/table-tr-bg.png) 0 0 repeat-x;
+}
+
+#node-10 .drupal-tabs ul.primary li.active a,
+#node-10 .drupal-tabs ul.primary li a:hover {
+    background: #fff;
+    border-bottom: none;
+}
+
+#node-10 .drupal-tabs ul.primary li.active a {
+    border-bottom: 1px #fff solid;
+}
+
+#node-10 .drupal-tabs .fragment {
+    background: #fff;
+    padding-bottom: 15px;
+    position: relative;
+}
+
+#node-10 .drupal-tabs .fragment .pager {
+    display: none;
+}
+
+#node-10 .drupal-tabs .fragment h2 {
+    background: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/bullet-block.gif) 0 0 no-repeat;
+    padding: 3px 0 3px 40px;
+}
+
+#node-10 .drupal-tabs #new-forum-post h2 {
+    background: transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/icons-forum-block.gif) 2px 3px no-repeat;
+    padding: 8px 0 5px 40px;
+}
+
+#node-10 .drupal-tabs #new-translations-tab h2 {
+    background-position: 0 -51px;
+    padding: 10px 0 5px 40px;
+}
+
+#node-10 .drupal-tabs .fragment table thead th {
+    height: auto;
+}
+
+#node-10 .drupal-tabs .fragment table tr.odd,
+#node-10 .drupal-tabs .fragment table tr.even {
+    border-color: #c1dff0;
+}
+
+#node-10 .drupal-tabs .fragment table td {
+    padding: .7em .2em;
+    border-bottom: 1px #c1dff0 solid;
+}
+
+#node-10 .drupal-tabs .fragment table th {
+    border-color: #b79715;
+    color: #b79715;
+    border-width: 2px;
+}
+
+.view-comments-recent .more-link,
+.view-comments-recent-heavenletters .more-link,
+.view-new-forum-post .more-link,
+.view-new-translations .more-link {
+    text-align: left;
+    padding: 5px;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.view-comments-recent .more-link a,
+.view-comments-recent-heavenletters .more-link a,
+.view-new-forum-post .more-link a,
+.view-new-translations .more-link {
+    background: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/bullet-block.gif) -14px -109px no-repeat;
+    padding: 3px 0 3px 18px;
+}
+
+
+/**new tabs style**/
+
+#node-10 .magic_tabs {
+    background: #fff;
+    position: relative;
+}
+
+#node-10 .magic_tabs ul.tabs {
+    margin: 5px 0 10px 0;
+    padding: 0;
+    overflow: hidden;
+    float: left;
+    width: 100%;
+    border-bottom: 2px #2492ff solid;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+
+#node-10 .magic_tabs ul.tabs li {
+    display: block;
+    float: left;
+}
+
+#node-10 .magic_tabs ul.tabs li a {
+    height: 15px;
+    padding: 10px .5em;
+    margin: 5px 2px 0 0;
+    border: 1px #2492ff solid;
+    border-bottom: none;
+    font-weight: bold;
+}
+
+#node-10 .magic_tabs ul.tabs li a span {
+    background: none;
+    font-size: 1.1em;
+    color: #2492ff;
+    padding: 0;
+}
+
+#node-10 .magic_tabs ul.tabs li a,
+#node-10 .magic_tabs table tr.odd {
+    background: #fff url(images/table-tr-bg.png) 0 0 repeat-x;
+}
+
+#node-10 .magic_tabs .item-list ul.tabs li a.selected,
+#node-10 .magic_tabs .item-list ul.tabs li a:hover {
+    background: #2d92ff;
+}
+
+#node-10 .magic_tabs .item-list ul.tabs li a.selected,
+#node-10 .magic_tabs .item-list ul.tabs li.selected a:hover {
+    margin-top: 0;
+    height: 20px;
+}
+
+#node-10 .magic_tabs .item-list ul.tabs li a.selected span,
+#node-10 .magic_tabs .item-list ul.tabs li a:hover span {
+    color: #fff !important;
+}
+
+#node-10 .magic_tabs .magic_content {
+    background: #fff;
+    padding-bottom: 15px;
+    position: relative;
+    padding: 0;
+}
+
+#node-10 .magic_tabs .magic_content h2 {
+    background: url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/bullet-block.gif) 0 0 no-repeat;
+    padding: 3px 0 3px 40px;
+    display: none;
+}
+
+
+/*
+#node-10 .magic_tabs  h2#new-forum-post {
+background:transparent url(https://heavenletters.org/sites/heavenletters.org/themes/h/images/icons-forum-block.gif) 2px 3px no-repeat;
+padding:8px 0 5px 40px;
+}
+#node-10 .magic_tabs  h2#new-translations-tab {
+background-position:0 -51px;
+padding:10px 0 5px 40px;
+}
+*/
+
+#node-10 .magic_tabs .magic_content table {
+    position: relative;
+    width: 100%;
+}
+
+#node-10 .magic_tabs .magic_content table thead th {
+    height: auto;
+    padding: .5em 0;
+    color: #2492ff;
+    width: auto;
+    font-size: 1.1em;
+}
+
+#node-10 .magic_tabs .magic_content .view-content-new-translations table thead th.view-field-node-title {
+    width: 290px;
+}
+
+#node-10 .magic_tabs .magic_content table tr.odd,
+#node-10 .magic_tabs .magic_content table tr.even {
+    border-color: #c1dff0;
+}
+
+#node-10 .magic_tabs .magic_content table td {
+    padding: .2em;
+    font-size: 1.2em;
+    border-bottom: 1px #c1dff0 solid;
+}
+
+#node-10 .magic_tabs .magic_content table th {
+    border: none;
+}
+
+.magic_content .more-link {
+    text-align: left;
+    padding: 10px 5px;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.magic_content a.read-more-bg {
+    font-weight: bold;
+    font-size: 1.2em;
+    padding: .5em 20px .5em 0;
+    background: transparent url(images/read-more-bg.png) right 50% no-repeat;
+}
+
+
+/*Annettes styles as requested*/
+
+.mtext2 {
+    color: #6600CC;
+    margin: 0.5em 0em 1em;
+}
+
+.stext2 {
+    color: #009900;
+    font-family: "courier new", sans-serif;
+    margin: 0.5em 0em 1em;
+}
+
+.acim2 {
+    color: #0099CC;
+    font-size: 1em;
+    font-style: italic;
+    margin: 0em 0em 1.5em 3.5em;
+}
+
+.mtext {
+    color: #6600CC;
+    margin: 0.5em 0em 1em;
+}
+
+.stext {
+    color: #009900;
+    font-family: "courier new", sans-serif;
+    margin: 0.5em 0em 1em;
+}
+
+.acim {
+    color: #0099CC;
+    font-size: 1em;
+    font-style: italic;
+    margin: 0em 0em 1.5em 3.5em;
+}
+
+
+/**
+**subscription form thickbox style
+**/
+
+#TB_overlay {
+    background: #fff !important;
+}
+
+#TB_window {
+    border-color: #06c;
+}
+
+#TB_window .clear {
+    clear: both;
+}
+
+#TB_window .box-wrapper {
+    background: #fff url(images/postangel.png) 350px 140px no-repeat;
+    float: left;
+}
+
+#TB_window .right-box {
+    width: 230px;
+    float: right;
+    padding: 1em 0 0;
+    font-size: 1.1em:
+}
+
+#TB_window .right-box a {
+    color: #06c !important;
+    text-decoration: underline;
+}
+
+#TB_window .right-box a:hover {
+    text-decoration: none;
+}
+
+#TB_window .left-box {
+    width: 350px;
+    float: left;
+}
+
+#TB_window .blue {
+    color: #036;
+}
+
+#TB_window .normal {
+    clear: both;
+    padding: 1px 0;
+}
+
+#TB_window legend {
+    color: #B79715;
+    font-size: 1.7em;
+    margin: 0 0 10px;
+}
+
+#TB_window .normal select,
+#TB_window .normal label,
+#TB_window .normal input {
+    float: left;
+    font-family: georgia, arial;
+    font-size: 1.2em;
+    width: 130px;
+}
+
+#TB_window .normal input,
+#TB_window .normal select {
+    width: auto;
+    margin: 0 0 0 5px;
+}
+
+#TB_window .normal .chekbox {
+    float: left;
+    font-weight: bold;
+    padding: 0 0 0;
+    width: 31%;
+    font-weight: normal;
+}
+
+#TB_window .normal .chekbox input {
+    display: inline;
+    width: auto !important;
+}
+
+#TB_window .submit {
+    position: relative;
+}
+
+#TB_window .submit input {
+    position: absolute;
+    right: -200px;
+    margin: -15px 0 0;
+    font-size: 1.5em;
+    width: 200px !important;
+    background: #B79715;
+    color: #fff;
+}
+
+
+/**subzcribe block style**/
+
+#block-block-10 {
+    width: 200px;
+    background: transparent url(images/subscribe-block.gif) 0 0 no-repeat;
+}
+
+#block-block-10 h2 {
+    display: none;
+}
+
+#block-block-10 .top-block,
+#block-block-10 .bottom-body,
+#block-block-10 .content {
+    background: none !important;
+}
+
+#block-block-10 .content a {
+    display: block;
+    font-size: 1.8em;
+    text-decoration: none;
+    text-align: center;
+    padding: 50px 0 70px;
+    text-indent: -9999px;
+    position: relative;
+}
+
+.heavenletters .comment-autor {
+    border: 1px solid #FFEA97;
+}
+
+.no-sidebars #front_views #views-filters {
+    display: none;
 }
