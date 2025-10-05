@@ -1,0 +1,1967 @@
+@import "layout.css";
+@import "icons.css";
+
+/* Heavenletters Theme v1 - designed by Mojahmedia.net April 2007*/
+
+
+/*
+** layout styles
+*/
+
+#container {
+    margin: 0 auto;
+    padding: 20px 0 0;
+}
+
+body.ntype-heavenletters #container {
+    width: 790px;
+    margin: 0 auto;
+}
+
+body.ntype-heavenletters #sidebar-left,
+#sidebar-left .field-field-heavenletter-title-associ {
+    display: none;
+}
+
+#container {
+    padding: 25px 0 0;
+}
+
+body.centralized #container {
+    width: 780px;
+    margin: 0 auto;
+}
+
+.no-sidebars #container {
+    width: 100%;
+    margin: 0 auto;
+}
+
+#main {
+    float: left;
+    width: 100%;
+}
+
+body.sidebar-left #main {
+    margin-left: -210px;
+}
+
+body.sidebar-right #main {
+    margin-right: -210px;
+}
+
+body.forum #main {
+    margin-right: -180px;
+}
+
+body.both-sidebars #main {
+    margin: 0 -165px 0 -210px;
+}
+
+#squeeze {
+    position: relative;
+    padding: 0 1em;
+}
+
+body.forum #squeeze {
+    padding: 0;
+}
+
+
+/* And add blanks left and right for the sidebars to fill */
+
+body.sidebar-left #squeeze {
+    xmargin-left: 210px;
+}
+
+body.sidebar-right #squeeze {
+    margin-right: 210px;
+}
+
+body.both-sidebars #squeeze {
+    margin: 0 165px 0 210px;
+}
+
+body.forum #squeeze {
+    margin-right: 180px;
+    padding-left: 15px;
+}
+
+
+/* We ensure the sidebars are still clickable using z-index */
+
+#container .sidebar {
+    margin: 0 0 5em;
+    width: 205px;
+    float: left;
+    z-index: 2;
+    position: relative;
+}
+
+#container #sidebar-left {
+    width: 165px;
+}
+
+#container .sidebar .block {
+    margin: 0 0 5px 0;
+}
+
+#sidebar-left .block {
+    padding: 0 15px 0 0px;
+}
+
+#sidebar-right .block {
+    padding: 0 0px 0 15px;
+}
+
+.block .content {
+    margin: 0.5em 0;
+}
+
+#footer {
+    float: none;
+    clear: both;
+    margin: 4em 0 0;
+}
+
+/*
+** icon styles
+*/
+
+
+/*   $Id: icons.css,v 1.2 2006/10/23 04:36:43 zirafa Exp $ */
+
+
+/**
+*   ICON STYLES
+*
+*  Puts all the references to icon images in one place.
+*/
+
+
+/* Leaf, collapsed, and expanded icons used for navigation*/
+
+
+/* Forum posts and recent blog posts */
+
+.block-forum ul li {
+    list-style-type: none;
+    list-style-image: none;
+    list-style-position: inside;
+    margin: 0;
+    padding: 5px 0px 5px 20px;
+    background-repeat: no-repeat;
+    background-position: 0 .5em;
+    background: url(images/content_li_bullet.gif) 0 50% no-repeat;
+}
+
+.block-blog ul li {
+    list-style-type: none;
+    list-style-image: none;
+    margin: 0;
+    padding: 5px 0px 5px 20px;
+    background-image: url(images/blog.png);
+    background-repeat: no-repeat;
+    background-position: 0 .7em;
+}
+
+
+/* Who's new & Who's online*/
+
+#block-user-2 ul li,
+#block-user-3 ul li {
+    list-style-type: none;
+    list-style-image: none;
+    margin: 0;
+    padding: 5px 0px 5px 20px;
+    background-repeat: no-repeat;
+    background-position: 0 .5em;
+    background: url(images/bullet-block.gif) -10px -135px no-repeat;
+}
+
+
+/* Status and Error icons */
+
+div.status {
+    background-image: url(images/dialog-information_i.gif);
+    background-repeat: no-repeat;
+    background-position: .5em 50%;
+}
+
+div.error {
+    background-image: url(images/dialog-warning.gif);
+    background-repeat: no-repeat;
+    background-position: .5em 50%;
+}
+
+/* Administration panel */
+
+.admin-panel h3 {
+    background: #6191C5 url(images/cog.png) no-repeat .5em .5em;
+}
+
+html {
+    font-size: 100%;
+}
+
+body {
+    font-family: arial, helvetica, clean, sans-serif;
+    font-size: 62.5%;
+}
+
+table {
+    font-size: inherit;
+    font: 100%;
+}
+
+select,
+input,
+textarea {
+    font: 99% arial, helvetica, clean, sans-serif;
+}
+
+pre,
+code {
+    font: 115% monospace;
+    *font-size: 100%;
+    margin: 0;
+}
+
+.clear {
+    clear: both;
+}
+
+
+/**
+*   LAYOUT STYLES
+*
+*  Styles pertaining to minor layout adjustments, such as
+*   changing from fluid width to fixed width.
+*   See layout.css for major adjustments.
+*/
+
+body {
+    margin: 0;
+    padding: 0;
+    min-width: 700px;
+    /* 2x (left-side fullwidth + main padding) + right-side fullwidth */
+}
+
+/**
+*  OTHER STYLES
+*
+*  Styles that are specific to this theme.
+*/
+
+
+/* Menu Style Reset */
+
+ul.menu {
+    list-style: none;
+}
+
+li.expanded {
+    list-style-type: none;
+    list-style-image: none;
+}
+
+li.collapsed {
+    list-style-type: none;
+    list-style-image: none;
+}
+
+li.leaf {
+    list-style-type: none;
+    list-style-image: none;
+}
+
+#main ul.menu {
+    padding: 0 0 5px;
+    border-top: 1px #cae8f9 solid;
+    margin: 0;
+}
+
+#main ul.menu li {
+    padding: 3px 0;
+    background: url(images/content_li_bullet.gif) 0 50% no-repeat;
+}
+
+#main ul.menu a {
+    margin-left: 20px;
+}
+
+
+/* Common styles */
+
+body {
+    background: #fff;
+}
+
+#page {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    color: #111;
+    background: url(images/header_repeat_bg.jpg) 0 0 repeat-x;
+}
+
+#container {
+    margin: 0 0 10px 10px;
+}
+
+body.forum #container {
+    margin: 0;
+}
+
+body.forum #sidebar-right {
+    float: right;
+    width: 160px;
+    font-size: 1.4em;
+    overflow: hidden;
+}
+
+body.forum #sidebar-right h2 {
+    font-size: 1.2em;
+}
+
+body.forum #sidebar-right .block ul.menu {
+    padding-left: 0;
+}
+
+body.forum #sidebar-right .block ul.menu li {
+    border: 1px #fff solid;
+}
+
+body.forum #sidebar-right .block .content ul.menu li.leaf a {
+    background: transparent;
+}
+
+#main {
+    font-size: 1.3em;
+}
+
+#main .content {
+    padding-left: 0px;
+}
+
+#main .node .content {
+    color: #333;
+}
+
+#outer_front {
+    background: #fff url(images/heaven_fpbg.png) 0 0 repeat-x;
+}
+
+#main #front_views {
+    width: 760px;
+    margin: 0 auto;
+    padding: 20px 15px 0;
+}
+
+#front_views .node-page {
+    margin-top: 20px;
+}
+
+#front_views .node-page .image_left {
+    float: right;
+}
+
+.no-sidebars #main #front_views .left_front_views,
+.no-sidebars #main #front_views .right_front_views {
+    float: left;
+    width: 45%;
+    height: 250px;
+    border: 1px #e00 solid;
+}
+
+.no-sidebars #main #front_views .right_front_views {
+    float: right;
+}
+
+#front_views .node,
+#front_views .node-page,
+#front_views .node-story {
+    margin-left: 12px;
+}
+
+#front_views .read-more {
+    padding-left: 14px;
+}
+
+#front_views .node-page h2 {
+    margin-bottom: 15px;
+}
+
+#front_views span.submitted {
+    margin-left: 14px;
+    padding: 0;
+}
+
+.node-page {
+    clear: both;
+}
+
+#main .node-heavenletters .content {
+    padding: 0;
+}
+
+div.links {
+    font-size: .9em;
+}
+
+div.links {
+    color: #b79715;
+    text-align: right;
+    border-top: 1px #cae8f9 solid;
+    margin-top: 3px;
+    padding-top: 3px;
+    clear: both;
+}
+
+.links .node_read_more a {
+    font-size: 1.4em;
+}
+
+a,
+a:link {
+    color: #06c;
+    text-decoration: underline;
+}
+
+a:visited,
+a.visited {
+    color: #06c;
+    text-decoration: none;
+}
+
+a:hover,
+a:focus {
+    color: #2492ff;
+    text-decoration: none;
+}
+
+a:active,
+a.active {
+    color: #036;
+}
+
+h1.title,
+h1 {
+    font-family: georgia, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    color: #b79715;
+    font-size: 1.6em;
+    margin: 0;
+    margin-bottom: 0px;
+    clear: both;
+}
+
+#main h1,
+#main h1.title,
+#main #block-views_filterblock-0 h2.title {
+    margin-bottom: .5px;
+    font-size: 1.7em;
+}
+
+h1 a,
+h1 a:hover {
+    font-size: 1em;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: .5em 0 .5em 0;
+}
+
+h2,
+h2.title {
+    font-size: 1.4em;
+    line-height: 1em;
+}
+
+h2,
+h2.title,
+.block h3 {
+    color: #b79715;
+    font-family: georgia, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+}
+
+h2 a,
+h2 a:hover,
+.block h3 a {
+    font-family: georgia, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    margin: 0;
+}
+
+h3 {
+    font-size: 1.1em;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+h4,
+h5,
+h6 {
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+p,
+.book .body {
+    padding: 0;
+    margin: 0 0 1em;
+}
+
+#sidebar-right p {
+    margin: 0;
+}
+
+pre {
+    background: #ddd;
+    border: 1px solid #aaa;
+    padding: 0.75em 1.1em;
+}
+
+blockquote {
+    border: 1px 0px #ccc solid;
+    xmargin: 0.5em 1em;
+    xpadding: 0.3em;
+    font-style: italic;
+}
+
+code {
+    font-size: 100%;
+    font-family: Profont, 'lucida console', 'Courier New', Monaco, monospace;
+}
+
+img {
+    border: 0;
+}
+
+.forum #block-block-9 a#clustrMapsLink img {
+    width: 150px !important;
+}
+
+ol,
+ul,
+dl {
+    position: relative;
+}
+
+
+/* Header styles */
+
+#header {
+    position: relative;
+    background: transparent url(images/header_central.jpg) 50% 0 no-repeat;
+}
+
+.lenguaje {
+    padding: 0;
+    margin: 0;
+    text-align: right;
+    height: 15px;
+}
+
+#block-localizer-0 {
+    position: absolute;
+    top: -1px;
+    right: 10px;
+    margin: 0;
+    padding: 0;
+}
+
+#block-localizer-0 ul li,
+#block-localizer-0 ul {
+    list-style: none;
+    float: left;
+    margin: 0 0 0 5px;
+    padding: 0;
+}
+
+#block-search-0 {
+    position: absolute;
+    top: 22px;
+    right: 10px;
+    z-index: 10;
+    padding: 0;
+}
+
+.forum #edit-search-block-form-keys {
+    *height: 35px;
+}
+
+#block-search-0 h2 {
+    margin: 0;
+}
+
+#block-search-0 .form-text {
+    background: transparent url(images/big_bg.gif) -920px 0 no-repeat;
+    padding: 11px 12px;
+    width: 110px;
+    font-size: 1.3em;
+    border: none;
+}
+
+#block-search-0 .form-submit {
+    background: transparent url(images/big_bg.gif) -955px -40px no-repeat;
+    color: #fff;
+    font-size: 1.3em;
+}
+
+#block-search-0 .form-submit {
+    width: 70px;
+    height: 31px;
+    padding: 0 0 3px;
+    border: none;
+}
+
+#logo-title {
+    margin: 10px auto 0;
+    position: relative;
+    width: 780px;
+}
+
+#site-name {
+    margin: 0;
+}
+
+#site-name a,
+#site-name a:hover {
+    font-family: "Trebuchet MS", Arial, Verdana, Sans-serif;
+    font-weight: normal;
+    display: block;
+    width: 330px;
+    height: 40px;
+    text-indent: -9999px;
+    font-size: 2em;
+    margin: 0 0 0 60px;
+    padding: 0;
+}
+
+#site-slogan {
+    color: #000;
+    text-indent: -9999px;
+    margin: -5px 0 0;
+    font-size: 1.3em;
+    margin-left: 350px;
+}
+
+#search {
+    position: absolute;
+    padding: 0;
+    top: 0;
+    right: 0;
+}
+
+.no-sidebar a:visited {
+    text-decoration: underline;
+}
+
+#mission {
+    font-weight: bold;
+    padding: 10px 0 0;
+    margin-bottom: 20px;
+}
+
+#mission .field-field-heavenletter-title-associ a {
+    display: none;
+}
+
+#mission ul {
+    margin: 0;
+    border-top: 1px #ffffcc dotted;
+}
+
+#mission ul li {
+    list-style: none;
+    margin-bottom: 0;
+    color: #006;
+    font-weight: normal;
+    padding: 20px 15px 0 0;
+    font-family: georgia, arial, sans-serif;
+}
+
+#mission ul li p {
+    margin-bottom: 0px;
+}
+
+#mission .m1,
+#mission .m2,
+#mission .m3 {
+    color: #b79715;
+    font-size: 1.1em;
+    padding: 15px 0 0;
+    position: relative;
+}
+
+#mission .boxer {
+    width: 650px;
+    margin: 0 auto 10px;
+    background: #fff url(images/bg.gif) -651px 0px no-repeat;
+}
+
+#mission .boxer-body {
+    padding: 0 15px;
+    background: #fff url(images/bg.gif) 0 0 repeat-y;
+}
+
+#mission .boxer-bottom {
+    height: 20px;
+    background: #fff url(images/bg.gif) -1305px 0px no-repeat;
+}
+
+#mission .subscription {
+    padding: 0 1em .2em 5px;
+    font-family: georgia, verdana, arial;
+    font-size: 1em;
+    float: right;
+    width: 230px;
+    color: #006;
+}
+
+#mission .sub2 {
+    color: #41abe8;
+}
+
+#mission .subscription div.small_font {
+    text-align: right;
+    color: #fc0;
+    padding-right: 10px;
+}
+
+#mission .sub2 {
+    float: left;
+    width: 260px;
+    padding: 0 0 .2em;
+}
+
+#mission a {
+    display: block;
+    text-align: right;
+}
+
+#header-region {
+    height: 1em;
+}
+
+.breadcrumb {
+    margin: 10px 0 0;
+    padding: 0;
+    font-size: 1.2em;
+    margin-left: 20px;
+}
+
+
+/* Menu styles */
+
+div.menu {
+    height: 40px;
+    margin: 0;
+}
+
+#navigation {
+    text-align: center;
+}
+
+#primary {
+    font-size: 1em;
+    line-height: normal;
+    padding: 0;
+    width: 790px;
+    margin: 0 auto;
+}
+
+#primary ul {
+    margin: 0 0 0 7px;
+    padding: 0;
+    list-style: none;
+}
+
+#primary li {
+    margin: 0;
+    padding: 0;
+    float: left;
+}
+
+#navlist {
+    padding: 0;
+}
+
+#primary #navlist a {
+    font: normal 1.8em georgia, verdana, arial;
+    display: block;
+    padding: 17px 0 0 0;
+    margin: 0;
+    text-align: center;
+    text-decoration: none;
+}
+
+#primary #navlist li.menu-1-1-2 a.menu-1-1-2,
+#primary #navlist li.menu-1-1-2-active a.menu-1-1-2-active {
+    width: 105px;
+}
+
+#navlist a.menu-1-2-2,
+#navlist a.menu-1-2-2-active {
+    width: 145px;
+}
+
+#navlist a.menu-1-3-2,
+#navlist a.menu-1-3-2-active {
+    width: 155px;
+}
+
+#navlist a.menu-1-4-2,
+#navlist a.menu-1-4-2-active {
+    width: 215px;
+}
+
+#navlist a.menu-1-5-2,
+#navlist a.menu-1-5-2-active {
+    width: 152px;
+}
+
+#primary a:hover {
+    text-decoration: none;
+}
+
+#primary #navlist a.active,
+#primary #navlist a.menu-1-2-2-active,
+#primary #navlist a.menu-1-3-2-active,
+#primary #navlist a.menu-1-4-2-active,
+#primary #navlist a.menu-1-5-2-active {
+    padding: 22px 0 0;
+    color: #036;
+}
+
+
+/* Link styles */
+
+ul.links {
+    text-align: left;
+}
+
+.taxonomy {
+    margin: 0;
+    padding: 0;
+    display: inline;
+}
+
+.taxonomy ul.links li {
+    border: none;
+    padding: 0 .1em 0 .2em;
+}
+
+.taxonomy ul.links li:after {
+    content: ",";
+}
+
+.taxonomy ul.links li.last:after {
+    content: "";
+}
+
+ul.links li.first {
+    padding-left: 0;
+    border: none;
+}
+
+.links a {
+    padding: 0 .1em 0 .1em;
+}
+
+.links a.comment_add {
+    background: url(images/bullet-block.gif) -13px -198px no-repeat;
+    padding-left: 19px;
+}
+
+.submitted,
+.taxonomy {
+    font-size: .9em;
+    color: #b79715;
+    padding-left: 15px;
+}
+
+
+/* Form styles */
+
+input,
+textarea,
+textfield {
+    margin: 0;
+    color: #000;
+    font-family: arial;
+    padding: 1px;
+}
+
+.node-form .resizable-textarea,
+.node-form .resizable-textarea textarea {
+    border-right: 1px #d4d0c8 solid;
+}
+
+#comment-form .resizable-textarea {
+    border: 1px #d4d0c8 solid;
+    margin: 0;
+}
+
+#comment-form .resizable-textarea textarea {
+    border: 1px #d4d0c8 solid;
+}
+
+form#user-login {
+    width: auto;
+}
+
+form#user-login .form-text,
+#comment-form .form-text {
+    width: 95%;
+}
+
+fieldset {
+    border: none;
+    border-top: solid #9dceff 1px;
+}
+
+input.form-checkbox,
+input.form-radio {
+    border: none;
+}
+
+#search .form-text,
+#user-login-form .form-text {
+    color: #444;
+    border: 1px solid #6191C5;
+    padding: 2px;
+}
+
+.form-submit,
+.button {
+    padding: 1px;
+}
+
+#search .button,
+#search .form-submit,
+#user-login-form .button,
+#user-login-form .form-submit {
+    background-color: #68A0D9;
+    color: #fff;
+    font-weight: bold;
+    border: 1px solid #4070A1;
+}
+
+#node-form,
+#node-form .node-form {
+    overflow: auto;
+}
+
+#user-login-form {
+    text-align: left;
+}
+
+#user-login-form .item-list ul {
+    margin-top: 10px;
+}
+
+
+/* subscription form Style  */
+
+#main form#heaven fieldset.subsription {
+    padding-top: 5px;
+    margin: 25px auto;
+    width: 85%;
+}
+
+#main form#heaven fieldset.subsription legend {
+    font-size: 1.2em;
+    color: #b79715;
+}
+
+#main form#heaven .normal {
+    clear: both;
+    padding: 5px 0 0;
+}
+
+#main form#heaven .normal label {
+    font-size: 1.2em;
+    font-family: georgia, arial;
+    width: 130px;
+    float: left;
+}
+
+#main form#heaven input,
+#main form#heaven select {
+    display: inline;
+}
+
+#main form#heaven .normal .chk {
+    padding: 10px 0 0;
+}
+
+#main form#heaven .normal select,
+#main .normal input {
+    float: left;
+}
+
+#main form#heaven .normal .chekbox {
+    width: 45%;
+    float: left;
+    font-weight: bold;
+    padding: 0 0 10px;
+}
+
+#main form#heaven .normal .chekbox span.freq {
+    margin-bottom: 5px;
+    font-size: .8em;
+    font-weight: normal;
+}
+
+
+/* Alerts, Status, Help Messages  */
+
+.messages {
+    font-size: 1.2em;
+    min-height: 32px;
+    /* icon height */
+    padding: 1.3em 1em .3em 52px;
+    border: 2px solid #ddd;
+    background: #eee;
+    margin: 10px 0;
+}
+
+div.error {
+    border: 2px solid #F00;
+}
+
+.messages ul {
+    padding: 0 0 0 20px;
+    margin: 0;
+}
+
+#main #block-views-comments_recent .content {
+    padding: 0;
+}
+
+#main #block-views-comments_recent ul {
+    padding: 0;
+}
+
+#main #block-views-comments_recent ul li {
+    xfont-size: .9em;
+    list-style-position: inside;
+    list-style: none;
+    clear: both;
+    xmargin: 0 0 8px 0;
+    padding: 0 0 0 20px;
+    float: left;
+    width: 90%;
+    background: url(images/bullet-block.gif) -13px -198px no-repeat;
+}
+
+#main #block-views-comments_recent ul li .view-field,
+#main #block-views-comments_recent ul li .view-label {
+    float: left;
+    padding-right: 3px;
+}
+
+#main #block-views-comments_recent ul li .view-label {
+    padding-left: 5px;
+}
+
+#main .view-content-godwriting-workshops {
+    padding-top: 15px;
+}
+
+
+/* Footer styles */
+
+#footer-wrapper {
+    clear: both;
+    font-size: 1.4em;
+    font-weight: bold;
+    font-family: georgia, arial, verdana;
+    margin: 0;
+    margin-top: 15px;
+    background: transparent url(images/footer_slice.png) 0 0 repeat-x;
+}
+
+#footer {
+    clear: both;
+    color: #9c8112;
+    text-align: center;
+    margin: 0;
+    padding: 1em 3em;
+}
+
+#footer .footer_links {
+    margin-top: 10px;
+}
+
+#footer .footer_links a {
+    font-family: verdana, arial;
+    color: #41abe8;
+    font-size: 1em;
+    text-decoration: underline;
+}
+
+#footer .footer_links a:hover {
+    text-decoration: none;
+}
+
+#footer .address {
+    font-size: .8em;
+    padding-top: 10px;
+}
+
+
+/* Administration styles */
+
+.admin-panel {
+    margin: 0;
+    padding: 0;
+}
+
+.admin-panel .body {
+    background-color: #eee;
+    border: solid #6191C5 1px;
+}
+
+.admin-panel .body dl,
+.admin-panel .body p {
+    padding: 10px;
+}
+
+.admin-panel h3 {
+    margin-bottom: 0;
+    padding: 5px 5px 5px 30px;
+    font-family: verdana;
+    font-size: 1.4em;
+    color: #fff;
+    border-width: 0px 2px 2px 2px;
+}
+
+
+/*
+** Comment Style
+*/
+
+#comments a.empty-text {
+    display: block;
+    width: 300px;
+    margin: 15px auto 0;
+    font-size: 1.1em;
+    padding: 4px 0 4px 35px;
+    xbackground: transparent url(images/comment-bubble.gif) 0 50% no-repeat;
+    background: #fff url(images/bullet-block.gif) -5px 0 no-repeat;
+}
+
+#comments legend a {
+    background: transparent url(images/comment-bubble.gif) 0 50% no-repeat;
+    padding: 5px 0 5px 35px;
+}
+
+.comment,
+.comment-autor {
+    margin-top: .5em;
+    padding: 0 1em;
+    margin-bottom: .5em;
+    font-size: 1em;
+    line-height: 1.3em;
+}
+
+.comment {
+    border: 1px #ffea97 solid;
+    font-size: 1em;
+    line-height: 1.3em;
+}
+
+.comment-autor {
+    border: 1px #72c4ef solid;
+}
+
+.comment h3.title {
+    margin: 15px 0 5px;
+}
+
+.comment h3.title a,
+.comment-autor h3.title a {
+    color: #06c;
+    margin-bottom: 2px;
+    padding-bottom: 0;
+}
+
+.comment .content-comment,
+.comment-autor .content-comment {
+    padding: 6px 0;
+}
+
+.comment .submitted,
+.comment-autor .submitted {
+    margin: 0 0 5px;
+    font-size: .8em;
+    color: #b79715;
+}
+
+.comment p,
+.comment-autor p {
+    padding: 0 0 .5em 10px;
+    font-size: .9em;
+    margin: 0;
+}
+
+.heavenletters .comment p,
+.heavenletters .comment-autor p {
+    text-indent: 0;
+    font-family: verdana, arial;
+    font-size: 1em;
+    color: #000;
+    margin: 0 !important;
+}
+
+.comment .links,
+.comment-autor .links {
+    padding: 2px 0;
+}
+
+.comment .links ul,
+.comment-autor .links ul {
+    display: inline;
+}
+
+.comment .links ul li,
+.comment-autor .links ul li {
+    padding: 0;
+    margin: 0;
+}
+
+.comment .new {
+    float: right;
+}
+
+.comment .picture {
+    border: 1px solid #abc;
+    float: right;
+    margin: 0.5em;
+}
+
+
+/* Poll styles */
+
+.poll .bar .foreground {
+    background: #2763A5;
+}
+
+.poll .bar {
+    padding: 2px;
+    background: #BDCBDD;
+}
+
+
+/*
+** reader comments style styles
+*/
+
+#main .view-reader-comments .view-item-reader-comments {
+    border: 1px #cae8f9 solid;
+    margin: 0 0 20px;
+    padding: 5px 15px;
+}
+
+#main .view-reader-comments .view-item-reader-comments .view-data-node-data-field-my-picture-field-my-picture-fid {
+    float: left;
+}
+
+#main .view-reader-comments ul li {
+    list-style: none;
+    margin: 0;
+}
+
+#main .view-reader-comments .view-item-reader-comments img {
+    float: left;
+    margin: 0 3px;
+    padding: 5px;
+    background-color: #eaf5fd;
+    border: 1px #c9e8fa solid;
+}
+
+#main .view-data-node-data-field-name-and-location-field-name-and-location-value {
+    font-size: .9em;
+    color: #b79715;
+    text-align: right;
+    padding: 0 5px 0 0;
+    clear: both;
+}
+
+
+/* Book styles */
+
+div.node div.content .book-navigation {
+    background: #eee;
+    margin: 0;
+    padding: 0;
+}
+
+.content .book h1,
+.content .book h2,
+.content .book h3 {
+    font-family: georgia, arial, helvetica, sans-serif;
+    font-weight: normal;
+    margin: .5em 0 .5em 0;
+    text-indent: .5em;
+}
+
+.content .book p:first-letter {
+    font-size: 1.2em;
+}
+
+div.node div.content .book-navigation ul.menu {
+    border: 0;
+    border-top: 1px solid #2763A5;
+    margin: 0;
+    padding-bottom: 10px;
+}
+
+#main .book-navigation .page-links {
+    font-size: .9em;
+    background: #f7fcfd;
+    padding: 3px 10px 5px;
+    margin: 5px 0 10px;
+    border-bottom: 1px solid #cae8f9;
+    border-top: 1px solid #cae8f9;
+}
+
+
+/* Node, Block, Content styles */
+
+.node {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+}
+
+h2.title {
+    margin: 0 0 5px;
+}
+
+.node h2.title a {
+    font-weight: normal;
+    font-family: georgia, verdana, arial;
+}
+
+.node .content {
+    padding-top: 10px;
+    padding-bottom: 5px;
+}
+
+.profile {
+    clear: none;
+}
+
+span.submitted {
+    color: #A6ABBD;
+    display: block;
+    padding: 0pt 0pt 1em;
+}
+
+span.statistics_counter {
+    background: #fff url(images/bullet-block.gif) -13px -175px no-repeat;
+    padding-left: 22px;
+}
+
+
+/**
+ * heavenletters Style
+ */
+
+.heavenletters .field-item {
+    font-size: .8em;
+    color: #b79715;
+    float: left;
+    padding: 0 5px 1em 0;
+}
+
+.heavenletters .god-said {
+    color: #036;
+    font-weight: bold;
+    margin: 5px 0 10px 0;
+    font-size: 1.1em;
+}
+
+.heavenletters p {
+    font: normal 1.25em/1.4em georgia, verdana, arial;
+    text-indent: 1em;
+    clear: both;
+    color: #00006a;
+    margin-right: 50px;
+}
+
+#front_views .heavenletters p {
+    text-indent: 0;
+}
+
+#front_views .view-content-heavenletters-page {
+    padding-top: 0;
+}
+
+#front_views .view-content-heavenletters-page .node-heavenletters {
+    border: none;
+}
+
+.heavenletters .autor {
+    color: #b79715;
+}
+
+.heavenletters .taxonomy {
+    padding-top: 10px;
+    color: #b79715;
+    display: block;
+}
+
+.heavenletters .links {
+    padding: 10px 0 5px;
+}
+
+.heavenletters .taxonomy .links {
+    padding: 0;
+}
+
+
+/* Heaven letters teaser Style*/
+
+.view-content-heavenletters-page {
+    padding-top: 20px;
+}
+
+.view-content-heavenletters-page .node-heavenletters {
+    margin: 0 0 20px;
+    padding: .5em 1em;
+}
+
+.view-content-heavenletters-page h2.title {
+    font-weight: normal;
+    font-size: 1.6em;
+}
+
+#main .view-content-heavenletters-page .node-heavenletters .content {
+    padding: 0;
+}
+
+.view-content-heavenletters-page .node-heavenletters p {
+    font-size: 1.15em;
+    padding-left: 15px;
+}
+
+.view-content-heavenletters-page .node-heavenletters .read-more-teaser,
+#main .more-taxonomy {
+    text-align: right;
+    padding: 10px 15px 0;
+    font-size: 1em;
+}
+
+.node-heavenletters .more-comment,
+#node-3895 .more-node {
+    display: none;
+}
+
+.view-content-heavenletters-page .node-heavenletters .read-more-teaser a,
+#main .more-taxonomy a {
+    padding: 15px 0 15px 46px;
+    background: transparent url(images/bullet-block.gif) 0 -44px no-repeat;
+}
+
+#node-3895 .view-heavenletters-page .node-heavenletters .read-more a {
+    display: none;
+}
+
+.view-content-heavenletters-page .node-heavenletters .links li.node_read_more,
+.node-heavenletters .links li.node_read_more {
+    display: none;
+}
+
+
+/**
+ * heaven haikus,heaven quotes  Style
+ */
+
+.heavenquotes span.submitted {
+    font-size: .9em;
+    color: #b79715;
+    display: block;
+    padding: 0 10px;
+}
+
+#main .heavenquotes .field-item {
+    font-size: .9em;
+    color: #b79715;
+    padding-top: 5px;
+}
+
+#main .node-heavenquotes p {
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+#main .node-heavenquotes span.submitted {
+    padding-bottom: 0;
+    margin-bottom: 5px;
+}
+
+#main .node-heavenquotes .content p {
+    clear: both;
+    font-family: "trebuchet ms", verdana, arial;
+    padding-bottom: 1em;
+    border: none;
+}
+
+#main .heavenquotes .related {
+    color: #b79715;
+}
+
+
+/* Heaven Haikus, Quotes teaser Style*/
+
+.view-content-heaven-haikus {
+    padding-top: 20px;
+}
+
+.view-content-heaven-haikus .node-heavenquotes {
+    margin: 0 0 20px;
+    padding: .5em 1em;
+    border: 1px #9dceff solid;
+}
+
+.view-content-heaven-haikus .node-heavenquotes .submitted {
+    color: #b79715;
+}
+
+
+/**
+ * heaven Petals  Style
+ */
+
+#main .view-content-heavenpetals {
+    margin: 0 0 20px;
+    padding: .5em 1em;
+    border: 1px #9dceff solid;
+}
+
+
+/**
+ * archives  Style
+ */
+
+.view-summary-archives ul,
+.view-archives .view-content-archives ul {
+    padding: 0;
+}
+
+.view-archives .view-content-archives ul li {
+    clear: both;
+    list-style: none;
+    list-style-position: inside;
+    margin-bottom: 15px;
+}
+
+.view-archives .view-content-archives .view-item-archives .view-data-node-title {
+    font: normal 1.2em georgia, verdana, arial;
+    padding: 0;
+    margin: 0;
+}
+
+.view-archives .view-content-archives .view-item-archives .view-data-node-title a {
+    margin: 0;
+    display: block;
+    clear: both;
+    float: left;
+}
+
+.view-archives .view-content-archives .view-item-archives .date-display-single {
+    color: #b79715;
+    font-size: .85em;
+    display: block;
+    clear: both;
+}
+
+.view-archives .view-content-archives .view-item-archives .view-label {
+    display: inline;
+    font-size: .85em;
+    padding: 4px 5px 0;
+}
+
+.view-archives .view-content-archives .view-item-archives .view-data-term-node-2-name,
+.view-archives .view-content-archives .view-item-archives ul.links {
+    display: inline;
+}
+
+.view-archives .view-content-archives .view-item-archives ul.links li {
+    list-style-position: inside;
+    font-size: .85em;
+    margin: 0;
+    padding: 0;
+}
+
+.view-summary-archives ul li {
+    list-style: none;
+    margin: 0 0 3px;
+    padding: 5px 0 5px 20px;
+    background: url(images/content_li_bullet.gif) 0 50% no-repeat;
+}
+
+
+/**
+ * God Questions  Style
+ */
+
+#main .god_questions .field-field-published-date {
+    clear: both;
+    font-size: 1em;
+    color: #b79715;
+    padding: 0 5px 1em 0;
+}
+
+
+/**
+ *Rating Item style.
+ */
+
+#main .rating-item {
+    background: none;
+    border: none;
+    font-size: .8em;
+    color: #b79715;
+}
+
+#main .node-heavenletters .content .rating-item {
+    padding-top: 30px;
+    background: transparent url(images/rose_deco.gif) 50% top no-repeat;
+}
+
+
+/**
+ *forum style.
+ */
+
+.forum .content p {
+    padding-left: 10px;
+    clear: both;
+}
+
+#main #block-forum-1 .item-list ul li {
+    list-style: none;
+    list-style-type: none;
+    margin: 0;
+    padding-left: 20px;
+}
+
+
+/*
+** reader comments style styles
+*/
+
+#main .view-reader-comments .view-item-reader-comments {
+    border: 1px #cae8f9 solid;
+    margin: 0 0 20px;
+    padding: 5px 15px;
+}
+
+#main .view-reader-comments ul li {
+    list-style: none;
+    margin: 0;
+}
+
+#main .view-reader-comments .view-item-reader-comments img {
+    float: left;
+    margin: 0 3px;
+}
+
+#main .view-data-node-data-field-name-and-location-field-name-and-location-value {
+    font-size: .9em;
+    color: #b79715;
+    text-align: right;
+    padding: 0 5px 0 0;
+    clear: both;
+}
+
+
+/*
+** book pages styles
+*/
+
+.book .content {
+    padding: 0 15px;
+}
+
+.book .content p {
+    padding: 0;
+    margin: 0 0 1em;
+}
+
+.book-navigation {
+    border: none;
+}
+
+.book-navigation ul.menu {
+    padding: 0 0 5px;
+    border-top: 1px #cae8f9 solid;
+    margin: 0;
+}
+
+.book-navigation ul.menu li {
+    padding-left: 20px;
+    background: url(images/content_li_bullet.gif) 0 50% no-repeat;
+}
+
+.book-navigation ul.menu a {
+    padding: 2px 0 5px;
+}
+
+.book-navigation .page-links {
+    border: none;
+    clear: none;
+}
+
+.block-views_filterblock {
+    text-align: left;
+    clear: both;
+}
+
+#main .block-views_filterblock fieldset {
+    width: 22%;
+    float: left;
+    border: none;
+}
+
+#main .block-views_filterblock fieldset legend {
+    color: #b79715;
+    padding: 0;
+    font-weight: bold;
+}
+
+#main .block-views_filterblock fieldset .form-item {
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 96%;
+}
+
+#main .block-views_filterblock fieldset .form-text {
+    display: inline;
+    width: 95%;
+}
+
+#main .block-views_filterblock .form-submit {
+    margin-top: 19px;
+}
+
+.view-heavenletters-searcher table tr a {
+    padding: 0 0 0 5px;
+    line-height: 2em;
+}
+
+
+/**
+ * Sidebars style.
+ */
+
+#sidebar-left .block,
+#sidebar-right .block {
+    padding: 0;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.sidebar .view-content-random-comments p a {
+    display: block;
+    width: 120px;
+    overflow: hidden;
+    word-wrap: break-word;
+}
+
+.normal {
+clear:both;
+padding:5px 0;
+}
+legend {
+color:#B79715;
+font-size:1.2em;
+}
+.normal select,
+.normal label,
+.normal input {
+float:left;
+font-family:georgia,arial;
+font-size:1.2em;
+width:130px !important;
+}
+.normal input,
+.normal select {
+width:auto;
+margin:0 0 0 5px;
+}
+
+/**
+ * Sidebar-left style.
+ */
+
+#sidebar-left {
+    font-family: georgia, verdana, arial;
+    font-size: 1.3em;
+}
+
+#sidebar-left .god_said {
+    height: 63px;
+    background: transparent url(images/page_img.gif) 50% -370px no-repeat;
+}
+
+#sidebar-left a {
+    font-size: 1em;
+    padding: 0 5px;
+    word-wrap: word-break;
+}
+
+#sidebar-left .block h2 {
+    font-size: 1.1em;
+    margin: 0;
+    padding: 0 0 0 10px;
+    background: transparent url(images/big_bg.gif) -749px 0 repeat-y;
+    border-bottom: 1px #fff2dc solid;
+}
+
+#sidebar-left .block .content {
+    margin: 0;
+    padding: 0 5px 0 10px;
+    background: transparent url(images/big_bg.gif) -749px 0 repeat-y;
+}
+
+#sidebar-left .block .content p {
+    padding: 0 10px 1em;
+    margin: 0;
+}
+
+#sidebar-left ul {
+    padding: 0;
+}
+
+#sidebar-left ul li {
+    list-style-image: none;
+    list-style: none;
+}
+
+#sidebar-left .block .top-block {
+    background: transparent url(images/big_bg.gif) -409px -5px no-repeat;
+    height: 29px;
+}
+
+#sidebar-left .block .block-body {
+    position: relative;
+    padding: 0;
+}
+
+#sidebar-left .block .bottom-body {
+    *margin-top: -4px;
+    height: 9px;
+    background: transparent url(images/big_bg.gif) -579px bottom no-repeat;
+}
+
+#sidebar-left #block-views-random_quotes,
+#sidebar-left #block-views-random_quotes .content {
+    background: none;
+    padding: 0;
+    color: #006;
+}
+
+#sidebar-left .view-content-home-page-quotes {
+    color: #006;
+}
+
+#sidebar-left #block-views-random_quotes h2 {
+    border: none;
+}
+
+#sidebar-left #block-views-random_quotes .top-block {
+    background: none;
+    height: 1px;
+}
+
+#sidebar-left #block-views-random_quotes .block-body {
+    padding: 0;
+}
+
+#sidebar-left #block-views-random_quotes ul li {
+    background: transparent url(images/big_bg.gif) -409px -5px no-repeat;
+    margin: 0 0 20px;
+    padding: 28px 0 0;
+}
+
+#sidebar-left #block-views-random_quotes li .view-field {
+    background: transparent url(images/big_bg.gif) no-repeat -581px bottom;
+    padding-bottom: 12px;
+    text-align: right;
+}
+
+#sidebar-left #block-views-random_quotes li .view-data-node-body {
+    text-align: left;
+    background: transparent url(images/big_bg.gif) -749px 0 repeat-y;
+    padding: 0 10px;
+}
+
+#sidebar-left #block-views-random_quotes li .view-field .field-item {
+    background: transparent url(images/big_bg.gif) -749px 0 repeat-y;
+    margin: 0;
+    padding: 0 7px 0 0;
+}
+
+#sidebar-left #block-views-random_quotes .bottom-body {
+    display: none;
+}
+
+
+/**
+ * Sidebar-left views-block Style
+ */
+
+#sidebar-left #block-views ul {
+    padding: 0;
+}
+
+#sidebar-left #block-views,
+#sidebar-left #block-views .content {
+    background: none;
+    padding: 0;
+}
+
+#sidebar-left #block-views .top-block {
+    display: none;
+}
+
+#sidebar-left #block-views li {
+    margin: 0 0 10px;
+    padding: 29px 0 0;
+    background: transparent url(images/big_bg.gif) -409px -5px no-repeat;
+}
+
+#sidebar-left #block-views li .view-field {
+    background: transparent url(images/big_bg.gif) no-repeat -581px bottom;
+    padding-bottom: 12px;
+    text-align: right;
+}
+
+#sidebar-left #block-views li .view-data-node-body {
+    text-align: left;
+    background: transparent url(images/big_bg.gif) -749px 0 repeat-y;
+    padding: 0 10px;
+}
+
+#sidebar-left #block-views li .view-field .field-item {
+    background: transparent url(images/big_bg.gif) -749px 0 repeat-y;
+    margin: 0;
+    padding: 0 7px 0 0;
+}
+
+
+/**
+ * Sidebar-left Rnadom Comments Style
+ */
+
+#sidebar-left #block-views-random_comments .top-block {
+    display: none;
+}
+
+#sidebar-left #block-views-random_comments .content,
+#sidebar-left #block-views-random_comments .content ul {
+    padding: 0;
+}
