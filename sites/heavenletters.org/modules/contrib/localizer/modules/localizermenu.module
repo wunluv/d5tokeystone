@@ -1,0 +1,190 @@
+<?php
+include_once(drupal_get_path('module', 'localizer') . '/models/localizertranslation.php');
+
+function localizermenu_translate_all() {
+
+  global $_menu;
+
+  $languages = localizer_available_uilocales();
+  $reqpath = $_GET['q'];
+  $drupalpath = drupal_get_normal_path($reqpath);
+  $drupallocpath = drupal_get_normal_path(localizer_pathwithoutlocale($reqpath));
+
+  $drupallocpath_l = array();
+  foreach($languages as $langprefix=>$langname) {
+    $drupallocpath_l[$langprefix] = drupal_get_normal_path(localizer_pathwithlocale($reqpath, $langprefix));
+  }
+
+  if(module_exists('localizernode')) {
+    $homelocpath = localizernode_get_localizedpath(variable_get('site_frontpage', 'node'), localizer_get_defaultcontentlocale());
+  }
+  else
+  {
+    $homelocpath = variable_get('site_frontpage', 'node');
+  }
+
+  foreach($_menu['items'] as $mid => $item) {
+    if($item['type'] & (MENU_CREATED_BY_ADMIN | MENU_MODIFIED_BY_ADMIN)) {
+      $expanded = false;
+
+      $path = $item['path'];
+
+      if (module_exists('localizernode')) {
+        $path = localizernode_get_localizedpath($path, localizer_get_defaultcontentlocale());
+        $_menu['items'][$mid]['path'] = $path;
+      }
+
+      if($drupalpath == $path) {
+        $expanded = true;
+      }
+
+      if(!$expanded) {
+        if($drupallocpath == $path) {
+          $expanded = true;
+        }
+      }
+
+      if(!$expanded) {
+        foreach($languages as $langprefix=>$langname) {
+          if(!$expanded) {
+            if($drupallocpath_l[$langprefix] == $path) {
+              $expanded = true;
+              break;
+            }
+          }
+        }
+      }
+
+      $translation = localizermenu_translatemenuitem($mid);
+      $_menu['items'][$mid]['title'] = empty($translation['title']) ? $item['title'] : $translation['title'];
+      $_menu['items'][$mid]['description'] = empty($translation['description']) ?  $item['description'] : $translation['description'];
+
+      if($expanded) {
+        $_menu['items'][$mid]['path'] = $drupalpath;
+        $locations=localizermenu_expandmenu($mid);
+        $locations[$homelocpath] = l(t('Home'), $homelocpath);
+        $locations = array_reverse($locations);
+        array_pop($locations);
+        drupal_set_breadcrumb($locations);
+      }
+    }
+  }
+}
+
+function localizermenu_translatemenuitem($mid, $language=NULL) {
+  static $translations = array();
+  if(!$language) $language=localizer_get_uilocale(); 
+  if (!isset($translations[$language][$mid])) {
+    $items = localizertranslation_findall("(object_name = 'menu' OR object_name = 'menu_item') AND locale = '$language'");
+    foreach($items as $key=>$item) {
+      $item_key = $item['object_key'];
+      $item_field = $item['object_field'];
+      $item_translation = $item['translation'];
+      $translations[$language][$item_key][$item_field] = $item_translation;
+    }
+  }
+  return $translations[$language][$mid];
+}
+
+function localizermenu_expandmenu($_mid) {
+  global $_menu;
+  static $locations = array();
+
+  if($_mid>0) {
+    $_menu['visible'][$_mid]['type'] |= MENU_EXPANDED;
+    $pid = $_menu['visible'][$_mid]['pid'];
+    if($_menu['visible'][$_mid]['type'] & MENU_VISIBLE_IN_BREADCRUMB) {
+      $localpath = $_menu['visible'][$_mid]['path'];
+      if(module_exists('localizernode')) {
+        $localpath = localizernode_get_localizedpath($localpath, localizer_get_defaultcontentlocale());
+      }
+      
+      $locations[$locpath] = l($_menu['items'][$_mid]['title'], $localpath);
+    }
+    localizermenu_expandmenu($pid);
+  }
+  return $locations;
+}
+
+/**
+ * Implementation of hook_form_alter().
+*/
+function localizermenu_form_alter($form_id, &$form) {
+  global $_menu;
+  $mid = $form['mid']['#value'];
+  $type = $_menu['items'][$mid]['type'];
+  if ($type & MENU_CREATED_BY_ADMIN | MENU_MODIFIED_BY_ADMIN) {
+    if($form_id == 'menu_edit_menu_form'  && (arg(4) != 'add')) {
+      localizer_adminlocale_formselect($form);
+      if(localizer_get_defaultuilocale() != localizer_get_adminlocale()) {
+        unset($form['#submit']);
+        localizer_formdisablecontrols($form, array('title'=>1));
+        $form['#submit']['localizermenu_form_submission'] = array();
+        $items = localizertranslation_findall("object_name='menu' AND object_key='$mid' AND locale='" . localizer_get_adminlocale() . "'");
+        foreach($items as $key=>$item) {
+          $item_field = $item['object_field'];
+          $item_translation = $item['translation'];
+          if(array_key_exists($item_field, $form) && $item_translation) {
+            $form[$item_field]['#default_value'] = $item_translation;
+          }
+        }
+      }
+    }
+    if ($form_id == 'menu_edit_item_form' && (arg(4) != 'add')) {
+      localizer_adminlocale_formselect($form);
+      if(localizer_get_defaultuilocale() != localizer_get_adminlocale()) {
+        unset($form['#submit']);
+        localizer_formdisablecontrols($form, array('title'=>1, 'description'=>1));
+        $form['#submit']['localizermenu_form_submission'] = array();
+        $items = localizertranslation_findall("object_name='menu_item' AND object_key='$mid' AND locale='" . localizer_get_adminlocale() . "'");
+        foreach($items as $key=>$item) {
+          $item_field = $item['object_field'];
+          $item_translation = $item['translation'];
+          if(array_key_exists($item_field, $form) && $item_translation) {
+            $form[$item_field]['#default_value'] = $item_translation;
+          }
+        }
+      }
+    }
+    elseif ($form_id == 'menu_confirm_delete_form') {
+      $form['#submit']['localizermenu_delete_confirm'] = array(); // register callback for deletions
+    }
+  }
+}
+
+function localizermenu_form_submission($form_id, $form) {
+  if($form_id == 'menu_edit_menu_form') {
+    $translation = array(
+      'tid' => '',
+      'object_name' => 'menu',
+      'object_key' => $form['mid'],
+      'object_field' => 'title',
+      'locale' => localizer_get_adminlocale(),
+      'translation' => $form['title']
+    );
+    localizertranslation_save($translation);
+  }
+  elseif($form_id == 'menu_edit_item_form') {
+    $translation = array(
+      'tid' => '',
+      'object_name' => 'menu_item',
+      'object_key' => $form['mid'],
+      'object_field' => 'title',
+      'locale' => localizer_get_adminlocale(),
+      'translation' => $form['title']
+    );
+    localizertranslation_save($translation);
+
+    $translation['object_field'] = 'description';
+    $translation['translation'] = $form['description'];
+    localizertranslation_save($translation);
+  }
+}
+
+function localizermenu_delete_confirm ($form_id, $form) {
+  if (!empty($form['mid'])) {
+    localizertranslation_deleteall("object_key='" . $form['mid'] . "'");
+  }
+}
+
+?>

@@ -1,0 +1,9 @@
+--- modules/taxonomy/taxonomy.info.orig	2007-11-22 18:19:47.000000000 +0100
++++ modules/taxonomy/taxonomy.info	2007-11-12 03:31:00.000000000 +0100
+@@ -1,5 +1,5 @@
+ ; $Id: taxonomy.info.patch,v 1.1.2.1 2007/11/22 17:37:17 robertogerola Exp $
+-name = Taxonomy
++name = Taxonomy-Localizer
+ description = Enables the categorization of content.
+ package = Core - optional
+ version = VERSION

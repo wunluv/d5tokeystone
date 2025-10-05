@@ -1,0 +1,90 @@
+<?php
+include_once(drupal_get_path('module', 'localizer') . '/models/localizertranslation.php');
+
+function localizertaxonomy_form_alter($form_id, &$form) {
+  if (($form_id == 'taxonomy_form_vocabulary') && (arg(3) != 'add')) {
+    $vid = $form['vid']['#value'];
+    localizer_adminlocale_formselect($form);
+    if(localizer_get_defaultuilocale() != localizer_get_adminlocale()) {
+      unset($form['#submit']);
+      localizer_formdisablecontrols($form, array('name'=>1, 'description'=>1, 'help'=>1));
+      $form['#submit']['localizertaxonomy_form_vocabulary_submission'] = array();
+      $items = localizertranslation_findall("object_name='taxonomy_vocabulary' AND object_key='$vid' AND locale='" . localizer_get_adminlocale() . "'");
+      foreach($items as $key=>$item) {
+        $item_field = $item['object_field'];
+        $item_translation = $item['translation'];
+        if(array_key_exists($item_field, $form) && $item_translation) {
+          $form[$item_field]['#default_value'] = $item_translation;
+        }
+      }
+    }
+  }
+  else if(($form_id == 'taxonomy_form_term') && (arg(3) != 'add')) {
+    $tid = $form['tid']['#value'];
+    localizer_adminlocale_formselect($form);
+    if(localizer_get_defaultuilocale() != localizer_get_adminlocale()) {
+      unset($form['#submit']);
+      localizer_formdisablecontrols($form, array('name'=>1, 'description'=>1, 'synonyms'=>1));
+      $form['#submit']['localizertaxonomy_form_term_submission'] = array();
+      $items = localizertranslation_findall("object_name='taxonomy_term' AND object_key='$tid' AND locale='" . localizer_get_adminlocale() . "'");
+      foreach($items as $key=>$item) {
+        $item_field = $item['object_field'];
+        $item_translation = $item['translation'];
+        if(array_key_exists($item_field, $form) && $item_translation) {
+          $form[$item_field]['#default_value'] = $item_translation;
+        }
+      }
+    }
+  }
+  elseif ($form_id == 'menu_confirm_delete_form') {
+    $form['#submit']['localizertaxonomy_delete_confirm'] = array(); // register callback for deletions
+  }
+}
+
+function localizertaxonomy_form_vocabulary_submission($form_id, $form) {
+  $translation = array(
+    'tid' => '',
+    'object_name' => 'taxonomy_vocabulary',
+    'object_key' => $form['vid'],
+    'object_field' => 'name',
+    'locale' => localizer_get_adminlocale(),
+    'translation' => $form['name']
+  );
+  localizertranslation_save($translation);
+
+  $translation['object_field'] = 'description';
+  $translation['translation'] = $form['description'];
+  localizertranslation_save($translation);
+
+  $translation['object_field'] = 'help';
+  $translation['translation'] = $form['help'];
+  localizertranslation_save($translation);
+}
+
+function localizertaxonomy_form_term_submission($form_id, $form) {
+  $translation = array(
+    'tid' => '',
+    'object_name' => 'taxonomy_term',
+    'object_key' => $form['tid'],
+    'object_field' => 'name',
+    'locale' => localizer_get_adminlocale(),
+    'translation' => $form['name']
+  );
+  localizertranslation_save($translation);
+
+  $translation['object_field'] = 'description';
+  $translation['translation'] = $form['description'];
+  localizertranslation_save($translation);
+
+  $translation['object_field'] = 'synonyms';
+  $translation['translation'] = $form['synonyms'];
+  localizertranslation_save($translation);
+}
+
+function localizertaxonomy_delete_confirm ($form_id, $form) {
+  if (!empty($form['mid'])) {
+    localizertranslation_deleteall("object_key='" . $form['mid'] . "'");
+  }
+}
+
+?>

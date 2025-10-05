@@ -1,0 +1,49 @@
+<?php
+function localizeruser_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {localizeruser} (
+        uid int(10) unsigned NOT NULL,
+        contentlocales varchar(100),
+        switch_uicontent tinyint(2) NOT NULL default '1',
+        PRIMARY KEY  (uid)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+    break;
+    case 'pgsql':
+      db_query("CREATE TABLE {localizeruser} (
+        uid int4 NOT NULL,
+        contentlocales varchar(100),
+        switch_uicontent int2 NOT NULL default 1,
+        PRIMARY KEY  (uid)
+      );");
+    break;
+  }
+}
+
+function localizeruser_update_1() {
+  $items = array();
+  $items[] = update_sql("ALTER TABLE {localizeruser} CHANGE nodeslocale nodeslocales VARCHAR(100)");
+  return $items;
+}
+
+function localizeruser_update_2() {
+  $items = array();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $items[] = update_sql("ALTER TABLE {localizeruser} ADD COLUMN switch_uicontent tinyint(2) NOT NULL default '1'");
+    break;
+    case 'pgsql':
+      $items[] = update_sql("ALTER TABLE {localizeruser} ADD COLUMN switch_uicontent int2 NOT NULL default 1");
+    break;
+  }
+  return $items;
+}
+
+function localizeruser_update_3() {
+  $items = array();
+  $items[] = update_sql("ALTER TABLE {localizeruser} CHANGE nodeslocales contentlocales VARCHAR(100)");
+  return $items;
+}
+?>

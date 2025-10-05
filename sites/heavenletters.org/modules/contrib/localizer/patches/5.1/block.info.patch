@@ -1,0 +1,9 @@
+--- modules/block/block.info	2007-01-30 01:20:07.000000000 +0100
++++ sites/all/modules/localizer/block/block.info	2007-04-16 14:59:38.000000000 +0200
+@@ -1,5 +1,5 @@
+ ; $Id: block.info.patch,v 1.1.2.1 2007/04/23 09:55:49 robertogerola Exp $
+-name = Block
++name = "Block [Localizer]"
+ description = Controls the boxes that are displayed around the main content.
+ package = Core - required
+ version = VERSION

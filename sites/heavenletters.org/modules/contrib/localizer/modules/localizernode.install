@@ -1,0 +1,30 @@
+<?php
+function localizernode_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {localizernode} (
+        nid int(10) unsigned NOT NULL ,
+        locale VARCHAR(10) NOT NULL default '-',
+        pid int(10) unsigned NOT NULL ,
+        PRIMARY KEY (nid),
+        KEY localizernode_idx1 (pid),
+        UNIQUE KEY localizernode_idx2 (locale,pid)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+    break;
+    case 'pgsql':
+      db_query("CREATE TABLE {localizernode} (
+        nid int4 NOT NULL ,
+        locale VARCHAR(10) NOT NULL default '-',
+        pid int4 NOT NULL ,
+        PRIMARY KEY (nid),
+        UNIQUE (locale,pid)
+      );");
+      db_query("create index localizernode_pid_index on {localizernode} (pid)");
+    break;
+  }
+  global $locale;
+  if(!$locale) $locale='en';
+  db_query("INSERT INTO {localizernode} (nid,locale,pid) SELECT nid,'" . $locale . "',nid FROM {node};");
+}
+?>

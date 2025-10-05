@@ -1,0 +1,72 @@
+<?php
+
+/*
+* Build a permissions list for viewing unpublished nodes of all content types.
+* Also, provide a 'use view_unpublished module' permission which determines if this module
+* will even attempt to override the default node/nid path.
+*/
+function view_unpublished_perm() {
+  $perms = array('use view_unpublished module', 'view all unpublished content', 'edit all unpublished content');
+  $types = db_query("select type from {node_type}");
+  $i = 0;
+  while ($type = db_result($types, $i++)) {
+    $perms[] = 'view unpublished '. $type .' content';
+    $perms[] = 'edit unpublished '. $type .' content';
+  }
+ 
+  return $perms;
+}
+
+/*
+*  Selectively overrides the node/nid path to set access => true when a user has permission
+*  to view unpublished content
+*/
+function view_unpublished_menu($may_cache) {
+  $items = array();
+  if (!$may_cache) {
+    if (is_numeric(arg(1)) && arg(0) == 'node' && user_access('use view_unpublished module') && !user_access('administer nodes')) {
+        $node = node_load(arg(1));
+        if ($node->status == 0 && (user_access('view unpublished '. $node->type .' content') || user_access('view all unpublished content'))) {
+          //print_r($node);
+          //die();
+          $items[] = array(
+            'path' => 'node/'. arg(1), 
+            'title' => t('View'),
+            'callback' => 'node_page_view',
+            'callback arguments' => array($node),
+            'type' => MENU_CALLBACK,
+            'access' => true,
+          );
+        }
+        if ($node->status == 0 && (user_access('edit unpublished '. $node->type .' content') || user_access('edit all unpublished content'))) {
+          $items[] = array('path' => 'node/'. arg(1) .'/edit', 
+            'title' => t('Edit'),
+            'callback' => 'node_page_edit',
+            'callback arguments' => array($node),
+            'access' => true,
+            'weight' => 1,
+            'type' => MENU_LOCAL_TASK
+          );
+        } 
+    }
+  }
+ 
+  return $items;
+}
+
+
+/*
+*  Implementation of hook_nodeapi
+*/
+function view_unpublished_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  switch ($op) {
+    case 'update':
+     if (is_numeric(arg(1)) && arg(0) == 'node' && arg(2) == 'edit' && user_access('use view_unpublished module') && !user_access('administer nodes')) {
+       // If node successfully edited, then go to node view: http://drupal.org/node/301221
+       if ($node->status == 0 && (user_access('view unpublished '. $node->type .' content') || user_access('view all unpublished content'))) {
+         drupal_goto("node/$node->nid");
+        }
+	 }
+      break;
+  }
+}

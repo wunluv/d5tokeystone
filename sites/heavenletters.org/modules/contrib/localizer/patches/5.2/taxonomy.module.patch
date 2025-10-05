@@ -1,0 +1,124 @@
+--- taxonomy.module.orig	2007-09-15 16:12:36.000000000 +0200
++++ taxonomy.module	2007-09-15 16:11:40.000000000 +0200
+@@ -181,6 +181,7 @@ function taxonomy_overview_terms($vid) {
+   if (!$vocabulary) {
+     return drupal_not_found();
+   }
++  if(function_exists('tobject')) $vocabulary = tobject('taxonomy_vocabulary', $vocabulary->vid, $vocabulary);
+ 
+   drupal_set_title(check_plain($vocabulary->name));
+   $start_from      = $_GET['page'] ? $_GET['page'] : 0;
+@@ -193,6 +194,7 @@ function taxonomy_overview_terms($vid) {
+     // number of tags in the freetagging vocabulary.
+     $results = pager_query(db_rewrite_sql('SELECT t.*, h.parent FROM {term_data} t INNER JOIN  {term_hierarchy} h ON t.tid = h.tid WHERE t.vid = %d ORDER BY weight, name', 't', 'tid'), $page_increment, 0, NULL, $vid);
+     while ($term = db_fetch_object($results)) {
++      if(function_exists('tobject')) $term=tobject('taxonomy_term', $term->tid, $term);
+       $rows[] = array(
+         l($term->name, "taxonomy/term/$term->tid"),
+         l(t('edit'), "admin/content/taxonomy/edit/term/$term->tid", array(), $destination),
+@@ -202,6 +204,7 @@ function taxonomy_overview_terms($vid) {
+   else {
+     $tree = taxonomy_get_tree($vocabulary->vid);
+     foreach ($tree as $term) {
++      if(function_exists('tobject')) $term=tobject('taxonomy_term', $term->tid, $term);
+       $total_entries++; // we're counting all-totals, not displayed
+       if (($start_from && ($start_from * $page_increment) >= $total_entries) || ($displayed_count == $page_increment)) {
+         continue;
+@@ -621,6 +624,7 @@ function taxonomy_term_confirm_delete_su
+  */
+ function taxonomy_form($vid, $value = 0, $help = NULL, $name = 'taxonomy') {
+   $vocabulary = taxonomy_get_vocabulary($vid);
++  if(function_exists('tobject')) $vocabulary=tobject('taxonomy_vocabulary', $vocabulary->vid, $vocabulary);
+   $help = ($help) ? $help : $vocabulary->help;
+   if ($vocabulary->required) {
+     $blank = 0;
+@@ -668,6 +672,7 @@ function taxonomy_get_vocabularies($type
+   $vocabularies = array();
+   $node_types = array();
+   while ($voc = db_fetch_object($result)) {
++    if(function_exists('tobject')) $voc=tobject('taxonomy_vocabulary', $voc->vid, $voc);
+     $node_types[$voc->vid][] = $voc->type;
+     unset($voc->type);
+     $voc->nodes = $node_types[$voc->vid];
+@@ -767,6 +772,7 @@ function taxonomy_node_get_terms_by_voca
+   $result = db_query(db_rewrite_sql('SELECT t.tid, t.* FROM {term_data} t INNER JOIN {term_node} r ON r.tid = t.tid WHERE t.vid = %d AND r.nid = %d ORDER BY weight', 't', 'tid'), $vid, $nid);
+   $terms = array();
+   while ($term = db_fetch_object($result)) {
++    if(function_exists('tobject')) $term=tobject('taxonomy_term', $term->tid, $term);
+     $terms[$term->$key] = $term;
+   }
+   return $terms;
+@@ -782,6 +788,7 @@ function taxonomy_node_get_terms($nid, $
+     $result = db_query(db_rewrite_sql('SELECT t.* FROM {term_node} r INNER JOIN {term_data} t ON r.tid = t.tid INNER JOIN {vocabulary} v ON t.vid = v.vid WHERE r.nid = %d ORDER BY v.weight, t.weight, t.name', 't', 'tid'), $nid);
+     $terms[$nid][$key] = array();
+     while ($term = db_fetch_object($result)) {
++      if(function_exists('tobject')) $term=tobject('taxonomy_term', $term->tid, $term);
+       $terms[$nid][$key][$term->$key] = $term;
+     }
+   }
+@@ -906,6 +913,7 @@ function taxonomy_get_related($tid, $key
+     $result = db_query('SELECT t.*, tid1, tid2 FROM {term_relation}, {term_data} t WHERE (t.tid = tid1 OR t.tid = tid2) AND (tid1 = %d OR tid2 = %d) AND t.tid != %d ORDER BY weight, name', $tid, $tid, $tid);
+     $related = array();
+     while ($term = db_fetch_object($result)) {
++      if(function_exists('tobject')) $term=tobject('taxonomy_term', $term->tid, $term);
+       $related[$term->$key] = $term;
+     }
+     return $related;
+@@ -923,6 +931,7 @@ function taxonomy_get_parents($tid, $key
+     $result = db_query(db_rewrite_sql('SELECT t.tid, t.* FROM {term_data} t INNER JOIN {term_hierarchy} h ON h.parent = t.tid WHERE h.tid = %d ORDER BY weight, name', 't', 'tid'), $tid);
+     $parents = array();
+     while ($parent = db_fetch_object($result)) {
++      if(function_exists('tobject')) $parent=tobject('taxonomy_term', $parent->tid, $parent);
+       $parents[$parent->$key] = $parent;
+     }
+     return $parents;
+@@ -960,6 +969,7 @@ function taxonomy_get_children($tid, $vi
+   }
+   $children = array();
+   while ($term = db_fetch_object($result)) {
++    if(function_exists('tobject')) $term=tobject('taxonomy_term', $term->tid, $term);
+     $children[$term->$key] = $term;
+   }
+   return $children;
+@@ -998,6 +1008,7 @@ function taxonomy_get_tree($vid, $parent
+ 
+     $result = db_query(db_rewrite_sql('SELECT t.tid, t.*, parent FROM {term_data} t INNER JOIN  {term_hierarchy} h ON t.tid = h.tid WHERE t.vid = %d ORDER BY weight, name', 't', 'tid'), $vid);
+     while ($term = db_fetch_object($result)) {
++      if(function_exists('tobject')) $term=tobject('taxonomy_term', $term->tid, $term);
+       $children[$vid][$term->parent][] = $term->tid;
+       $parents[$vid][$term->tid][] = $term->parent;
+       $terms[$vid][$term->tid] = $term;
+@@ -1124,6 +1135,7 @@ function taxonomy_get_term_by_name($name
+   $db_result = db_query(db_rewrite_sql("SELECT t.tid, t.* FROM {term_data} t WHERE LOWER('%s') LIKE LOWER(t.name)", 't', 'tid'), trim($name));
+   $result = array();
+   while ($term = db_fetch_object($db_result)) {
++    if(function_exists('tobject')) $term=tobject('taxonomy_term', $term->tid,$term);
+     $result[] = $term;
+   }
+ 
+@@ -1171,6 +1183,9 @@ function taxonomy_get_term($tid) {
+ 
+   if (!isset($terms[$tid])) {
+     $terms[$tid] = db_fetch_object(db_query('SELECT * FROM {term_data} WHERE tid = %d', $tid));
++    if (function_exists('tobject')) {
++      $terms[$tid] = tobject('taxonomy_term', $tid, $terms[$tid]);
++    }
+   }
+ 
+   return $terms[$tid];
+@@ -1373,6 +1388,7 @@ function taxonomy_term_page($str_tids = 
+     $tids = array(); // we rebuild the $tids-array so it only contains terms the user has access to.
+     $names = array();
+     while ($term = db_fetch_object($result)) {
++      if(function_exists('tobject')) $term=tobject('taxonomy_term', $term->tid, $term);
+       $tids[] = $term->tid;
+       $names[] = $term->name;
+     }
+@@ -1501,6 +1517,7 @@ function taxonomy_autocomplete($vid, $st
+ 
+     $matches = array();
+     while ($tag = db_fetch_object($result)) {
++      if(function_exists('tobject')) $tag=tobject('taxonomy_term', $tag->tid, $tag);
+       $n = $tag->name;
+       // Commas and quotes in terms are special cases, so encode 'em.
+       if (strpos($tag->name, ',') !== FALSE || strpos($tag->name, '"') !== FALSE) {

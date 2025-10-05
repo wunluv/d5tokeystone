@@ -1,0 +1,11 @@
+--- modules/block/block.module.orig	2007-11-22 18:19:42.000000000 +0100
++++ modules/block/block.module	2007-11-12 03:31:00.000000000 +0100
+@@ -645,7 +645,7 @@ function block_list($region) {
+   if (!count($blocks)) {
+     $rids = array_keys($user->roles);
+     $placeholders = implode(',', array_fill(0, count($rids), '%d'));
+-    $result = db_query("SELECT DISTINCT b.* FROM {blocks} b LEFT JOIN {blocks_roles} r ON b.module = r.module AND b.delta = r.delta WHERE b.theme = '%s' AND b.status = 1 AND (r.rid IN ($placeholders) OR r.rid IS NULL) ORDER BY b.region, b.weight, b.module", array_merge(array($theme_key), $rids));
++    $result = db_query(db_rewrite_sql("SELECT DISTINCT b.* FROM {blocks} b LEFT JOIN {blocks_roles} r ON b.module = r.module AND b.delta = r.delta WHERE b.theme = '%s' AND b.status = 1 AND (r.rid IN ($placeholders) OR r.rid IS NULL) ORDER BY b.region, b.weight, b.module", 'blocks', 'module'), array_merge(array($theme_key), $rids));
+     while ($block = db_fetch_object($result)) {
+       if (!isset($blocks[$block->region])) {
+         $blocks[$block->region] = array();

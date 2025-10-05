@@ -1,0 +1,9 @@
+--- modules/menu/menu.info	2007-01-30 01:20:07.000000000 +0100
++++ sites/all/modules/localizer/menu/menu.info	2007-04-16 14:59:21.000000000 +0200
+@@ -1,5 +1,5 @@
+ ; $Id: menu.info.patch,v 1.1.2.1 2007/04/23 09:55:49 robertogerola Exp $
+-name = Menu
++name = "Menu [Localizer]"
+ description = Allows administrators to customize the site navigation menu.
+ package = Core - optional
+ version = VERSION

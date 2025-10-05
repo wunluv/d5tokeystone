@@ -1,0 +1,10 @@
+; $Id: view_unpublished.info,v 1.1 2008/08/11 15:47:25 dsantangelo Exp $
+name = View Unpublished Content
+description = "Select which roles should be able to see unpublished content"
+package = "Permissions"
+
+; Information added by drupal.org packaging script on 2009-08-30
+version = "5.x-1.0"
+project = "view_unpublished"
+datestamp = "1251660359"
+

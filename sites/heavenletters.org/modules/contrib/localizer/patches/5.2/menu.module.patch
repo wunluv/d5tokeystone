@@ -1,0 +1,20 @@
+--- menu.module.orig	2007-09-15 16:12:22.000000000 +0200
++++ menu.module	2007-09-15 16:24:09.000000000 +0200
+@@ -1,5 +1,5 @@
+ <?php
+-// $Id: menu.module.patch,v 1.1.2.1 2007/09/15 14:29:13 robertogerola Exp $
++// $Id: menu.module.patch,v 1.1.2.1 2007/09/15 14:29:13 robertogerola Exp $
+ 
+ /**
+  * @file
+@@ -410,8 +410,8 @@ function menu_edit_item_form($type, $mid
+ /**
+  * Process menu and menu item add/edit form submissions.
+  */
+-function menu_edit_item_form_submit($form_id, $form_values) {
+-  menu_edit_item_save($form_values);
++function menu_edit_item_form_submit($form_id, &$form_values) {
++  $form_values['mid']=menu_edit_item_save($form_values);
+   return 'admin/build/menu';
+ }
+ 

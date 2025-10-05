@@ -1,0 +1,1431 @@
+<?php
+/**
+* Localizer module.
+* @author Roberto Gerola, 2006, http://www.speedtech.it
+*/
+
+include_once(drupal_get_path('module', 'localizer') . '/models/localizertranslation.php');
+
+/**
+* Valid permissions for this module
+* @return array An array of valid permissions for the onthisdate module
+*/
+function localizer_perm() {
+  $perms = array();
+  $perms[] = 'access localizer';
+  $perms[] = 'administer localizer';
+/*
+  $languages = localizer_available_uilocales();
+  foreach($languages as $key=>$value) {
+    $perms[] = $value . ' translator';    
+  }
+*/
+  return $perms;
+}
+
+/**
+* Implementation of the hook menu for adding localizer menu items.
+* It translates also all user menu items.
+*/
+function localizer_menu($may_cache) {
+  //change locale based on different methods
+  localizer_change_uilocale();
+  if(module_exists('localizermenu')) {
+    localizermenu_translate_all();
+  }
+
+  $items = array();
+
+  $items[] = array(
+    'path' => 'language',
+    'title' => t('Localizer switch ui locale'),
+    'callback' => 'localizer_switchuilocale',
+    'access' => user_access('access localizer'),
+    'type' => MENU_CALLBACK);
+
+  $items[] = array(
+    'path' => 'switchuilocale',
+    'title' => t('Localizer switch ui locale'),
+    'callback' => 'localizer_switchuilocale',
+    'access' => user_access('access localizer'),
+    'type' => MENU_CALLBACK);
+
+  $items[] = array(
+    'path' => 'switchadminlocale',
+    'title' => t('Localizer switch admin locale'),
+    'callback' => 'localizer_switchadminlocale',
+    'access' => user_access('access localizer'),
+    'type' => MENU_CALLBACK);
+
+  $items[] = array(
+    'path' => 'admin/settings/localizer',
+    'title' => t('Localizer'),
+    'description' => t('Configure multilingual support'),
+    'callback' => 'drupal_get_form',
+    'callback arguments' => 'localizer_admin',
+    'access' => user_access('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM);
+
+  return $items;
+}
+
+/**
+* Hook settings for the module
+*/
+function localizer_admin() {
+  $form['localeswitchblock'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Language switching block'),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+        '#weight' => -18,
+  );
+
+  $form['localeswitchblock']['localizer_switchblock_hidecurrentlocale'] = array (
+    '#type' => 'checkbox',
+    '#title' => t('Hide the current language'),
+    '#default_value' => variable_get('localizer_switchblock_hidecurrentlocale', TRUE),
+  );
+
+  $form['localeswitchblock']['localizer_switchblock_showlangname'] = array (
+    '#type' => 'checkbox', 
+    '#title' => t('Show the language name'),
+    '#default_value' => variable_get('localizer_switchblock_showlangname', TRUE),
+  );
+
+  $form['localeswitchblock']['localizer_switchblock_showflags'] = array (
+    '#type' => 'checkbox',
+    '#title' => t('Show flag'),
+    '#default_value' => variable_get('localizer_switchblock_showflags', TRUE),
+  );
+
+  $form['localeswitchblock']['localizer_switchblock_flagseparator'] = array (
+    '#type' => 'textfield', 
+    '#title' => t('Flag and language name separator'), 
+    '#default_value' => variable_get('localizer_switchblock_flagseparator', ' '),
+    '#size' => 5,
+    '#maxlength' => 10,
+    '#description' => t('Token separating the flag and the language name.'),
+  );
+
+  $form['localeswitchblock']['localizer_switchblock_flagspath'] = array (
+    '#type' => 'textfield', 
+    '#title' => t('Flag icons path'), 
+    '#default_value' => variable_get('localizer_switchblock_flagspath', drupal_get_path('module', 'localizer') . '/flags/*.png'),
+    '#size' => 50,
+    '#maxlength' => 180,
+    '#description' => t('Path for flag icons, relative to Drupal installation. \'*\' is a placeholder for language code.'),
+  );
+
+   $form['localeswitchblock']['localizer_switchblock_flagsize'] = array (
+    '#type' => 'textfield', 
+    '#title' => t('Flag icons size'), 
+    '#default_value' => variable_get('localizer_switchblock_flagsize', '16x11'),
+    '#size' => 10,
+    '#maxlength' => 10,
+    '#description' => t('Image size for flags, in the form "width x height".'),
+  );
+
+  $form['localedetect'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Language initial detection options'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#weight' => -17,
+  );
+
+  $form['localedetect']['localizer_detect_browser'] = array (
+    '#type' => 'checkbox', 
+    '#title' => t("Detect through browser's language"), 
+    '#default_value' => variable_get('localizer_detect_browser', TRUE),
+    '#weight' => -18,
+  );
+
+  $form['localeswitch'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Language switching options'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#weight' => -16,
+  );
+
+  $form['localeswitch']['localizer_frontpage_redirect'] = array (
+    '#type' => 'checkbox',
+    '#title' => t("Redirect front page to the localized version"), 
+    '#default_value' => variable_get('localizer_frontpage_redirect', TRUE),
+    '#weight' => -19,
+  );
+
+   $form['localeswitch']['localizer_switch_byparameter'] = array (
+    '#type' => 'checkbox',
+    '#title' => t('Switch by locale parameter'),
+    '#default_value' => variable_get('localizer_switch_byparameter', TRUE),
+    '#weight' => -18,
+  );
+
+   $form['localeswitch']['localizer_switch_bynode'] = array (
+    '#type' => 'checkbox',
+    '#title' => t("Switch by node's language"), 
+    '#default_value' => variable_get('localizer_switch_bynode', TRUE),
+    '#weight' => -17,
+  );
+
+   $form['localeswitch']['localizer_switch_bylocaleprefix'] = array (
+    '#type' => 'checkbox',
+    '#title' => t("Switch by url's language prefix"),
+    '#default_value' => variable_get('localizer_switch_bylocaleprefix', TRUE),
+    '#weight' => -16,
+  );
+
+  $form['localeswitch']['byhostname'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('By hostname'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+    '#weight' => -15,
+  );
+   $form['localeswitch']['byhostname']['localizer_switch_byhostname'] = array (
+    '#type' => 'checkbox',
+    '#title' => t('Switch by hostname'),
+    '#default_value' => variable_get('localizer_switch_byhostname', FALSE),
+    '#description' => t('If this option is active all the other switching options will be ignored.'),
+  );
+  foreach (localizer_available_uilocales() as $lang => $language) {
+    $form['localeswitch']['byhostname']['localizer_switch_hostname_' . $lang] = array(
+      '#type' => 'textfield',
+      '#default_value' => variable_get('localizer_switch_hostname_' . $lang , $lang . '.' . localizer_get_domain()),
+      '#title' => t('@hostname hostname', array('@hostname' => $language)),
+    );
+  }
+
+  $form['localizer_multilingual_support'] = array (
+    '#type' => 'checkbox',
+    '#title' => t('Multilingual content support'),
+    '#default_value' => variable_get('localizer_multilingual_support', FALSE),
+    '#weight' => -15,
+  );
+
+  if(variable_get('localizer_multilingual_support', FALSE)) {
+  $form['mlblock'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Multilingual content block'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#weight' => -14,
+  );
+
+  $form['mlblock']['localizer_mlblock_showlangname'] = array (
+    '#type' => 'checkbox', 
+    '#title' => t('Show the language names'),
+    '#default_value' => variable_get('localizer_mlblock_showlangname', TRUE),
+  );
+
+  $form['mlblock']['localizer_mlblock_showflags'] = array (
+    '#type' => 'checkbox',
+    '#title' => t('Show the flags'),
+    '#default_value' => variable_get('localizer_mlblock_showflags', TRUE),
+  );
+
+  $form['mlblock']['localizer_mlblock_flagseparator'] = array (
+    '#type' => 'textfield', 
+    '#title' => t('Flag and language name separator'), 
+    '#default_value' => variable_get('localizer_mlblock_flagseparator', ' '),
+    '#size' => 5,
+    '#maxlength' => 10,
+    '#description' => t('Token separating the flag and the language name.'),
+  );
+
+  $form['mlblock']['localizer_mlblock_flagspath'] = array (
+    '#type' => 'textfield', 
+    '#title' => t('Flag icons path'), 
+    '#default_value' => variable_get('localizer_mlblock_flagspath', drupal_get_path('module', 'localizer') . '/flags/*.png'),
+    '#size' => 50,
+    '#maxlength' => 180,
+    '#description' => t('Path for flag icons, relative to Drupal installation. \'*\' is a placeholder for language code.'),
+  );
+
+   $form['mlblock']['localizer_mlblock_flagsize'] = array (
+    '#type' => 'textfield', 
+    '#title' => t('Flag icons size'), 
+    '#default_value' => variable_get('localizer_mlblock_flagsize', '16x11'),
+    '#size' => 10,
+    '#maxlength' => 10,
+    '#description' => t('Image size for flags, in the form "width x height".'),
+  );
+
+  $form['multilingualcontent'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Multilingual content display options'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#weight' => -13,
+  );
+
+  $form['multilingualcontent']['users'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Authenticated users'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#weight' => -18,
+  );
+
+  $form['multilingualcontent']['users']['localizer_usercontentlocales'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Languages'),
+    '#default_value' => variable_get('localizer_usercontentlocales', array()),
+    '#options' => localizer_available_contentlocales(),
+    '#weight' => -18,
+    '#description' => t('Displays the content in all the selected languages'),
+  );
+
+  $switch_uicontent_options = array(
+       '1' => t('When switching user interface locale, switch also the content locale'),
+       '2' => t('Keep separated user interface and content locale'),
+  );
+
+  $form['multilingualcontent']['users']['localizer_userswitch_uicontent'] = array (
+    '#type' => 'radios',
+    '#weight' => -17,
+    '#title' => t("User interface and content language switch"),
+    '#options' => $switch_uicontent_options,
+    '#default_value' => variable_get('localizer_userswitch_uicontent', 1),
+  );
+
+  $form['multilingualcontent']['anonymous'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Anonymous users'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#weight' => -17,
+  );
+
+  $form['multilingualcontent']['anonymous']['localizer_anonymouscontentlocales'] = array(
+    '#type' => 'checkboxes', 
+    '#title' => t('Languages'), 
+    '#default_value' => variable_get('localizer_anonymouscontentlocales', array()),
+    '#options' => localizer_available_contentlocales(),
+    '#weight' => -18,
+    '#description' => t('Displays the content in all selected languages'),
+  );
+
+  $form['multilingualcontent']['anonymous']['localizer_anonymousswitch_uicontent'] = array (
+    '#type' => 'radios',
+    '#weight' => -17,
+    '#title' => t("User interface and content language switch"),
+    '#options' => $switch_uicontent_options,
+    '#default_value' => variable_get('localizer_anonymousswitch_uicontent', 1),
+  );
+  }
+
+  $form['contents_types'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Content settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#weight' => -12,
+  );
+
+  $form['contents_types']['localizer_contents_types'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Content types'),
+    '#default_value' => variable_get('localizer_contents_types', array('page'=>'page', 'story'=>'story')),
+    '#options' => node_get_types('names'),
+    '#weight' => -18,
+    '#description' => t('Localizer support is enabled for each content type checked.')
+  );
+
+  $form['contents_types']['localizer_anylanguage_support'] = array (
+    '#type' => 'checkbox',
+    '#title' => t("Enable support for 'any' language"),
+    '#default_value' => variable_get('localizer_anylanguage_support', TRUE),
+    '#weight' => -18,
+    '#description' => t("Add 'Any' (language neutral) to the language choices.")
+  );
+
+  $form['contents_types']['localizer_autopath_translations'] = array (
+    '#type' => 'checkbox',
+    '#title' => t('Append/replace language prefix to URL paths for translations,'),
+    '#default_value' => variable_get('localizer_autopath_translations', FALSE),
+    '#weight' => -17,
+    '#description' => 'If enabled, automatically dd language prefix to new contents translations paths.'
+  );
+
+  $form['externalmodulessupport'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Support for external modules'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#weight' => -11,
+  );
+
+  $form['externalmodulessupport']['localizer_global_viewsupport'] = array (
+    '#type' => 'checkbox',
+    '#title' => t('Views global support'),
+    '#default_value' => variable_get('localizer_global_viewsupport', TRUE),
+    '#weight' => -18,
+    '#description' => t('Filter all views contents by the current language')
+  );
+
+  $form['externalmodulessupport']['localizer_search_all_languages'] = array (
+    '#type' => 'checkbox',
+    '#title' => t('Searches return results in all languages'),
+    '#default_value' => variable_get('localizer_search_all_languages', FALSE),
+    '#weight' => -19,
+    '#description' => 'If enabled, searches will include results from all languages. If disabled (default) only results in the current locale will be returned.'
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+* Hook for switching the language through the block
+* @param switch_to
+* The locale of the new selected language
+*/
+function localizer_switchuilocale($_locale) {
+  localizer_set_uilocale($_locale);
+  drupal_goto();
+}
+
+/**
+* Generate HTML for the localizer block
+* @param op the operation from the URL
+* @param delta offset
+* @returns block HTML
+*/
+function localizer_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $block[0]['info'] = t('Language');
+      if(variable_get('localizer_multilingual_support', FALSE)) {
+        $block[1]['info'] = t('Content languages');
+      }
+      break;
+    case 'view':
+      if($delta == 0) {
+        $block['subject'] = t('Language');
+        $block['content'] = localizer_block_switchuilocale();
+      }
+      else if($delta==1 && variable_get('localizer_multilingual_support', FALSE)) {
+        $block['subject'] = t('Content languages');
+        $block['content'] = localizer_block_contentlocales();
+      }
+      break;
+  }
+  return $block;
+}
+
+/**
+* Generate HTML for language change
+* @out prints HTML code on standard output
+* @returns HTML code
+*/
+function localizer_block_switchuilocale($out=FALSE) {
+  $output = theme('localizer_block_switchuilocale', localizer_block_switchuilocale_links(variable_get('localizer_switchblock_showflags', TRUE), variable_get('localizer_switchblock_showlangname',TRUE), variable_get('localizer_switchblock_flagseparator', ' ')));
+  if($out) {
+    echo $output;
+  }
+  else {
+    return $output;
+  }
+}
+
+/**
+* Create the links for the switching language block
+* @param showflags shows the languages flags
+* @param shownames shows the languages names
+* @param separator text to use as separator between the flag and the name
+* @returns links in HTML format
+*/
+function localizer_block_switchuilocale_links($showflags=TRUE, $shownames=TRUE, $separator = ' ', $setcurrentactive=FALSE) {
+  $languages = localizer_available_uilocales();
+
+  foreach ($languages as $lang => $langname) {
+    if(variable_get('localizer_switchblock_hidecurrentlocale', TRUE) && $lang == localizer_get_uilocale()) continue;
+
+      $destination = localizer_get_destination(localizer_get_defaultcontentlocale(FALSE, $lang));
+      if($destination == ''){
+        $destination = variable_get('site_frontpage', 'node');
+      }
+
+      $langname = localizer_t($langname, 0, $lang);
+      $langname_title = $shownames ? $langname: '';
+      $flag = $showflags ? localizer_flag($lang, 'localizer_switchblock',array('alt' => $langname)) : '' ;
+      $separator = ($langname_title != '' && $flag != '') ? $separator : '';
+
+      $pos = strpos($destination, 'destination=');
+      if($pos === FALSE) {
+      }
+      else
+      {
+        $destination = _localizer_get_localizedpath($_GET['q'], $lang);
+      }
+
+      if(variable_get('localizer_switch_byhostname', FALSE)) {
+        global $base_path;
+        $host = variable_get('localizer_switch_hostname_' . $lang, $lang . '.' . localizer_get_domain());
+        if(variable_get('clean_url', 0)) {
+          $url = 'http://' . $host . $base_path . $destination;
+          $query = NULL;
+        }
+        else {
+          $url = 'http://' . $host . $base_path;
+          $query = 'q=' . $destination;
+        }
+        if($lang==localizer_get_uilocale() && $setcurrentactive) {
+          $links[$lang]= l("$flag$separator$langname_title", $url, array('title' => $langname, 'class' => 'currentuilocale active'), $query , NULL, TRUE, TRUE);
+        }
+        else {
+          $links[$lang]= l("$flag$separator$langname_title", $url, array('title' => $langname, 'class' => 'uilocale'), $query , NULL, TRUE, TRUE);
+        }
+      }
+      else
+      {
+        $switchurl = 'language/'.$lang;
+        
+        if(variable_get('localizer_switch_bynode', FALSE) && (drupal_get_normal_path($destination) != $_GET['q'] || localizernode_existscontentlocale($_GET['q'], $lang))) {
+          $switchurl = $destination;
+          unset($destination);
+        }
+        else {
+          $destination = "destination=" . urlencode($destination);
+        }
+        
+        if($lang==localizer_get_uilocale() && $setcurrentactive) {
+          $links[$lang]= l("$flag$separator$langname_title", $switchurl, array('title' => $langname, 'class' => 'currentuilocale active'), $destination , NULL, FALSE, TRUE);
+        }
+        else {
+          $links[$lang]= l("$flag$separator$langname_title", $switchurl, array('title' => $langname, 'class' => 'uilocale'), $destination , NULL, FALSE, TRUE);
+        }
+      }
+  }
+  return $links;
+}
+
+/**
+* Add the languages tabs to a form
+* @param form the form to which the tabs must be added
+*/
+function localizer_switchuilocale_tabs(&$form, $weight='-100') {
+  $links=localizer_block_switchuilocale_links(FALSE, TRUE);
+
+  $form['localizer_switchuilocale'] = array (
+    '#prefix' => '<div class="localizer_switchuilocale tabs"><ul class="tabs primary">',
+    '#suffix' => '</ul></div><br />',
+    '#weight' => $weight,
+  );
+
+  foreach($links as $lang=>$link) {
+    $active = '';
+    if($lang==localizer_get_uilocale()) {
+      $active = ' class="active" ';
+    }
+    $form['localizer_switchuilocale']['localizer_switchuilocale_tab_' . $lang] = array (
+      '#prefix' => "<li${active}>",
+      '#suffix' => '</li>',
+      '#value' => $link,
+    );
+  }
+}
+
+function localizer_adminlocale_urls() {
+  global $base_path;
+  $languages = localizer_available_uilocales();
+
+  foreach ($languages as $lang => $langname) {
+      $destination = $_GET['q'];
+      $langname_title = localizer_t($langname, 0, $lang);
+      $url='switchadminlocale/'.$lang;
+      $destination = "destination=" . urlencode($destination);
+      $urls[$lang]['title'] = $langname_title;
+      $urls[$lang]['url'] = url('switchadminlocale/' . $lang, $destination);
+  }
+  return $urls;
+}
+
+function localizer_adminlocale_formselect(&$form, $weight='-100') {
+  $urls=localizer_adminlocale_urls();
+
+  $form['localizer_adminlocale'] = array (
+    '#prefix' => '<div class="localizer_adminlocale">',
+    '#suffix' => '</div><br />',
+    '#weight' => $weight,
+  );
+
+  $options = "";
+  foreach($urls as $lang=>$url) {
+    $selected='';
+    if($lang==localizer_get_adminlocale()) $selected=' selected="selected" ';
+    $options .= '<option value="' . $url['url'] . '"' . $selected . '>' . $url['title'] . '</option>';
+  }
+
+  $btnaction='onclick="javascript:document.location=localizer_adminlocale_select.value;"';
+  $form['localizer_adminlocale']['localizer_adminlocale_select'] = array(
+    '#weight' => -18,
+    '#prefix' => '<strong>' . t('Language') . ' :</strong> <select name="localizer_adminlocale_select">',
+    '#value' => $options,
+    '#suffix' => '</select> <input type="button" ' . $btnaction . ' name="localizer_adminlocale_button" value="' . t('Change') . '"/>',
+  );
+}
+
+function localizer_set_adminlocale($_locale) {
+  $_SESSION['adminlocale'] = $_locale;
+  drupal_goto();
+}
+
+function localizer_get_adminlocale() {
+  if(! $_SESSION['adminlocale']) $_SESSION['adminlocale'] = localizer_get_uilocale();
+  return $_SESSION['adminlocale'];
+}
+
+function localizer_switchadminlocale($_locale) {
+  localizer_set_adminlocale($_locale);
+  drupal_goto();
+}
+
+function localizer_block_contentlocales($out=FALSE) {
+  $output = '<div class="localizer_nodeslocale">' . drupal_get_form('localizer_block_contentlocales_form', $form) . '</div>';
+  if($out) {
+    echo $out;
+  }
+  else {
+    return $output;
+  }
+}
+
+/**
+* Render the block to change the nodes locales
+*/
+function localizer_block_contentlocales_form() {
+  $languages = localizer_available_contentlocales();
+  $separator = variable_get('localizer_mlblock_flagseparator', ' ');
+
+  $langoptions = array();
+
+  foreach ($languages as $lang => $langname) {
+    $langname = localizer_t($langname, 0, $lang);
+    $langname_title = variable_get('localizer_mlblock_showlangname', TRUE)? $langname: '';
+    $flag = variable_get('localizer_mlblock_showflags', TRUE) ? localizer_flag($lang, 'localizer_mlblock', array('alt' => $langname)) : '' ;
+    $separator = ($langname_title != '' && $flag != '') ? $separator : '';
+
+    $langoptions[$lang] = $flag . $separator . $langname_title;
+  }
+
+  $form['localizer_contentlocales'] = array(
+    '#type' => 'checkboxes',
+    '#default_value' => unserialize($_SESSION['localizer_contentlocales']),
+    '#options' => $langoptions,
+    '#weight' => -18,
+  );
+
+  $form['array_filter'] = array('#type' => 'hidden');
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Change'));
+
+  return $form;
+}
+
+/**
+* Hook for saving the nodes locales through the block
+* @param sform_id
+* The form id
+* @param $form_values
+* The values of the passed form
+*/
+function localizer_block_contentlocales_form_submit($form_id, $form_values) {
+  foreach($form_values['localizer_contentlocales'] as $key=>$value) {
+    if(is_integer($key)) unset($form_values['localizer_contentlocales'][$key]);
+  }
+
+  $_SESSION['localizer_contentlocales'] = serialize($form_values['localizer_contentlocales']);
+  if(module_exists('localizernode')) {
+    drupal_goto(localizernode_get_localizedpath($_GET['q'], localizer_get_defaultcontentlocale(TRUE)));
+  }
+  else
+  {
+    drupal_goto($_GET['q']);
+  }
+}
+
+/**
+* Create the HTML a language's flag
+* @param lang the language of the flag
+* @param attribs additional attributes
+* @returns HTML code
+*/
+function localizer_flag($lang, $block='', $attribs = array()) {
+  if ($path = variable_get($block . '_flagspath', drupal_get_path('module', 'localizer') . '/flags/*.png')) {
+    $src = base_path() . str_replace('*', $lang, $path);
+    list($width, $height) = explode('x', variable_get($block . '_flagsize', '16x11'));
+    $attribs = array_merge(array('class' => 'localizer-flag', 'width' => $width, 'height' => $height, 'alt' => $lang), $attribs);
+    $html = "<img src=\"$src\" ".drupal_attributes($attribs)." />";
+    return $html;
+  }
+}
+
+/**
+* List the available ui locales
+*/
+function localizer_available_uilocales() {
+  static $languages;
+  if(!isset($languages)) {
+    if (function_exists('locale')) {
+      $languages = locale_supported_languages();
+      $languages = $languages['name'];
+    }
+    else {
+      $languages = array('en' => 'English');
+    }
+  }
+  return $languages;
+}
+
+function localizer_get_defaultuilocale() {
+  return key(localizer_available_uilocales());
+}
+
+/**
+* Return if the locale provided is valid
+*/
+function localizer_isvaliduilocale($_locale = '') {
+  static $valid_locales;
+  $valid_locales = localizer_available_uilocales();
+
+  if(($_locale!= '') && array_key_exists($_locale, $valid_locales)){
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+/**
+* Return the path without the locale prefix
+*/
+function localizer_pathwithoutlocale($path) {
+  $exploded_path = explode('/', $path);
+  $localeinpath = $exploded_path[0];
+  if(localizer_isvaliduilocale($localeinpath)){
+    array_shift($exploded_path);
+    return implode("/", $exploded_path);
+  }
+  else
+  {
+    return $path;
+  }
+}
+
+/**
+* Return the host without the locale prefix in the hostname
+*/
+function localizer_hostnamewithoutlocale($host) {
+  $exploded_host = explode('.', $host);
+  $localeinhost = $exploded_host[0];
+  if(localizer_isvalidlocale($localeinhost) || ($localeinhost == 'www')){
+    array_shift($exploded_host);
+    return implode(".", $exploded_host);
+  }
+  else
+  {
+    return $host;
+  }
+}
+
+/**
+* Return the path with the locale prefix
+*/
+function localizer_pathwithlocale($path, $_locale) {
+  if(localizer_isvaliduilocale($_locale)) {
+    return $_locale . '/' . localizer_pathwithoutlocale($path);
+  }
+  else
+  {
+    return $path;
+  }
+}
+
+/**
+* Return the locale contained in the path
+*/
+function localizer_localeinpath($path) {
+  $exploded_path = explode('/', $path);
+  $localeinpath = $exploded_path[0];
+  if(localizer_isvaliduilocale($localeinpath)){
+    return $localeinpath;
+  }
+  else
+  {
+    return '';
+  }
+}
+
+/**
+* Return the destination specific to the locale passed
+*
+* @param $_locale
+* @return
+* The localized destination
+*/
+function localizer_get_destination($_locale) {
+  $path = drupal_get_normal_path(isset($_GET['q']) ? $_GET['q'] : '');
+
+  if(function_exists('localizernode_get_localizedpath')) {
+    $lpath = localizernode_get_localizedpath($path, $_locale);
+  }
+  else {
+    $lpath = $path;
+  }
+
+  $lpath = drupal_get_path_alias($lpath);
+
+  return $lpath;
+}
+
+function _localizer_get_localizedpath($path, $_locale) {
+  if(function_exists('localizernode_get_localizedpath')) {
+    $lpath = localizernode_get_localizedpath($path, $_locale);
+  }
+  else {
+    $lpath = $path;
+  }
+
+  $lpath = drupal_get_path_alias($lpath);
+
+  return $lpath;
+}
+
+/**
+* Get the current UI locale
+*/
+function localizer_get_uilocale() {
+  global $locale;
+  if(!$locale) {
+    $locale = localizer_get_defaultuilocale();
+  }
+  return $locale;
+}
+
+/**
+* Set the current UI locale
+* @param $_locale
+* The new locale
+*/
+function localizer_set_uilocale($_locale = '') {
+  static $valid_locales;
+   $valid_locales = localizer_available_uilocales();
+
+  if(($_locale != '') && ($_locale != localizer_get_uilocale()) && (array_key_exists($_locale, $valid_locales))) {
+    global $locale;
+    $locale=$_locale;
+    $_SESSION['current_locale']=$locale;
+  }
+}
+
+/**
+* Change the UI locale
+*/
+function localizer_change_uilocale() {
+    $valid_locales = localizer_available_uilocales();
+
+    //first page redirect
+    //If the page is accessed by a SE, do not apply the frontpage redirect
+    if (variable_get('localizer_frontpage_redirect', TRUE) && drupal_is_front_page()) {
+      if (variable_get('localizer_switch_byhostname', FALSE)) {
+        $currenthost = $_SERVER['HTTP_HOST'];
+        $localebyhostname = localizer_localebyhostname($currenthost);
+        if ((localizer_get_uilocale() != $localebyhostname) && ($localebyhostname != '')) {
+          global $base_path;
+          $url = 'http://' . localizer_getlocalehostname($localebyhostname) . $base_path;
+          localizer_set_uilocale($localebyhostname);
+          if (module_exists('localizernode')) {
+            $destination = localizernode_get_localizedpath($_GET['q'], $localebyhostname);
+          }
+          else {
+            $destination = $_GET['q'];
+          }
+          $url .= drupal_get_path_alias($destination);
+          drupal_goto($url);
+        }
+      }
+
+      if (module_exists('localizernode')) {
+        if (localizer_get_defaultcontentlocale() != localizernode_get_contentlocale($_GET['q']) && localizernode_existscontentlocale($_GET['q'], localizer_get_defaultcontentlocale())) {
+          $destination = localizernode_get_localizedpath($_GET['q'], localizer_get_defaultcontentlocale());
+          drupal_goto($destination);
+         }
+      }
+      return;
+    }
+
+    //Switch by hostname and correct page show
+    if (variable_get('localizer_switch_byhostname', FALSE)) {
+      $currenthost = $_SERVER['HTTP_HOST'];
+      $localebyhostname = localizer_localebyhostname($currenthost);
+      if(arg(0)=='node' && is_numeric(arg(1)) && arg(2)) return;
+      $pathlocale = localizernode_get_contentlocale($_GET['q']);
+      if($localebyhostname != $pathlocale) {
+        if (module_exists('localizernode')) {
+          $destination = localizernode_get_localizedpath($_GET['q'], $localebyhostname);
+        }
+        if($destination != $_GET['q']) {
+          drupal_goto($destination);
+        }
+      }
+    }
+
+    //locale in hostname
+    if(variable_get('localizer_switch_byhostname', FALSE)) {
+      $currenthost = $_SERVER['HTTP_HOST'];
+      $localebyhostname = localizer_localebyhostname($currenthost);
+      if((localizer_get_uilocale() != $localebyhostname) && ($localebyhostname != '')) {
+        localizer_set_uilocale($localebyhostname);
+        if(module_exists('localizernode')) {
+          drupal_goto(localizernode_get_localizedpath($_GET['q'], $localebyhostname));
+        }
+      }
+      
+      $pathlocale = localizernode_get_contentlocale($_GET['q']);
+      if($pathlocale && localizer_get_uilocale() != $pathlocale && array_key_exists($pathlocale, $valid_locales) && localizernode_existscontentlocale($_GET['q'], localizer_get_uilocale())) {
+        drupal_goto(localizernode_get_localizedpath($_GET['q'], $localebyhostname));
+      }
+      
+      return;
+    }
+
+    //locale as parameter
+    if(variable_get('localizer_switch_byparameter', TRUE) && array_key_exists('locale', $_GET) && localizer_get_uilocale()!=$_GET['locale'])
+    {
+      localizer_set_uilocale($_GET['locale']);
+      if(module_exists('localizernode')) {
+        drupal_goto(localizernode_get_localizedpath($_GET['q'], localizer_get_defaultcontentlocale()));
+      }
+    }
+
+    //locale by path
+    if(variable_get('localizer_switch_bynode', TRUE) && module_exists('localizernode')) {
+      $pathlocale = localizernode_get_contentlocale($_GET['q']);
+      if($pathlocale && localizer_get_uilocale() != $pathlocale && array_key_exists($pathlocale, $valid_locales) && localizernode_existscontentlocale($_GET['q'], localizer_get_uilocale()))
+      {
+        localizer_set_uilocale($pathlocale);
+        drupal_goto($_GET['q']);
+      }
+    }
+
+    if(variable_get('localizer_switch_bylocaleprefix', TRUE)) {
+      $localeinurl = explode('/', $_REQUEST['q']);
+      $localeinurl = $localeinurl[0];
+      if((localizer_get_uilocale() != $localeinurl) && array_key_exists($localeinurl, $valid_locales)) {
+        localizer_set_uilocale($localeinurl);
+        drupal_goto($_GET['q']);
+      }
+    }
+}
+
+/**
+* Return the locale associated with an hostname
+*
+* @param $hostname
+* @return
+* The locale associated
+*/
+function localizer_localebyhostname($hostname) {
+  $localebyhostname = '';
+  foreach (localizer_available_uilocales() as $lang => $language) {
+    $localizer_hostname = variable_get('localizer_switch_hostname_' . $lang, $lang . '.' . localizer_get_domain());
+    if($hostname == $localizer_hostname) {
+      $localebyhostname = $lang;
+      break;
+    }
+  }
+  return $localebyhostname;
+}
+
+/**
+* Return the hostname associated with a locale
+*
+* @param $hostname
+* @return
+* The locale associated
+*/
+function localizer_getlocalehostname($locale) {
+  return variable_get('localizer_switch_hostname_' . $locale, $locale . '.' . localizer_get_domain());
+}
+
+/**
+* List the available ui locales
+*/
+function localizer_available_contentlocales() {
+  static $languages;
+  if(!isset($languages)) {
+    if (function_exists('locale')) {
+      $languages = locale_supported_languages();
+      $languages = $languages['name'];
+    }
+    else {
+      $languages = array('en' => 'English');
+    }
+  }
+  return $languages;
+}
+
+function localizer_get_defaultcontentlocale($force=FALSE, $uilocale='') {
+  if ($uilocale=='') $uilocale=localizer_get_uilocale();
+
+  if(variable_get('localizer_multilingual_support', FALSE)) {
+    global $user;
+
+    if(localizer_isset_contentlocale()) {
+      $contentlocale = key(localizer_get_contentlocales($force));
+    }
+    else {
+      $contentlocale = $uilocale;
+    }
+
+    if($user->uid) {
+      if($user->switch_uicontent==1) {
+        return $uilocale;
+      }
+      elseif($user->switch_uicontent==2) {
+        return $contentlocale;
+      }
+      elseif($user->switch_uicontent==3) {
+        if(variable_get('localizer_userswitch_uicontent', 1)==1) {
+          return $uilocale;
+        }
+        elseif (variable_get('localizer_userswitch_uicontent', 1)==2){
+          return $contentlocale;
+        }
+        else {
+          return $uilocale;
+        }
+      }
+      else {
+        return $uilocale;
+      }
+    }
+    else
+    {
+      if(variable_get('localizer_anonymousswitch_uicontent', 1)==1) {
+        return $uilocale;
+      }
+      elseif (variable_get('localizer_anonymousswitch_uicontent', 1)==2){
+        return $contentlocale;
+      }
+      else {
+        return $uilocale;
+      }
+    }
+  }
+  return $uilocale;
+}
+
+/**
+* Get the current locales for the nodes
+* @return
+* The current locales for nodes
+*/
+function localizer_get_contentlocales($force=FALSE) {
+  global $user;
+  static $contentlocales;
+
+  if(!$contentlocales || $force) {
+    $contentlocales = array();
+
+    if(variable_get('localizer_multilingual_support', FALSE)) {
+      if(isset($_SESSION['localizer_contentlocales']))
+      {
+        $contentlocales = _localizer_clearcontentlocales(unserialize($_SESSION['localizer_contentlocales']));
+      }
+
+      //Checks if the options are in sessions
+      if($user->uid && empty($contentlocales)) {
+        //Authtenticated users
+        $contentlocales = _localizer_clearcontentlocales($user->contentlocales);
+        if(empty($contentlocales)) {
+          $contentlocales = _localizer_clearcontentlocales(variable_get('localizer_usercontentlocales', array()));
+        }
+      }
+      else if(empty($contentlocales)) {
+        //Anonymous users
+        $contentlocales = _localizer_clearcontentlocales(variable_get('localizer_anonymouscontentlocales', array()));
+      }
+      if(empty($contentlocales)) $contentlocales[localizer_get_uilocale()] = 1;
+    }
+    else
+    {
+      $contentlocales[localizer_get_uilocale()] = 1;
+    }
+  }
+
+  $_SESSION['localizer_contentlanguages'] = serialize($contentlocales);
+  return $contentlocales;
+}
+
+/**
+* Check if a node locale is specified
+*/
+function localizer_isset_contentlocale() {
+  global $user;
+  static $contentlocales = array();
+
+  if(!$contentlocales) {
+    if(variable_get('localizer_multilingual_support', FALSE)) {
+      $contentlocales = array();
+      if(isset($_SESSION['localizer_contentlocales']))
+      {
+        $contentlocales = _localizer_clearcontentlocales(unserialize($_SESSION['localizer_contentlocales']));
+      }
+
+      //Checks if the options are in sessions
+      if($user->uid && empty($contentlocales)) {
+        //Authtenticated users
+        $contentlocales = _localizer_clearcontentlocales($user->contentlocales);
+        if(empty($contentlocales)) {
+          $contentlocales = _localizer_clearcontentlocales(variable_get('localizer_usercontentlocales', array()));
+        }
+      }
+      else if(empty($contentlocales)) {
+        //Anonymous users
+        $contentlocales = _localizer_clearcontentlocales(variable_get('localizer_anonymouscontentlocales', array()));
+      }
+    }
+    else
+    {
+      $contentlocales[localizer_get_uilocale()] = 1;
+    }
+  }
+  return (!empty($contentlocales));
+}
+
+/**
+* Get the current locales for the nodes as SQL code
+* @return
+* The current locales for nodes as SQL code
+*/
+function localizer_get_contentlocales_assql() {
+  static $contentlocales_assql;
+  if(!$contentlocales_assql) {
+    $contentlocales_assql = '';
+    $contentlocales = localizer_get_contentlocales();
+    if(!empty($contentlocales)) {
+      foreach($contentlocales as $key=>$active) {
+        if($active) {
+          if($contentlocales_assql) $contentlocales_assql .= ",";
+            $contentlocales_assql .= "'$key'";
+          }
+      }
+    }
+  }
+  return $contentlocales_assql;
+}
+
+/**
+* Get the current locales for the nodes as string
+* @return
+* The current locales for nodes as string
+*/
+function localizer_get_contentlocales_asstring() {
+  static $contentlocales_asstring;
+  if(!$contentlocales_asstring) {
+    $contentlocales_asstring = '';
+    $contentlocales = localizer_get_contentlocales();
+    if(!empty($contentlocales)) {
+      foreach($contentlocales as $key=>$active) {
+        if($active) {
+          if($contentlocales_asstring) $contentlocales_sql .= ",";
+            $contentlocales_asstring .= "$key";
+          }
+      }
+    }
+  }
+  return $contentlocales_asstring;
+}
+
+/**
+* Clear an array of nodes locales of invalid values
+*
+* @param $contentlocales
+* The array to clear
+* @return The cleared contentlocales
+*/
+function _localizer_clearcontentlocales($contentlocales) {
+  if(is_array($contentlocales)) {
+    foreach($contentlocales as $key=>$value) {
+      if(is_integer($key) || $value=='0') unset($contentlocales[$key]);
+    }
+  }
+  return $contentlocales;
+}
+
+/**
+* Get the current host
+*/
+function localizer_get_host() {
+  static $host;
+
+  if(!isset($host)) {
+    global $base_url;
+    $parts = parse_url($base_url);
+    $host = ($parts['host']);
+  }
+  return $host;
+}
+
+/**
+* Get the current domain
+*/
+function localizer_get_domain() {
+  static $domain;
+
+  if(!isset($domain)) {
+    $host_parts = explode('.', localizer_get_host());
+    $host_parts = array_reverse($host_parts);
+    $domain = $host_parts[1] . '.' . $host_parts[0];
+  }
+
+  return $domain;
+}
+
+/**
+* Disable controls on a form
+* @param form
+* form with the controls to disable
+* @param enabledcontrols
+* controls to leave enabled
+*/
+function localizer_formdisablecontrols(&$form, $enabledcontrols) {
+  reset($form);
+  while (list($key) = each($form)) {
+      $item =& $form[$key];
+      if($item['#type']=='fieldset') {
+      localizer_formdisablecontrols($item, $enabledcontrols);
+    }
+    else {
+      if(array_key_exists($key, $enabledcontrols)) {
+        continue;
+      }
+      else {
+        if($item['#type']=='select') $form[$key]['#attributes']['disabled']='disabled';
+        if($item['#type']=='checkbox') $form[$key]['#attributes']['disabled']='disabled';
+        if($item['#type']=='checkboxes') $form[$key]['#attributes']['disabled']='disabled';
+        if($item['#type']=='weight') $form[$key]['#attributes']['disabled']='disabled';
+        if($item['#type']=='radios') $form[$key]['#attributes']['disabled']='disabled';
+        if($item['#type']=='textfield') $form[$key]['#attributes']['disabled']='disabled';
+        if($item['#type']=='textarea') $form[$key]['#attributes']['disabled']='disabled';
+      }
+    }
+  }
+}
+
+function localizer_formsetvalues(&$form, $values) {
+  reset($form);
+  while (list($key) = each($form)) {
+    $item =& $form[$key];
+    if($item['#type']=='fieldset') {
+      localizer_formsetvalues($item, $values);
+    }
+    else {
+      if(is_array($values) && array_key_exists($key, $values)) {
+        $item['#default_value']=$values[$key];
+      }
+    }
+  }
+}
+
+
+/**
+* Get the key for using with cache system adding current locales
+*
+* @param $key
+* The original key
+* @return
+* The key for cache
+*/
+if (module_exists('localizer')) {
+function cache_key($key=NULL) {
+  if($key==NULL) return NULL;
+  if(!$key) return $key;
+  $key = $key. '-' . localizer_get_uilocale() . '-' . localizer_get_contentlocales_asstring();
+  return $key;
+}
+}
+
+/**
+* Translate an object
+*
+* @param $object_name 
+* The object name (tipically the name of the database table)
+* @param $object_key 
+* The object key (tipically the id of the database record)
+* @param $object 
+* The object to translate
+* @return 
+* The translated object
+*/
+if (module_exists('localizer')) {
+function tobject($object_name, $object_key, $object) {
+
+  $items = localizertranslation_findall("object_name='$object_name' AND object_key='$object_key' AND locale='" . localizer_get_uilocale() . "'");
+
+  foreach($items as $key=>$item) {
+    if(!empty($item['translation'])) {
+      $object_field=$item['object_field'];
+      $object->$object_field=$item['translation'];
+    }
+  }
+  return $object;
+}
+}
+
+/**
+* Check if the current localizated page is the front page.
+* @return
+* TRUE if the current page is the front page; FALSE if otherwise. 
+*/
+function localizer_is_front_page() {
+  if (variable_get('localizer_frontpage_redirect', TRUE)) {
+    $locale = localizer_get_uilocale();
+    $front = localizernode_get_localizedpath(variable_get('site_frontpage', 'node'), $locale);
+    return (localizer_get_destination($locale) == $front);
+  }
+  else {
+    return drupal_is_front_page();
+  }
+}
+
+/**
+* Get the language of the browser
+*/
+function localizer_get_browser_lang() {
+  $languages = localizer_available_uilocales();
+  $lang = split(",", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+  if (!empty($lang[0]) && array_key_exists($lang[0],$languages)) {
+    return $lang[0];
+  }
+  return localizer_get_defaultuilocale();
+}
+
+/**
+* Set the initial language in the order : session, user preferences or browser detect
+*/
+if (module_exists('localizer')) {
+function i18n_get_lang() {
+  global $user;
+
+  if (isset($_SESSION['current_locale'])) {
+    localizer_set_uilocale($_SESSION['current_locale']);
+  }
+  else if ($user->uid) {
+    localizer_set_uilocale($user->language);
+  }
+  else if (variable_get('localizer_detect_browser', TRUE)) {
+    localizer_set_uilocale(localizer_get_browser_lang());
+  }
+  else {
+   localizer_set_uilocale(localizer_get_defaultuilocale());
+  }
+  return localizer_get_uilocale();
+}
+}
+
+//Rewrite of some core functions
+/**
+* Translate a string a substitute the arguments
+*
+* @param $string 
+* The string to translate
+* @param $args
+* Array of additional arguments to substitute
+* @param $_locale
+* The locale to use for the translation 
+* @return
+* The translated string
+*/
+function localizer_t($string, $args = 0, $_locale = '') {
+  if($_locale == '') {
+    global $locale;
+    $_locale = $locale;
+  }
+
+  if ($_locale != 'en') {
+    $string = localizer_locale($string, $_locale);
+  }
+
+  if (!$args) {
+    return $string;
+  }
+  else {
+    return strtr($string, $args);
+  }
+}
+
+/**
+* Translate a string
+* @param $string
+* The stirng to translate
+* @param $_locale
+* The locale to use for the translation
+* @return
+* The translated string
+*/
+
+function localizer_locale($string, $locale) {
+  static $locale_t;
+
+  // Store database cached translations in a static var.
+  $cache = cache_get("locale:$locale");
+
+  if ($cache == 0) {
+    locale_refresh_cache();
+    $cache = cache_get("locale:$locale");
+  }
+  $locale_t = unserialize($cache->data);
+
+  // We have the translation cached (if it is TRUE, then there is no
+  // translation, so there is no point in checking the database)
+  if (isset($locale_t[$string])) {
+    $string = ($locale_t[$string] === TRUE ? $string : $locale_t[$string]);
+  }
+
+  // We do not have this translation cached, so get it from the DB.
+  else {
+    $result = db_query("SELECT s.lid, t.translation FROM {locales_source} s INNER JOIN {locales_target} t ON s.lid = t.lid WHERE s.source = '%s' AND t.locale = '%s'", $string, $locale);
+    // Translation found
+    if ($trans = db_fetch_object($result)) {
+      if (!empty($trans->translation)) {
+        $locale_t[$string] = $trans->translation;
+        $string = $trans->translation;
+      }
+    }
+
+    // Either we have no such source string, or no translation
+    else {
+      $result = db_query("SELECT lid, source FROM {locales_source} WHERE source = '%s'", $string);
+      // We have no such translation
+      if ($obj = db_fetch_object($result)) {
+        if ($locale) {
+          db_query("INSERT INTO {locales_target} (lid, locale, translation) VALUES (%d, '%s', '')", $obj->lid, $locale);
+        }
+      }
+      // We have no such source string
+      else {
+        db_query("INSERT INTO {locales_source} (location, source) VALUES ('%s', '%s')", request_uri(), $string);
+        if ($locale) {
+          $lid = db_fetch_object(db_query("SELECT lid FROM {locales_source} WHERE source = '%s'", $string));
+          db_query("INSERT INTO {locales_target} (lid, locale, translation) VALUES (%d, '%s', '')", $lid->lid, $locale);
+        }
+      }
+      // Clear locale cache in DB
+      cache_clear_all("locale:$locale");
+    }
+  }
+
+  return $string;
+}
+
+function theme_localizer_block_switchuilocale($links)
+{
+  return theme('item_list', $links);
+}
+
+?>

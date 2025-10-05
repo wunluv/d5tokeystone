@@ -1,0 +1,13 @@
+; $Id:
+name = Localizer variable
+description = Provides multilingual support for variables
+dependencies = localizer
+package = Localizer
+version = "5.x-1.11"
+project = "localizer"
+
+; Information added by drupal.org packaging script on 2008-04-23
+version = "5.x-1.11"
+project = "localizer"
+datestamp = "1208979313"
+

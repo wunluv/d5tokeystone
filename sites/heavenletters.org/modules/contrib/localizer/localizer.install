@@ -1,0 +1,63 @@
+<?php
+function localizer_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {localizertranslation} (
+        tid int(10) unsigned NOT NULL,
+        object_key varchar(100) NOT NULL,
+        object_name varchar(100) NOT NULL,
+        object_field varchar(100) NOT NULL,
+        translation text NOT NULL,
+        locale varchar(10) NOT NULL,
+        PRIMARY KEY  (tid),
+        UNIQUE KEY localizertranslation_idx1 (object_key,object_name,object_field,locale)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+    break;
+    case 'pgsql':
+      db_query("CREATE TABLE {localizertranslation} (
+        tid int4 NOT NULL ,
+        object_key varchar(100) NOT NULL,
+        object_name varchar(100) NOT NULL,
+        object_field varchar(100) NOT NULL,
+        translation text NOT NULL,
+        locale varchar(10) NOT NULL,
+        PRIMARY KEY  (tid),
+        UNIQUE (object_key,object_name,object_field,locale)
+      );");
+    break;
+  }
+}
+
+function localizer_update_1() {
+  $items = array();
+  $items[] = update_sql("UPDATE {variable} SET name='localizer_usernodeslocales' WHERE name='localizer_usernodeslocale'");
+  $items[] = update_sql("UPDATE {variable} SET name='localizer_anonymousnodeslocales' WHERE name='localizer_anonymousnodeslocale'");
+  return $items;
+}
+
+function localizer_update_2() {
+  $items = array();
+  $items[] = update_sql("UPDATE {variable} SET name='localizer_usercontentlocales' WHERE name='localizer_usernodeslocales'");
+  $items[] = update_sql("UPDATE {variable} SET name='localizer_anonymouscontentlocales' WHERE name='localizer_anonymousnodeslocales'");
+  return $items;
+}
+
+function localizer_update_3() {
+  $items = array();
+
+  $items[] = update_sql("ALTER TABLE {localizertranslation} CHANGE tid tid INT(10) UNSIGNED NOT NULL");
+
+  $max_id = db_result(db_query("SELECT MAX(tid) FROM {localizertranslation}"));
+  if($max_id) {
+    if(db_result(db_query("SELECT COUNT(*) FROM {sequences} WHERE name='localizertranslation_tid'")) > 0) {
+      $items[] = update_sql("UPDATE {sequences} SET id=$max_id WHERE name='localizertranslation_tid'");
+    }
+    else {
+      $items[] = update_sql("INSERT INTO {sequences} (id, name) VALUES($max_id, 'localizertranslation_tid')");
+    }
+  }
+  return $items;
+}
+
+?>

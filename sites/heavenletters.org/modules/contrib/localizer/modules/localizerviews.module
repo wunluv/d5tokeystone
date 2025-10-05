@@ -1,0 +1,110 @@
+<?php
+function localizerviews_views_tables() {
+  $tables['localizernode'] = array(
+    "name" => "localizernode",
+    "join" => array(
+      "left" => array(
+        "table" => "node",
+        "field" => "nid"
+      ),
+      "right" => array(
+        "field" => "nid"
+      ),
+    ),
+    "fields" => array(
+      "locale" => array(
+        'name' => "Localizer : content locale",
+        'handler' => 'views_handler_localizer_contentlocales',
+        'option' => array(
+          '#type' => 'select',
+          '#options' => array(
+             'text_without_flag' => t('Text without flag'),
+             'text_with_flag' => t('Text with flag'),
+             'only_flag' => t('Only flag')
+          ),
+        ),
+        'sortable' => true,
+        'addlfields' => array("locale")
+      ),
+    ),
+    "sorts" => array(
+      "name" => array('locale' => "Node : Locale")
+    ),
+    "filters" => array(
+      "localizer_contentlocales" => array(
+        'name' => "Localizer : content locale",
+        'operator' => array('is'=>t('is')),
+        'list' => "views_handler_localizer_filter_contentlocales_list",
+        'handler' => "views_handler_localizer_filter_contentlocales",
+      ),
+      "localizer_support" => array(
+        'name' => "Localizer : activate generic support",
+        'operator' => array('is'=>t('is')),
+        'handler' => "views_handler_localizer_generic_support",
+        'list' => array('active'=>t('Active'), 'inactive'=>t('Inactive')),
+        'list-type' => 'select',
+      )
+    )
+  );
+  return $tables;
+}
+
+function views_handler_localizer_contentlocales($fieldinfo, $fielddata, $value, $data) {
+  static $languages;
+  if(!$languages) $languages=localizer_available_contentlocales();
+  if($fielddata['options'] == 'text_with_flag') {
+    $lang = $value;
+    $langname=t('@language', array('@language' => $languages[$value]));
+    $separator = variable_get('localizer_mlblock_flagseparator', ' ');
+    $flag = localizer_flag($lang, 'localizer_mlblock', array('alt' => $langname));
+    $separator = ($langname != '' && $flag != '') ? $separator : '';
+    return $flag . $separator . $langname;
+  }
+  else if($fielddata['options'] == 'only_flag') {
+    $lang = $value;
+    $langname=t('@language', array('@language' => $languages[$value]));
+    $flag = localizer_flag($lang, 'localizer_mlblock', array('alt' => $langname));
+    return $flag;
+  }
+  else {
+    return t('@language', array('@language' => $languages[$value]));
+  }
+}
+
+function views_handler_localizer_filter_contentlocales_list() {
+  static $languages;
+  if(!$languages) {
+    $languages=localizer_available_contentlocales();
+  }
+  return $languages;
+}
+
+function views_handler_localizer_filter_contentlocales($op, $filter, $filterinfo, &$query) {
+  $contentlocales_assql = '';
+  if($filter['value']) {
+    if(is_array($filter['value'])) {
+      $values = $filter['value'];
+    }
+    else if(is_string($filter['value'])) {
+      $values = explode(',', $filter['value']);
+    }
+    foreach($values as $key=>$value) {
+      if($contentlocales_assql) $contentlocales_assql .= ',';
+      $contentlocales_assql .= "'$value'";
+    }
+  }
+
+  if($contentlocales_assql) {
+    $query->ensure_table("localizernode");
+    $query->add_where("localizernode.locale IN (" . $contentlocales_assql . ",'-') OR localizernode.locale IS NULL");
+  }
+}
+
+function views_handler_localizer_generic_support($op, $filter, $filterinfo, &$query) {
+  if($filter['value'] == 'active') {
+    $contentlocales_assql = localizer_get_contentlocales_assql();
+    $query->ensure_table("localizernode");
+    $query->add_where("localizernode.locale IN (" . $contentlocales_assql . ",'-') OR localizernode.locale IS NULL");
+  }
+}
+?>

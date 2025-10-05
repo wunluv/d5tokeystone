@@ -1,0 +1,22 @@
+<?php
+function localizerblock_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {localizerblock} (
+        blid VARCHAR(50) NOT NULL ,
+        locale VARCHAR(10) NOT NULL default '-',
+        PRIMARY KEY (blid)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+      break;
+    case 'pgsql':
+      db_query("CREATE TABLE {localizerblock} (
+        blid VARCHAR(50) NOT NULL ,
+        locale VARCHAR(10) NOT NULL default '-',
+        PRIMARY KEY (blid)
+      );");
+    break;
+  }
+}
+
+?>

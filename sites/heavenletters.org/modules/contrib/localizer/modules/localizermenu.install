@@ -1,0 +1,12 @@
+<?php
+function localizermenu_install() {
+  db_query("UPDATE {system} SET weight = 1 WHERE name = 'localizermenu'");
+}
+
+function localizermenu_update_1() {
+  $items = array();
+  $items[] = update_sql("UPDATE {system} SET weight = 1 WHERE name = 'localizermenu'");
+  return $items;
+}
+
+?>

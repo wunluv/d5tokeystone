@@ -1,0 +1,9 @@
+--- taxonomy.info.orig	2007-09-15 16:12:33.000000000 +0200
++++ taxonomy.info	2007-09-15 16:20:37.000000000 +0200
+@@ -1,5 +1,5 @@
+ ; $Id: taxonomy.info.patch,v 1.1.2.1 2007/09/15 14:29:13 robertogerola Exp $
+-name = Taxonomy
++name = "Taxonomy [Localizer]"
+ description = Enables the categorization of content.
+ package = Core - optional
+ version = VERSION

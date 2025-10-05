@@ -1,0 +1,21 @@
+CREDITS
+=======
+
+Drupal module created by Roberto Gerola, <roberto.gerola@speedtech.it>
+
+Website : http://www.speedtech.it
+
+ACKNOWLEDGEMENTS
+----------------
+Based on the following modules :
+- i18n (Jose A. Reyero)
+- translation (Axel)
+- switchlang (Heine Deelstra)
+- tr (Rob Ellis)
+
+DEVELOPERS
+----------
+Roberto Gerola
+ray007
+_Troy
+EdInJapan

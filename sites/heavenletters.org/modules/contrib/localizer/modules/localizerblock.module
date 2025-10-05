@@ -1,0 +1,63 @@
+<?php
+include_once(drupal_get_path('module', 'localizer') . '/models/localizerblock.php');
+
+function localizerblock_form_alter($form_id, &$form) {
+  if ($form_id=='block_admin_configure') {
+    $form['#submit']['localizerblock_form_submission'] = array(); // register callback
+
+    $options = localizer_available_contentlocales();
+    $options = array_merge(array('-' => 'Any') , $options);
+    $blid = $form['module']['#value'] . '-' . $form['delta']['#value'];
+    $item = localizerblock_findbyblid($blid);
+    if(!$item['locale']) $item['locale'] = '-';
+
+    $form['localizerblock_locale'] = array(
+      '#type' => 'select',
+      '#title' => t('Language'),
+      '#default_value' => $item['locale'],
+      '#options' => $options,
+      '#required' => FALSE,
+      '#weight' => -20,
+    );
+  }
+  elseif ($form_id == 'block_box_delete') {
+    $form['#submit']['localizerblock_form_delete'] = array(); // register callback for deletions
+  }
+}
+
+function localizerblock_form_submission($form_id, $form) {
+  if(is_array($form) && array_key_exists('localizerblock_locale', $form)) {
+    $blid = $form['module'] . '-' . $form['delta'];
+    localizerblock_save(array('blid'=>$blid, 'locale'=>$form['localizerblock_locale']));
+  }
+}
+
+function localizerblock_form_delete ($form_id, $form) {
+  $blid = 'block-' . $form[$bid];
+  localizerblock_delete($blid);
+}
+
+function localizerblock_db_rewrite_sql($query, $primary_table, $primary_field) {
+  global $user;
+  $sql = array();
+
+  $applylocalizer = ($primary_table=='blocks');
+
+  if ($applylocalizer) {
+    $contentlocales_assql = localizer_get_contentlocales_assql();
+    if($contentlocales_assql) {
+      switch ($GLOBALS['db_type']) {
+        case 'mysql':
+        case 'mysqli':
+          $blid = "CONCAT(b.module,'-',b.delta)";
+        break;
+        case 'pgsql':
+          $blid = "(b.module || '-' || b.delta)";
+        break;
+      }
+      $sql['join'] = "LEFT JOIN {localizerblock} loc ON loc.blid=$blid";
+      $sql['where'] = "loc.locale IN (" . $contentlocales_assql . ",'-') OR loc.locale IS NULL";
+    }
+  }
+  return $sql;
+}

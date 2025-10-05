@@ -1,0 +1,508 @@
+<?php
+include(drupal_get_path('module', 'localizer') . '/models/localizernode.php');
+
+/**
+* Localizer node module.
+* @author Roberto Gerola, 2006, http://www.speedtech.it
+*/
+
+/**
+* Implementation of the hook menu for adding localizernode menu items.
+*/
+function localizernode_menu($may_cache) {
+  $items = array();
+
+  if(!$may_cache) {
+    if (arg(0) == 'node' && is_numeric(arg(1))) {
+      $node = node_load(arg(1));
+      $content_types_enabled = variable_get('localizer_contents_types', array('page'=>'page', 'story'=>'story'));
+      if(array_key_exists($node->type, $content_types_enabled) && $content_types_enabled[$node->type]) {
+        $items[] = array(
+          'path' => 'node/'. arg(1) .'/localizernode',
+          'title' => t('Translations'),
+          'callback' => 'localizernode_node_page',
+          'access' => user_access('administer localizer'),
+          'type' => MENU_LOCAL_TASK,
+          'weight' => 3
+        );
+      }
+    }
+  }
+  return $items;
+}
+
+/**
+* Implementation of hook nodeapi.
+* The translation mechanism acts here, for the "load" $op
+*/
+function localizernode_nodeapi(&$node, $op, $teaser, $page) {  
+  $contents_types_enabled = variable_get('localizer_contents_types', array('page'=>'page', 'story'=>'story'));
+
+  switch ($op) {
+    case 'load':
+      if($contents_types_enabled[$node->type]) {    
+        $localizernode = localizernode_findbynid($node->nid);
+        return array('localizernode_locale' => $localizernode['locale'], 'localizernode_pid' => $localizernode['pid']);
+      }
+      break;
+    case 'insert':
+    case 'update':
+      if($contents_types_enabled[$node->type]) {    
+        $localizernode = array('nid'=>$node->nid, 'pid'=>$node->localizernode_pid, 'locale'=>$node->localizernode_locale);
+        if($node->localizernode_locale) {
+          localizernode_save($localizernode);
+        }
+        if($node->localizernode_menu) {      
+          $translation = array(
+            'tid' => '',
+            'object_name' => 'menu_item',
+            'object_key' => $node->localizernode_menu['mid'],
+            'object_field' => 'title',
+            'locale' => $node->localizernode_locale,
+            'translation' => $node->localizernode_menu['title']
+          );
+          localizertranslation_save($translation);
+          $translation['object_field'] = 'description';
+          $translation['translation'] = $node->localizernode_menu['description'];
+          localizertranslation_save($translation);
+        }
+      }
+      break; 
+    case 'delete':
+      if($contents_types_enabled[$node->type]) {    
+        localizernode_delete($node->nid);
+      }
+      break;
+  }
+}
+
+/**
+* Modify the form for every node adding the necessary fields for localizer module : pid and locale
+*/
+function localizernode_form_alter($form_id, &$form) { 
+
+if (!isset($form['type'])) { 
+  return;
+}
+
+switch ($form_id) { 
+  case $form['type']['#value'] .'_node_form':
+    if(arg(3) == 'localizernode') {
+      // We are translating a node in the form : node/add/type/localizernode/nid/lang
+      global $user;
+      $source_nid = arg(4);
+      $target_locale = arg(5);
+
+      $node = node_load($source_nid);
+      $node->title = '(' . $target_locale  . ') ' . $node->title;
+      $node->nid = NULL;
+      $node->uid = $user->uid;
+      $node->created = 0;
+      $node->menu = NULL;
+      $node->localizernode_locale = $target_locale;
+      $node->localizernode_pid = $source_nid;
+
+      if(variable_get('localizer_autopath_translations', FALSE)) {
+        $node->path = $node->localizernode_locale . '/' . localizer_pathwithoutlocale($node->path);
+      }
+      else {
+        $node->path = NULL;        
+      }
+      
+      node_save($node);
+      drupal_goto('node/'. $node->nid . '/edit');
+    }
+
+    $contents_types_enabled = variable_get('localizer_contents_types', array('page'=>'page', 'story'=>'story'));
+    if($contents_types_enabled[$form['type']['#value']]) {
+      $options = localizer_available_contentlocales();
+      if (variable_get('localizer_anylanguage_support', TRUE)) {
+        $options = array_merge(array('-' => 'Any') , $options);
+      }
+            
+      if (arg(1)=='add') {
+        if (variable_get('localizer_switch_byhostname', FALSE)) {
+          $currenthost = $_SERVER['HTTP_HOST'];
+          $localebyhostname = localizer_localebyhostname($currenthost);
+          $form['#node']->localizernode_locale = $localebyhostname;
+        }
+        else {
+          $form['#node']->localizernode_locale = localizer_get_defaultcontentlocale();
+        }
+      }
+      else {           
+        $form['localizernode_locale'] = array(
+          '#type' => 'select',
+          '#title' => t('Language'),
+          '#default_value' => $form['#node']->localizernode_locale,
+          '#options' => $options,
+          '#required' => FALSE,
+          '#weight' => -18,
+        );
+      }
+
+      if($form['#node']->localizernode_pid && ($form['#node']->localizernode_pid != $form['#node']->nid)) {
+        //This is a translation
+        $form['localizernode_menu'] = $form['menu'];
+        unset($form['menu']);
+
+        localizer_formdisablecontrols(&$form['localizernode_menu'], array('title'=>1, 'description'=>1));
+        if ($form['nid']['#value'] > 0) {
+          $item = db_fetch_array(db_query("SELECT * FROM {menu} WHERE path = 'node/%d'", $form['#node']->localizernode_pid));
+          if (isset($form['#post']['menu']) && is_array($form['#post']['menu'])) {
+            $item = !is_array($item) ? $form['#post']['menu'] : (($form['#post']['op'] == t('Preview')) ? array_merge($item, $form['#post']['menu']) : array_merge($form['#post']['menu'], $item));
+          }
+
+          $translation = localizermenu_translatemenuitem($item['mid'], $form['#node']->localizernode_locale);
+          $item['title'] = empty($translation['title']) ? $item['title'] : $translation['title'];
+          $item['description'] = empty($translation['description']) ?  $item['description'] : $translation['description'];
+
+          $form['localizernode_menu']['title']['#default_value'] = $item['title'];
+          $form['localizernode_menu']['description']['#default_value'] = $item['description'];
+          $form['localizernode_menu']['pid']['#default_value'] = $item['pid'];
+          $form['localizernode_menu']['path']['#value'] = $item['path'];
+          $form['localizernode_menu']['weight']['#default_value'] = $item['weight'];
+          $form['localizernode_menu']['mid']['#value'] = $item['mid'];
+          $form['localizernode_menu']['type']['#value'] = $item['type'];
+
+          if($item['mid'] > 0 ){
+              $form['localizernode_menu']['advanced'] = array('#type' => 'item',
+                '#value' => t('You may also <a href="@edit">edit the advanced settings</a> for this menu item.', array('@edit' => url("admin/build/menu/item/edit/{$item['mid']}"))),
+              );
+          }
+        }
+      }          
+    }
+
+    break;
+   }
+}
+
+/**
+* Hook for the overview of a node.
+* Implements the translations tab interface
+*/
+function localizernode_node_overview($node) {
+  $languages = localizer_available_contentlocales();
+  unset($languages[$node->localizernode_locale]);
+  $output = t('Current translations');
+  $header = array(t('Language'), t('Title'), t('Options'));
+  foreach($languages as $lang => $langname){
+      $options = array();
+      $localizernode=localizernode_findone('pid=' . $node->localizernode_pid . " AND locale='$lang'");
+      if($localizernode['nid']) {
+        $trnode = db_fetch_object(db_query('SELECT n.nid, n.title, n.status, loc.locale FROM {node} n INNER JOIN {localizernode} loc ON n.nid = loc.nid AND n.nid = %d', $localizernode['nid']));
+        $title = l($trnode->title, 'node/'. $trnode->nid, NULL, 'locale=' . $trnode->locale);
+      }
+      else {
+        $title = t('Not translated');
+        $options[] = l(t('create translation'), 'language/' . $lang , array(), "destination=node/add/$node->type/localizernode/$node->nid/$lang");
+      }
+      $options[] = l(t('select node'), "node/$node->nid/localizernode/select/$lang");
+      $rows[] = array($langname, $title, implode(" | ", $options));
+  }
+  $output .= theme('table', $header, $rows);
+  $output .= drupal_get_form('localizernode_node_overview_form', $node);
+  return $output;
+}
+
+function localizernode_node_overview_form($node) {
+  if($node->localizernode_pid != $node->nid) {
+    $form['submit'] = array('#type' => 'submit', '#value' => t('Remove'), '#suffix' => t('Remove node from this translation set'));
+  }
+  return $form;
+}
+
+/**.
+* Intercepts all the calls for the page.
+*/
+function localizernode_node_page() {
+  $args = func_get_args();
+  $op = isset($_POST['op']) ? $_POST['op'] : $args[0];
+  $edit = $_POST['edit'];
+  $nid = arg(1);
+  $node = node_load($nid);
+  drupal_set_title(check_plain($node->title));
+  $output = '';
+  $locale = $args[1];
+
+  switch($op){
+    case 'select':
+      $output .= localizernode_node_overview($node);
+      $output .= localizernode_node_select($node, $locale);
+      break;
+    case t('Save'):
+      $output .= localizernode_node_select($node, $locale);
+      break;
+    case 'remove':
+    case t('Remove'):
+      localizernode_save(array('nid'=>$node->nid, 'pid'=>$node->nid, 'locale'=>$node->localizernode_locale));
+      drupal_set_message("The node has been removed from the translation set");
+      drupal_goto("node/$node->nid/localizernode");
+    default:
+      $output .= localizernode_node_overview($node);
+  }
+  print theme('page', $output);
+}
+
+function localizernode_node_select($node, $locale) {
+  $form['node'] = array('#type' => 'value', '#value' =>$node);
+  $languages = localizer_available_contentlocales();
+
+  $result = pager_query(db_prefix_tables("SELECT n.nid, n.title FROM {node} n INNER JOIN {localizernode} loc ON n.nid=loc.nid WHERE loc.locale = '%s' AND n.type='" . $node->type . "' ORDER BY n.title"), 40, 0, NULL, $locale);
+
+  while($trnode = db_fetch_object($result)){
+    $list[$trnode->nid] = l($trnode->title, "node/$trnode->nid") ;
+  }
+
+  if($list) {
+    $output = drupal_get_form('localizernode_node_select_form', $node, $locale, $list);
+  }
+  else {
+    $output = t("No nodes available in @language",  array('@language' => $languages[$locale]));
+  }
+  return $output;
+}
+
+function localizernode_node_select_form($node, $locale, $list){
+  $languages = localizer_available_contentlocales();
+  $translations = localizernode_get_translations($node->nid);
+  $form['localizernode_pid'] = array('#type' => 'hidden', '#value' => $node->localizernode_pid);
+  $form['nodes']['nid'] = array(
+    '#type' => 'radios', '#title' => t('Select translation for @language', array('@language' => $languages[$locale])), 
+    '#default_value' => isset($translations[$locale]) ? $translations[$locale]->nid : '',
+    '#options' => $list);
+  $form['pager'] = array('#value' => theme('pager'));
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Save'));
+  return $form;
+}
+
+function localizernode_node_select_form_submit($form_id, $form_values){
+  $localizernode_pid = $form_values['localizernode_pid'];
+  $nid = $form_values['nid'];
+  if( $localizernode_pid && $nid ) {
+    $localizernode=localizernode_findbynid($nid);
+    localizernode_save(array('nid'=>$nid, 'pid'=>$localizernode_pid, 'locale'=>$localizernode['locale']));
+    drupal_set_message(t('The translation has been saved'));
+  }
+}
+
+/**
+* Gets the translations for the current node
+* @param nid the id of the node
+* @param getitself includes also the node in the list
+*/
+function localizernode_get_translations($nid, $getitself = FALSE) {
+  $localizernode = localizernode_findbynid($nid);
+  $pid = $localizernode['pid'];
+
+  if($getitself) {
+    $result = db_query('SELECT n.nid, n.title, n.status, loc.locale FROM {node} n INNER JOIN {localizernode} loc ON n.nid = loc.nid AND loc.pid = %d', $pid);
+  }
+  else {
+    $result = db_query('SELECT n.nid, n.title, n.status, loc.locale FROM {node} n INNER JOIN {localizernode} loc ON n.nid = loc.nid AND loc.pid = %d AND loc.nid <> %d', $pid, $nid);
+  }
+
+  $items = array();
+  while ($node = db_fetch_object($result)) {
+    $items[$node->locale] = $node;
+  }
+  return $items;
+}
+
+function localizernode_db_rewrite_sql($query, $primary_table, $primary_field) {
+  global $user;
+  $sql = array();
+
+  $applylocalizer = ($primary_table == 'n');
+  $applylocalizer = $applylocalizer && !preg_match('/' . $primary_table . '\.nid\s*=\s*\'?(%d|\d+)\'?/', $query);
+
+  if(module_exists('gsitemap') && !variable_get('localizer_switch_byhostname', FALSE)) {
+    if(($primary_table == 'n') && preg_match('/gsitemap/', $query)) {
+      //Don't apply localizer because we are serving a 
+      //gsitemap request on a site with switchbyhostname
+      $applylocalizer = FALSE;
+    }
+  }
+
+  if(module_exists('views') && variable_get('localizer_global_viewsupport', TRUE)) {
+      $applylocalizer = $applylocalizer || ($primary_table == 'node');
+  }
+
+  if($applylocalizer) {
+    $contents_types_enabled = variable_get('localizer_contents_types', array());
+    preg_match('/type\s*=\s*\'\S*\'/', $query, $matches);
+    $pos = strpos($matches[0], "'");
+    $type = str_replace("'", "", substr($matches[0], $pos));
+    if($type && !$contents_types_enabled[$type]) $applylocalizer = FALSE;
+  }
+
+  if ($applylocalizer && arg(0) == 'search' && variable_get('localizer_search_all_languages', FALSE)) {
+      $applylocalizer = FALSE;
+  }
+
+  if ($applylocalizer) {
+    $contentlocales_assql = localizer_get_contentlocales_assql();
+    if($contentlocales_assql) {
+      $sql['join'] = "LEFT JOIN {localizernode} loc ON loc.nid=" . $primary_table . ".nid";
+      if (variable_get('localizer_anylanguage_support', TRUE)) {
+        $sql['where'] = "loc.locale IN (" . $contentlocales_assql . ",'-') OR loc.locale IS NULL";
+      }
+      else {
+        $sql['where'] = "loc.locale IN (" . $contentlocales_assql . ") OR loc.locale IS NULL";
+      }
+    }
+  }
+  return $sql;
+}
+
+function localizernode_get_nids($nid) {
+  $nids = array();
+  $localizernode=localizernode_findbynid($nid);
+  $pid = $localizernode['pid'];
+  if($pid) {
+    $items = localizernode_findone('pid=' . $pid);
+    $nids = array_keys($items);
+  }
+  return $nids;
+}
+
+/**
+* Gets the localized node's id
+* @param nid the node id
+* @param locale the locale of the translated node
+* @returns the corresponding translated node's nid
+*/
+function localizernode_get_localizednid($nid, $_locale) {
+  static $locnids = array();
+  if(array_key_exists($nid, $locnids) && array_key_exists($_locale, $locnids[$nid])) {
+    return $locnids[$nid][$_locale];
+  }
+
+  $localizernode = localizernode_findbynid($nid);
+  $node_locale = $localizernode['locale'];
+  if($_locale != $node_locale) {
+    $pid = $localizernode['pid'];
+    if($pid) {
+      $localizernode = localizernode_findone('pid=' . $pid . " AND locale='$_locale'");
+      $trnid = $localizernode['nid'];
+    }
+  }
+  if(!$trnid) {
+    $trnid = $nid;
+  }
+  $locnids[$nid][$_locale] = $trnid;
+  return $trnid;
+}
+
+/**
+* Gets the localized node's id
+* @param nid the node id
+* @param locale the locale of the translated node
+* @returns the corresponding translated node's nid
+*/
+function localizernode_get_contentlocale($_path) {
+  $normal_path = drupal_get_normal_path($_path);
+  $arguments = explode('/', $normal_path);
+  $node_locale = '';
+  if($arguments[0]=='node' && is_numeric($arguments[1])) {
+    $localizernode = localizernode_findbynid($arguments[1]);
+    $node_locale = $localizernode['locale'];
+  }
+  return $node_locale;
+}
+
+function localizernode_get_nodepid($_path) {
+  $normal_path = drupal_get_normal_path($_path);
+  $arguments = explode('/', $normal_path);
+  $node_locale = '';
+  if($arguments[0]=='node' && is_numeric($arguments[1])) {
+    $localizernode = localizernode_findbynid($arguments[1]);
+    $node_pid = $localizernode['pid'];
+  }
+  return $node_pid;
+}
+
+function localizernode_existscontentlocale($_path, $_locale) {
+  $normal_path = drupal_get_normal_path($_path);
+  $arguments = explode('/', $normal_path);
+  $node_locale = '';
+  if($arguments[0]=='node' && is_numeric($arguments[1])) {
+    $localizernode = localizernode_findbynid($arguments[1]);
+    $node_pid = $localizernode['pid'];
+    if($node_pid) {
+      $localizernode = localizernode_findone('pid=' . $node_pid . " AND locale='$_locale'");
+      $node_nid = $localizernode['nid'];
+    }
+  }
+  if($node_nid) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+/**
+* Gets the localized node
+* @param nid the node id
+* @param locale the locale of the translated node
+* @returns the corresponding translated node
+*/
+function localizernode_get_localizednode($_nid, $_locale) {
+  $trnid = localizernode_get_localizednid($_nid, $_locale);
+
+  if($trnid) {
+    $trnode=node_load($trnid);
+  }
+  else
+  {
+      $trnode=node_load($_nid);
+  }
+
+  return $trnode;
+}
+
+/**
+* Gets the localized node
+* @param nid the node id
+* @param locale the locale of the translated node
+* @returns the corresponding translated node
+*/
+function localizernode_localizenode(&$_node, $_locale) {
+  $trnid = localizernode_get_localizednid($_node->nid, $_locale);
+
+  if($trnid && (localizer_get_defaultcontentlocale() != $_node->localizernode_locale)) {
+    $_node=node_load($trnid);
+  }
+}
+
+/**
+* Gets the localized path
+* @param _path the path
+* @param _locale the locale
+* @returns the corresponding translated path
+*/
+function localizernode_get_localizedpath($_path, $_locale) {
+  static $locpaths = array();
+  if(array_key_exists($_path, $locpaths) && array_key_exists($_locale, $locpaths[$_path])) {
+    return $locpaths[$_path][$_locale];
+  }
+
+  $normal_path = drupal_get_normal_path($_path);
+  $arguments = explode('/', $normal_path);
+  if($arguments[0]=='node' && is_numeric($arguments[1])) {
+    $nid = $arguments[1];
+    $lnid = localizernode_get_localizednid($nid, $_locale);
+    $lpath = 'node/' . $lnid;
+    for($i=2; $i<sizeof($arguments); $i++) {
+      $lpath .= '/' . $arguments[$i];
+    }
+  }
+  else {
+    $lpath = $_path;
+  }
+  $locpaths[$_path][$_locale] = $lpath;
+  return $lpath;
+}
+

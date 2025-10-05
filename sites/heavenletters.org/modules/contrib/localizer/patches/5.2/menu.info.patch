@@ -1,0 +1,9 @@
+--- menu.info.orig	2007-09-15 16:12:20.000000000 +0200
++++ menu.info	2007-09-15 16:22:50.000000000 +0200
+@@ -1,5 +1,5 @@
+ ; $Id: menu.info.patch,v 1.1.2.1 2007/09/15 14:29:13 robertogerola Exp $
+-name = Menu
++name = "Menu [Localizer]"
+ description = Allows administrators to customize the site navigation menu.
+ package = Core - optional
+ version = VERSION

@@ -1,0 +1,13 @@
+--- modules/menu/menu.module.orig	2007-11-22 18:19:33.000000000 +0100
++++ modules/menu/menu.module	2007-11-20 14:43:21.000000000 +0100
+@@ -410,8 +410,8 @@ function menu_edit_item_form($type, $mid
+ /**
+  * Process menu and menu item add/edit form submissions.
+  */
+-function menu_edit_item_form_submit($form_id, $form_values) {
+-  menu_edit_item_save($form_values);
++function menu_edit_item_form_submit($form_id, &$form_values) {
++  $form_values['mid']=menu_edit_item_save($form_values);
+   return 'admin/build/menu';
+ }
+ 

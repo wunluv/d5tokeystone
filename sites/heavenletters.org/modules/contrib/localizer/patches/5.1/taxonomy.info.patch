@@ -1,0 +1,9 @@
+--- modules/taxonomy/taxonomy.info	2007-01-30 01:20:07.000000000 +0100
++++ sites/all/modules/localizer/taxonomy/taxonomy.info	2007-04-16 14:58:57.000000000 +0200
+@@ -1,5 +1,5 @@
+ ; $Id: taxonomy.info.patch,v 1.1.2.1 2007/04/23 09:55:49 robertogerola Exp $
+-name = Taxonomy
++name = "Taxonomy [Localizer]"
+ description = Enables the categorization of content.
+ package = Core - optional
+ version = VERSION

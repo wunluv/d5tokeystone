@@ -1,0 +1,100 @@
+<?php
+include(drupal_get_path('module', 'localizer') . '/models/localizeruser.php');
+
+function localizeruser_user($op, &$edit, &$account, $category = NULL) {
+  if(function_exists('localizeruser_user_' . $op)) {
+    return call_user_func('localizeruser_user_' . $op, $edit, $account, $category);
+  }
+}
+
+function localizeruser_user_delete(&$edit, &$account, $category = NULL) {
+  localizeruser_delete($account->uid);
+}
+
+function localizer_user_insert(&$edit, &$account, $category = NULL) {
+  if(is_array($edit) && array_key_exists('contentlocales', $edit)) {
+    foreach($edit['contentlocales'] as $key=>$value) {
+      if(is_integer($key)) unset($edit['contentlocales'][$key]);
+    }
+
+    $localizeruser = array('uid'=>$account->uid, 'contentlocales'=>serialize($edit['contentlocales']), 'switch_uicontent'=>$edit['switch_uicontent']);
+    localizeruser_save($localizeruser);
+  }
+ 
+  global $user;
+  $languages = localizer_available_uilocales();
+  if ($languages[$edit['language']] && ($user->uid==$account->uid)) {
+    localizer_set_uilocale($edit['language']);
+  }
+}
+
+function localizeruser_user_update(&$edit, &$account, $category = NULL) {  
+  if(is_array($edit) && array_key_exists('contentlocales', $edit)) {
+    foreach($edit['contentlocales'] as $key=>$value) {
+      if(is_integer($key)) unset($edit['contentlocales'][$key]);
+    }
+
+    $localizeruser = array('uid'=>$account->uid, 'contentlocales'=>serialize($edit['contentlocales']), 'switch_uicontent'=>$edit['switch_uicontent']);
+    localizeruser_save($localizeruser);
+  }
+ 
+  global $user;
+  $languages = localizer_available_uilocales();
+  if ($languages[$edit['language']] && ($user->uid==$account->uid)) {
+    localizer_set_uilocale($edit['language']);
+  }
+
+}
+
+function localizeruser_user_login(&$edit, &$account, $category = NULL) {
+  $languages = localizer_available_uilocales();
+  global $user;
+  if ($languages[$user->language]) {
+    localizer_set_uilocale($user->language);
+  }
+}
+
+function localizeruser_user_load(&$edit, &$account, $category = NULL) {
+  $localizeruser = localizeruser_findbyuid($account->uid);
+  $account->contentlocales = unserialize($localizeruser['contentlocales']);
+  $account->switch_uicontent = $localizeruser['switch_uicontent'];
+  if(!$account->switch_uicontent) $account->switch_uicontent = 1;
+}
+
+function localizeruser_user_form(&$edit, &$account, $category = NULL) {
+  if(variable_get('localizer_multilingual_support', FALSE)) {
+    $languages = localizer_available_contentlocales();
+
+    $form['localizeruser'] = array('#type' => 'fieldset',
+      '#title' => t('Multilingual content'),
+      '#weight' => -18,
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
+
+    $form['localizeruser']['contentlocales'] = array(
+      '#type' => 'checkboxes',
+      '#weight' => -18,
+      '#title' => t('Languages'),
+      '#default_value' => $account->contentlocales,
+      '#options' => localizer_available_contentlocales(),
+      '#description' => 'Displays the content in all the selected languages',
+    );
+
+    $options = array(
+       '1' => t('When switching user interface language, switch also the content language'),
+       '2' => t('Keep separated user interface and content language'),
+       '3' => t('Use global options')
+    );
+    $form['localizeruser']['switch_uicontent'] = array (
+      '#type' => 'radios',
+      '#weight' => -17,
+      '#title' => t("User interface and content language switch"),
+      '#options' => $options,
+      '#default_value' => $account->switch_uicontent,
+    );
+    return $form;
+  }
+}
+
+?>
