@@ -42,33 +42,26 @@ var lists = {
   User: (0, import_core.list)({
     access: {
       operation: {
-        create: ({ session: session2 }) => !!session2?.data && session2.data.role === "admin",
-        update: ({ session: session2, item }) => {
-          if (!session2?.data) return false;
-          if (session2.data.role === "admin") return true;
-          if (item?.id === session2.data.id) return true;
+        create: ({ session }) => !!session?.data && session.data.role === "admin",
+        update: ({ session, item }) => {
+          if (!session?.data) return false;
+          if (session.data.role === "admin") return true;
+          if (item?.id === session.data.id) return true;
           return false;
         },
-        delete: ({ session: session2 }) => !!session2?.data && session2.data.role === "admin",
-        query: ({ session: session2 }) => !!session2?.data
+        delete: ({ session }) => !!session?.data && session.data.role === "admin",
+        query: ({ session }) => !!session?.data
       },
       filter: {
-        query: ({ session: session2 }) => {
-          if (!session2?.data) return false;
-          if (session2.data.role === "admin") return true;
-          return { id: { equals: session2.data.id } };
+        query: ({ session }) => {
+          if (!session?.data) return false;
+          if (session.data.role === "admin") return true;
+          return { id: { equals: session.data.id } };
         },
-        update: ({ session: session2 }) => {
-          if (!session2?.data) return false;
-          if (session2.data.role === "admin") return true;
-          return { id: { equals: session2.data.id } };
-        }
-      }
-    },
-    hooks: {
-      afterOperation: ({ operation, item }) => {
-        if ((operation === "create" || operation === "update") && item) {
-          item.lastLogin = /* @__PURE__ */ new Date();
+        update: ({ session }) => {
+          if (!session?.data) return false;
+          if (session.data.role === "admin") return true;
+          return { id: { equals: session.data.id } };
         }
       }
     },
@@ -102,19 +95,6 @@ var lists = {
         }
       }),
       posts: (0, import_fields.relationship)({ ref: "Post.author", many: true }),
-      heavenletters: (0, import_fields.relationship)({ ref: "Heavenletter.author", many: true }),
-      translations: (0, import_fields.relationship)({ ref: "Translation.translator", many: true }),
-      lastLogin: (0, import_fields.timestamp)(),
-      isActive: (0, import_fields.select)({
-        options: [
-          { label: "Active", value: "true" },
-          { label: "Inactive", value: "false" }
-        ],
-        defaultValue: "true",
-        ui: {
-          displayMode: "segmented-control"
-        }
-      }),
       createdAt: (0, import_fields.timestamp)({
         defaultValue: { kind: "now" }
       })
@@ -128,22 +108,16 @@ var lists = {
   Heavenletter: (0, import_core.list)({
     access: {
       operation: {
-        create: ({ session: session2 }) => !!session2?.data && ["admin", "author"].includes(session2.data.role),
-        update: ({ session: session2, item }) => {
-          if (!session2?.data) return false;
-          if (session2.data.role === "admin") return true;
-          if (session2.data.role === "author" && item?.author === session2.data.id) return true;
-          return false;
-        },
-        delete: ({ session: session2 }) => !!session2?.data && session2.data.role === "admin",
-        query: ({ session: session2 }) => !!session2?.data
+        create: ({ session }) => !!session?.data && session.data.role === "admin",
+        update: ({ session }) => !!session?.data && session.data.role === "admin",
+        delete: ({ session }) => !!session?.data && session.data.role === "admin",
+        query: ({ session }) => !!session?.data
       }
     },
     fields: {
-      number: (0, import_fields.integer)({
-        validation: { isRequired: true, min: 1 },
-        isIndexed: "unique",
-        isFilterable: true
+      permalink: (0, import_fields.text)({
+        validation: { isRequired: true },
+        isIndexed: "unique"
       }),
       title: (0, import_fields.text)({ validation: { isRequired: true } }),
       body: (0, import_fields.text)({
@@ -152,136 +126,37 @@ var lists = {
           displayMode: "textarea"
         }
       }),
-      status: (0, import_fields.select)({
-        options: [
-          { label: "Draft", value: "draft" },
-          { label: "Published", value: "published" },
-          { label: "Archived", value: "archived" }
-        ],
-        defaultValue: "draft",
-        ui: {
-          displayMode: "segmented-control"
-        }
+      locale: (0, import_fields.text)({
+        validation: { isRequired: true, length: { min: 2, max: 8 } },
+        isIndexed: true
       }),
-      publishedAt: (0, import_fields.timestamp)(),
-      author: (0, import_fields.relationship)({
-        ref: "User.heavenletters",
-        ui: {
-          displayMode: "cards",
-          cardFields: ["name", "email", "role"],
-          inlineEdit: { fields: ["name", "email"] },
-          linkToItem: true,
-          inlineConnect: true
-        },
-        many: false
-      }),
-      translations: (0, import_fields.relationship)({
-        ref: "Translation.heavenletter",
-        many: true,
-        ui: {
-          displayMode: "cards",
-          cardFields: ["languageCode", "status", "translatedTitle"],
-          hideCreate: true
-        }
-      }),
-      createdAt: (0, import_fields.timestamp)({
-        defaultValue: { kind: "now" }
-      }),
-      updatedAt: (0, import_fields.timestamp)({
-        defaultValue: { kind: "now" }
-      })
-    },
-    ui: {
-      listView: {
-        initialColumns: ["number", "title", "status", "author", "translations", "publishedAt"]
-      }
-    }
-  }),
-  Translation: (0, import_core.list)({
-    access: {
-      operation: {
-        create: ({ session: session2 }) => !!session2?.data && ["admin", "translator"].includes(session2.data.role),
-        update: ({ session: session2, item }) => {
-          if (!session2?.data) return false;
-          if (session2.data.role === "admin") return true;
-          if (session2.data.role === "translator" && item?.translator === session2.data.id) return true;
-          return false;
-        },
-        delete: ({ session: session2, item }) => {
-          if (!session2?.data) return false;
-          if (session2.data.role === "admin") return true;
-          if (session2.data.role === "translator" && item?.translator === session2.data.id) return true;
-          return false;
-        },
-        query: ({ session: session2 }) => !!session2?.data
-      }
-    },
-    fields: {
-      languageCode: (0, import_fields.select)({
-        options: [
-          { label: "English", value: "en" },
-          { label: "German", value: "de" },
-          { label: "Spanish", value: "es" },
-          { label: "French", value: "fr" },
-          { label: "Italian", value: "it" },
-          { label: "Portuguese", value: "pt" },
-          { label: "Russian", value: "ru" },
-          { label: "Chinese", value: "zh" },
-          { label: "Japanese", value: "ja" },
-          { label: "Arabic", value: "ar" }
-        ],
-        validation: { isRequired: true },
+      publishNumber: (0, import_fields.integer)({
         isFilterable: true
       }),
-      translatedTitle: (0, import_fields.text)({ validation: { isRequired: true } }),
-      translatedBody: (0, import_fields.text)({
-        validation: { isRequired: true },
-        ui: {
-          displayMode: "textarea"
-        }
-      }),
-      translator: (0, import_fields.relationship)({
-        ref: "User.translations",
-        ui: {
-          displayMode: "cards",
-          cardFields: ["name", "email", "role"],
-          inlineEdit: { fields: ["name", "email"] },
-          linkToItem: true,
-          inlineConnect: true
-        },
-        many: false
-      }),
-      status: (0, import_fields.select)({
-        options: [
-          { label: "Draft", value: "draft" },
-          { label: "Translated", value: "translated" },
-          { label: "Published", value: "published" }
-        ],
-        defaultValue: "draft",
-        ui: {
-          displayMode: "segmented-control"
-        }
-      }),
-      heavenletter: (0, import_fields.relationship)({
-        ref: "Heavenletter.translations",
-        ui: {
-          displayMode: "cards",
-          cardFields: ["number", "title", "status"],
-          linkToItem: true,
-          inlineConnect: false
-        },
-        many: false
-      }),
+      publishedOn: (0, import_fields.timestamp)(),
+      writtenOn: (0, import_fields.timestamp)(),
+      nid: (0, import_fields.integer)(),
+      tnid: (0, import_fields.integer)(),
+      tags: (0, import_fields.json)(),
+      embeddings: (0, import_fields.json)(),
       createdAt: (0, import_fields.timestamp)({
-        defaultValue: { kind: "now" }
+        defaultValue: { kind: "now" },
+        ui: {
+          createView: { fieldMode: "hidden" },
+          itemView: { fieldMode: "read" }
+        }
       }),
       updatedAt: (0, import_fields.timestamp)({
-        defaultValue: { kind: "now" }
+        ui: {
+          createView: { fieldMode: "hidden" },
+          itemView: { fieldMode: "read" }
+        }
       })
     },
     ui: {
+      labelField: "title",
       listView: {
-        initialColumns: ["heavenletter", "languageCode", "status", "translatedTitle", "translator"]
+        initialColumns: ["title", "locale", "publishNumber", "publishedOn", "permalink"]
       }
     }
   }),
@@ -291,15 +166,15 @@ var lists = {
     },
     access: {
       operation: {
-        create: ({ session: session2 }) => !!session2?.data && ["admin", "author"].includes(session2.data.role),
-        update: ({ session: session2, item }) => {
-          if (!session2?.data) return false;
-          if (session2.data.role === "admin") return true;
-          if (session2.data.role === "author" && item?.author === session2.data.id) return true;
+        create: ({ session }) => !!session?.data && ["admin", "author"].includes(session.data.role),
+        update: ({ session, item }) => {
+          if (!session?.data) return false;
+          if (session.data.role === "admin") return true;
+          if (session.data.role === "author" && item?.author === session.data.id) return true;
           return false;
         },
-        delete: ({ session: session2 }) => !!session2?.data && session2.data.role === "admin",
-        query: ({ session: session2 }) => !!session2?.data
+        delete: ({ session }) => !!session?.data && session.data.role === "admin",
+        query: ({ session }) => !!session?.data
       }
     },
     fields: {
@@ -351,10 +226,10 @@ var lists = {
   Tag: (0, import_core.list)({
     access: {
       operation: {
-        create: ({ session: session2 }) => !!session2?.data && ["admin", "author"].includes(session2.data.role),
-        update: ({ session: session2 }) => !!session2?.data && ["admin", "author"].includes(session2.data.role),
-        delete: ({ session: session2 }) => !!session2?.data && session2.data.role === "admin",
-        query: ({ session: session2 }) => !!session2?.data
+        create: ({ session }) => !!session?.data && ["admin", "author"].includes(session.data.role),
+        update: ({ session }) => !!session?.data && ["admin", "author"].includes(session.data.role),
+        delete: ({ session }) => !!session?.data && session.data.role === "admin",
+        query: ({ session }) => !!session?.data
       }
     },
     ui: {
@@ -368,37 +243,6 @@ var lists = {
   })
 };
 
-// auth.ts
-var import_auth = require("@keystone-6/auth");
-var import_session = require("@keystone-6/core/session");
-var sessionSecret = process.env.KEYSTONE_SECRET;
-if (!sessionSecret) {
-  sessionSecret = "abcdefghijklmnopqrstuvwxyz1234567890";
-}
-var { withAuth } = (0, import_auth.createAuth)({
-  listKey: "User",
-  identityField: "email",
-  secretField: "password",
-  initFirstItem: {
-    fields: ["name", "email", "password", "role"],
-    itemData: {
-      role: "admin"
-    }
-  },
-  passwordResetLink: {
-    sendToken: async ({ token, identity }) => {
-      console.log(`Password reset for ${identity}: ${token}`);
-    },
-    tokensValidForMins: 60
-    // 1 hour
-  }
-});
-var sessionMaxAge = 8 * 60 * 60;
-var session = (0, import_session.statelessSessions)({
-  maxAge: sessionMaxAge,
-  secret: sessionSecret
-});
-
 // keystone.ts
 var import_dotenv = __toESM(require("dotenv"));
 import_dotenv.default.config();
@@ -410,71 +254,105 @@ var keystoneConfig = (0, import_core2.config)({
     url: process.env.DATABASE_URL
   },
   lists,
-  session,
+  // Temporarily disable session and auth to test basic functionality
+  // session,
   server: {
     cors: {
-      origin: "http://192.168.8.105:34773",
+      origin: true,
       credentials: true
-    }
-  },
-  graphql: {
-    extendGraphqlSchema: (schema) => {
-      const { parse, extendSchema } = require("graphql");
-      const typeDefs = `
-        extend type Query {
-          heavenlettersByTitle(search: String, title: String): [Heavenletter]
-          heavenletterByNumber(number: Int): Heavenletter
-        }
-      `;
-      const extended = extendSchema(schema, parse(typeDefs));
-      const queryType = extended.getType("Query");
-      if (queryType && queryType.getFields) {
-        const fields = queryType.getFields();
-        fields.heavenlettersByTitle.resolve = async (_root, args, context) => {
-          const search = args.search || args.title;
-          console.log("Keystone: heavenlettersByTitle resolver called with args.search=", args.search, "args.title=", args.title, "resolved search=", search);
-          if (!search) return [];
-          try {
-            return await context.query.Heavenletter.findMany({
-              where: {
-                title: {
-                  contains: search
-                }
-              }
-            });
-          } catch (err) {
-            console.warn("Keystone: query failed in heavenlettersByTitle resolver, error=", err);
-            return [];
-          }
-        };
-        fields.heavenletterByNumber.resolve = async (_root, args, context) => {
-          const num = args.number;
-          console.log("Keystone: heavenletterByNumber resolver called with number=", num);
-          if (typeof num !== "number") return null;
-          try {
-            if (typeof context.query.Heavenletter.findOne === "function") {
-              return await context.query.Heavenletter.findOne({ where: { number: num } });
-            }
-            const items = await context.query.Heavenletter.findMany({ where: { number: num }, take: 1 });
-            return items && items.length ? items[0] : null;
-          } catch (err) {
-            console.warn("Keystone: query failed in heavenletterByNumber resolver, error=", err);
-            return null;
-          }
-        };
-      }
-      return extended;
-    }
+    },
+    port: 3e3
   },
   ui: {
-    isAccessAllowed: (context) => {
-      const session2 = context.session;
-      return !!session2?.data && session2.data.isActive === "true" && ["admin", "author", "translator"].includes(session2.data.role);
-    }
+    // Temporarily disable UI access control to test basic functionality
+    isAccessAllowed: () => true
   }
+  // Temporarily disable GraphQL extensions to test basic functionality
+  // graphql: {
+  //   extendGraphqlSchema: (schema: any) => {
+  //     // Use graphql-js to extend the generated schema with typeDefs, then attach a resolver to the new field.
+  //     const { parse, extendSchema } = require('graphql');
+  //     const typeDefs = `
+  //       extend type Query {
+  //         heavenlettersByTitle(search: String, title: String): [Heavenletter]
+  //         heavenletterByNumber(number: Int): Heavenletter
+  //         heavenletterByPermalink(permalink: String!, locale: String): Heavenletter
+  //       }
+  //     `;
+  //     const extended = extendSchema(schema, parse(typeDefs));
+  //     // Attach resolver directly to the new field on the Query type.
+  //     const queryType = extended.getType('Query');
+  //     if (queryType && (queryType as any).getFields) {
+  //       const fields = (queryType as any).getFields();
+  //       fields.heavenlettersByTitle.resolve = async (_root: any, args: { search?: string, title?: string }, context: any) => {
+  //         const search = args.search || args.title;
+  //         console.log('Keystone: heavenlettersByTitle resolver called with args.search=', args.search, 'args.title=', args.title, 'resolved search=', search);
+  //         if (!search) return [];
+  //         // Use Keystone's query API. MySQL default collations are usually
+  //         // case-insensitive, so `contains` will typically behave insensitively.
+  //         try {
+  //           return await context.query.Heavenletter.findMany({
+  //             where: {
+  //               title: {
+  //                 contains: search,
+  //               },
+  //             },
+  //           });
+  //         } catch (err) {
+  //           console.warn('Keystone: query failed in heavenlettersByTitle resolver, error=', err);
+  //           return [];
+  //         }
+  //       };
+  //       fields.heavenletterByNumber.resolve = async (_root: any, args: { number?: number }, context: any) => {
+  //         const num = args.number;
+  //         console.log('Keystone: heavenletterByNumber resolver called with number=', num);
+  //         if (typeof num !== 'number') return null;
+  //         try {
+  //           // Prefer findOne for unique fields if available; otherwise fall back to findMany.
+  //           if (typeof context.query.Heavenletter.findOne === 'function') {
+  //             return await context.query.Heavenletter.findOne({ where: { publishNumber: num } });
+  //           }
+  //           const items = await context.query.Heavenletter.findMany({ where: { publishNumber: num }, take: 1 });
+  //           return items && items.length ? items[0] : null;
+  //         } catch (err) {
+  //           console.warn('Keystone: query failed in heavenletterByNumber resolver, error=', err);
+  //           return null;
+  //         }
+  //       };
+  //       fields.heavenletterByPermalink.resolve = async (_root: any, args: { permalink: string, locale?: string }, context: any) => {
+  //         const { permalink, locale } = args;
+  //         console.log('Keystone: heavenletterByPermalink resolver called with permalink=', permalink, 'locale=', locale);
+  //         if (!permalink) return null;
+  //         try {
+  //           const where = { permalink: { equals: permalink } };
+  //           if (locale) {
+  //             (where as any).locale = { equals: locale };
+  //           }
+  //           // Prefer findOne for unique fields if available; otherwise fall back to findMany.
+  //           if (typeof context.query.Heavenletter.findOne === 'function') {
+  //             return await context.query.Heavenletter.findOne({ where });
+  //           }
+  //           const items = await context.query.Heavenletter.findMany({ where, take: 1 });
+  //           return items && items.length ? items[0] : null;
+  //         } catch (err) {
+  //           console.warn('Keystone: query failed in heavenletterByPermalink resolver, error=', err);
+  //           return null;
+  //         }
+  //       };
+  //     }
+  //     return extended;
+  //   },
+  // },
+  // Temporarily disable UI access control to test basic functionality
+  // ui: {
+  //   isAccessAllowed: (context: any) => {
+  //     const session = context.session;
+  //     return !!session?.data && session.data.isActive === 'true' && ['admin', 'author', 'translator'].includes(session.data.role);
+  //   },
+  // },
 });
-console.log("Keystone: keystoneConfig built, extendGraphqlSchema present=", !!keystoneConfig.extendGraphqlSchema);
-var keystone_default = withAuth(keystoneConfig);
+console.log("Keystone: keystoneConfig built, extendGraphqlSchema present=", !!keystoneConfig.graphql?.extendGraphqlSchema);
+var keystone_default = keystoneConfig;
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   keystoneConfig

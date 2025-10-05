@@ -37,14 +37,6 @@ exports.lists = {
                 },
             },
         },
-        hooks: {
-            afterOperation: ({ operation, item }) => {
-                if ((operation === 'create' || operation === 'update') && item) {
-                    // Update lastLogin
-                    item.lastLogin = new Date();
-                }
-            },
-        },
         fields: {
             name: (0, fields_1.text)({ validation: { isRequired: true } }),
             email: (0, fields_1.text)({
@@ -75,19 +67,6 @@ exports.lists = {
                 },
             }),
             posts: (0, fields_1.relationship)({ ref: 'Post.author', many: true }),
-            heavenletters: (0, fields_1.relationship)({ ref: 'Heavenletter.author', many: true }),
-            translations: (0, fields_1.relationship)({ ref: 'Translation.translator', many: true }),
-            lastLogin: (0, fields_1.timestamp)(),
-            isActive: (0, fields_1.select)({
-                options: [
-                    { label: 'Active', value: 'true' },
-                    { label: 'Inactive', value: 'false' },
-                ],
-                defaultValue: 'true',
-                ui: {
-                    displayMode: 'segmented-control',
-                },
-            }),
             createdAt: (0, fields_1.timestamp)({
                 defaultValue: { kind: 'now' },
             }),
@@ -101,25 +80,16 @@ exports.lists = {
     Heavenletter: (0, core_1.list)({
         access: {
             operation: {
-                create: ({ session }) => !!(session === null || session === void 0 ? void 0 : session.data) && ['admin', 'author'].includes(session.data.role),
-                update: ({ session, item }) => {
-                    if (!(session === null || session === void 0 ? void 0 : session.data))
-                        return false;
-                    if (session.data.role === 'admin')
-                        return true;
-                    if (session.data.role === 'author' && (item === null || item === void 0 ? void 0 : item.author) === session.data.id)
-                        return true;
-                    return false;
-                },
+                create: ({ session }) => !!(session === null || session === void 0 ? void 0 : session.data) && session.data.role === 'admin',
+                update: ({ session }) => !!(session === null || session === void 0 ? void 0 : session.data) && session.data.role === 'admin',
                 delete: ({ session }) => !!(session === null || session === void 0 ? void 0 : session.data) && session.data.role === 'admin',
                 query: ({ session }) => !!(session === null || session === void 0 ? void 0 : session.data),
             },
         },
         fields: {
-            number: (0, fields_1.integer)({
-                validation: { isRequired: true, min: 1 },
+            permalink: (0, fields_1.text)({
+                validation: { isRequired: true },
                 isIndexed: 'unique',
-                isFilterable: true,
             }),
             title: (0, fields_1.text)({ validation: { isRequired: true } }),
             body: (0, fields_1.text)({
@@ -128,142 +98,37 @@ exports.lists = {
                     displayMode: 'textarea',
                 },
             }),
-            status: (0, fields_1.select)({
-                options: [
-                    { label: 'Draft', value: 'draft' },
-                    { label: 'Published', value: 'published' },
-                    { label: 'Archived', value: 'archived' },
-                ],
-                defaultValue: 'draft',
-                ui: {
-                    displayMode: 'segmented-control',
-                },
+            locale: (0, fields_1.text)({
+                validation: { isRequired: true, length: { min: 2, max: 8 } },
+                isIndexed: true,
             }),
-            publishedAt: (0, fields_1.timestamp)(),
-            author: (0, fields_1.relationship)({
-                ref: 'User.heavenletters',
-                ui: {
-                    displayMode: 'cards',
-                    cardFields: ['name', 'email', 'role'],
-                    inlineEdit: { fields: ['name', 'email'] },
-                    linkToItem: true,
-                    inlineConnect: true,
-                },
-                many: false,
-            }),
-            translations: (0, fields_1.relationship)({
-                ref: 'Translation.heavenletter',
-                many: true,
-                ui: {
-                    displayMode: 'cards',
-                    cardFields: ['languageCode', 'status', 'translatedTitle'],
-                    hideCreate: true,
-                },
-            }),
-            createdAt: (0, fields_1.timestamp)({
-                defaultValue: { kind: 'now' },
-            }),
-            updatedAt: (0, fields_1.timestamp)({
-                defaultValue: { kind: 'now' },
-            }),
-        },
-        ui: {
-            listView: {
-                initialColumns: ['number', 'title', 'status', 'author', 'translations', 'publishedAt'],
-            },
-        },
-    }),
-    Translation: (0, core_1.list)({
-        access: {
-            operation: {
-                create: ({ session }) => !!(session === null || session === void 0 ? void 0 : session.data) && ['admin', 'translator'].includes(session.data.role),
-                update: ({ session, item }) => {
-                    if (!(session === null || session === void 0 ? void 0 : session.data))
-                        return false;
-                    if (session.data.role === 'admin')
-                        return true;
-                    if (session.data.role === 'translator' && (item === null || item === void 0 ? void 0 : item.translator) === session.data.id)
-                        return true;
-                    return false;
-                },
-                delete: ({ session, item }) => {
-                    if (!(session === null || session === void 0 ? void 0 : session.data))
-                        return false;
-                    if (session.data.role === 'admin')
-                        return true;
-                    if (session.data.role === 'translator' && (item === null || item === void 0 ? void 0 : item.translator) === session.data.id)
-                        return true;
-                    return false;
-                },
-                query: ({ session }) => !!(session === null || session === void 0 ? void 0 : session.data),
-            },
-        },
-        fields: {
-            languageCode: (0, fields_1.select)({
-                options: [
-                    { label: 'English', value: 'en' },
-                    { label: 'German', value: 'de' },
-                    { label: 'Spanish', value: 'es' },
-                    { label: 'French', value: 'fr' },
-                    { label: 'Italian', value: 'it' },
-                    { label: 'Portuguese', value: 'pt' },
-                    { label: 'Russian', value: 'ru' },
-                    { label: 'Chinese', value: 'zh' },
-                    { label: 'Japanese', value: 'ja' },
-                    { label: 'Arabic', value: 'ar' },
-                ],
-                validation: { isRequired: true },
+            publishNumber: (0, fields_1.integer)({
                 isFilterable: true,
             }),
-            translatedTitle: (0, fields_1.text)({ validation: { isRequired: true } }),
-            translatedBody: (0, fields_1.text)({
-                validation: { isRequired: true },
-                ui: {
-                    displayMode: 'textarea',
-                },
-            }),
-            translator: (0, fields_1.relationship)({
-                ref: 'User.translations',
-                ui: {
-                    displayMode: 'cards',
-                    cardFields: ['name', 'email', 'role'],
-                    inlineEdit: { fields: ['name', 'email'] },
-                    linkToItem: true,
-                    inlineConnect: true,
-                },
-                many: false,
-            }),
-            status: (0, fields_1.select)({
-                options: [
-                    { label: 'Draft', value: 'draft' },
-                    { label: 'Translated', value: 'translated' },
-                    { label: 'Published', value: 'published' },
-                ],
-                defaultValue: 'draft',
-                ui: {
-                    displayMode: 'segmented-control',
-                },
-            }),
-            heavenletter: (0, fields_1.relationship)({
-                ref: 'Heavenletter.translations',
-                ui: {
-                    displayMode: 'cards',
-                    cardFields: ['number', 'title', 'status'],
-                    linkToItem: true,
-                    inlineConnect: false,
-                },
-                many: false,
-            }),
+            publishedOn: (0, fields_1.timestamp)(),
+            writtenOn: (0, fields_1.timestamp)(),
+            nid: (0, fields_1.integer)(),
+            tnid: (0, fields_1.integer)(),
+            tags: (0, fields_1.json)(),
+            embeddings: (0, fields_1.json)(),
             createdAt: (0, fields_1.timestamp)({
                 defaultValue: { kind: 'now' },
+                ui: {
+                    createView: { fieldMode: 'hidden' },
+                    itemView: { fieldMode: 'read' },
+                },
             }),
             updatedAt: (0, fields_1.timestamp)({
-                defaultValue: { kind: 'now' },
+                ui: {
+                    createView: { fieldMode: 'hidden' },
+                    itemView: { fieldMode: 'read' },
+                },
             }),
         },
         ui: {
+            labelField: 'title',
             listView: {
-                initialColumns: ['heavenletter', 'languageCode', 'status', 'translatedTitle', 'translator'],
+                initialColumns: ['title', 'locale', 'publishNumber', 'publishedOn', 'permalink'],
             },
         },
     }),

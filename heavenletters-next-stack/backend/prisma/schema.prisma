@@ -18,45 +18,31 @@ model User {
   bio       String?
   role      UserRole @default(author)
   posts     Post[]
-  heavenletters Heavenletter[]
-  translations Translation[]
+
   createdAt DateTime @default(now())
 
   @@map("ks_user")
 }
 
 model Heavenletter {
-  id          String       @id @default(cuid())
-  number      Int          @unique
-  title       String
-  body        String
-  status      HeavenletterStatus @default(draft)
-  publishedAt DateTime?
-  authorId    String?
-  author      User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  translations Translation[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id            Int      @id @default(autoincrement())
+  permalink     String   @unique @db.VarChar(255)  // exact Drupal .html path preserved
+  title         String   @db.VarChar(512)
+  body          String   @db.LongText                  // raw HTML or normalized text, no markdown conversion here
+  locale        String   @db.VarChar(8)              // e.g., en, es, fr
+  publishNumber Int?                        // meta only, not used in URL
+  publishedOn   DateTime?                     // original publish date if present
+  writtenOn     DateTime?                       // original written date if present
+  nid           Int?                                  // legacy Drupal node id for traceability
+  tnid          Int?                                 // translation set id
+  tags          Json?                                // array of tags or taxonomy references
+  embeddings    Json?                          // reserved for semantic search
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("ks_heavenletter")
-  @@index([number, status])
-}
-
-model Translation {
-  id               String   @id @default(cuid())
-  languageCode     String   // ISO language code (en, de, es, fr, it, etc.)
-  translatedTitle  String
-  translatedBody   String
-  translatorId     String?
-  translator       User?    @relation(fields: [translatorId], references: [id], onDelete: SetNull)
-  heavenletterId   String
-  heavenletter     Heavenletter @relation(fields: [heavenletterId], references: [id], onDelete: Cascade)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  @@map("ks_translation")
-  @@unique([heavenletterId, languageCode])
-  @@index([languageCode, translatorId])
+  @@index([locale])
+  @@index([publishNumber])
 }
 
 model Post {
@@ -74,10 +60,10 @@ model Post {
 }
 
 model Tag {
-  id       String @id @default(cuid())
-  name     String
-  posts    Post[]
-  createAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  name      String
+  posts     Post[]
+  createdAt DateTime @default(now())
 
   @@map("ks_tag")
 }
@@ -86,12 +72,6 @@ enum UserRole {
   admin
   author
   translator
-}
-
-enum HeavenletterStatus {
-  draft
-  published
-  archived
 }
 
 enum PostStatus {

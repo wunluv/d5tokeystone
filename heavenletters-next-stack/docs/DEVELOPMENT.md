@@ -4,20 +4,29 @@ This file documents the development database used by the heavenletters-next-stac
 
 ## Connection Details
 
-- **Host**: 192.168.8.103
-- **Port**: 3306 (default MariaDB/MySQL port)
-- **Database**: heaven
-- **Username**: root
-- **Password**: mojah42
+- **Host**: Configured via `DB_HOST` environment variable (see .env.sample)
+- **Port**: Configured via `DB_PORT` environment variable (default: 3306)
+- **Database**: Configured via `DB_NAME` environment variable (default: heaven)
 - **Container**: db (Docker container)
 - **Running in**: Docker container (development environment)
+
+## Using Environment Variables
+
+Connection details should be provided via environment variables in a `.env` file (never committed to the repository). See [backend/.env.sample](heavenletters-next-stack/backend/.env.sample) for a template with placeholders. Refer to [SECRETS_POLICY.md](heavenletters-next-stack/docs/SECRETS_POLICY.md) for guidelines on handling secrets securely.
+
+Example environment variables (see backend/.env.sample for complete template):
+- `DB_HOST=your_database_host` (e.g., 192.168.8.103 for development)
+- `DB_PORT=3306` (default MariaDB/MySQL port)
+- `DB_NAME=heaven` (database name)
+- `DB_USER=your_db_username` (use a least-privilege user)
+- `DB_PASSWORD=your_secure_password` (rotate regularly)
 
 ## Connection Command
 
 ```bash
-mysql -h 192.168.8.103 -P 3306 -u root -p heaven
-# Enter password: mojah42
+mysql --host=$DB_HOST --port=$DB_PORT --user=$DB_USER --password -D $DB_NAME
 ```
+Enter the password interactively when prompted, or provide it via secure secret storage (e.g., vault or environment variable). Never include passwords in scripts or commit them to the repository.
 
 ## Drupal 5.x Schema Documentation
 
@@ -142,3 +151,4 @@ WHERE n.nid IS NULL;
 - CCK tables follow the `content_type_[typename]` naming convention.
 - Update this file if the container IP, port, or schema changes.
 - Database was restored from `26092025_heavenletters.sql` dump file.
+- Always use environment variables for credentials as per SECRETS_POLICY.md.

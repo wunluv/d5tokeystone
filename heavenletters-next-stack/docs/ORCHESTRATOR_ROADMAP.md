@@ -125,7 +125,7 @@ Assigned Release Agent
 
 ## Progress Tracker
 | Phase | Status | Owner |
-| 0 Safety Preflight | Pending | Data Safety |
+| 0 Safety Preflight | In Progress | Orchestrator + Data Safety |
 | 2 Backend | Pending | Backend |
 | 3 Frontend | Pending | Frontend |
 | 4 Integration and Testing | Pending | QA |

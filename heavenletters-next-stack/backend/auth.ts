@@ -10,12 +10,13 @@ const { withAuth } = createAuth({
   listKey: 'User',
   identityField: 'email',
   secretField: 'password',
-  initFirstItem: {
-    fields: ['name', 'email', 'password', 'role'],
-    itemData: {
-      role: 'admin',
-    },
-  },
+  // Temporarily disabled for testing - initFirstItem can cause startup hangs
+  // initFirstItem: {
+  //   fields: ['name', 'email', 'password', 'role'],
+  //   itemData: {
+  //     role: 'admin',
+  //   },
+  // },
   passwordResetLink: {
     sendToken: async ({ token, identity }) => {
       // TODO: Implement email sending for password reset

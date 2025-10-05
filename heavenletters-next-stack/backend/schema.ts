@@ -6,6 +6,7 @@ import {
   timestamp,
   select,
   integer,
+  json,
 } from '@keystone-6/core/fields';
 
 export const lists = {
@@ -33,14 +34,6 @@ export const lists = {
           if (session.data.role === 'admin') return true;
           return { id: { equals: session.data.id } };
         },
-      },
-    },
-    hooks: {
-      afterOperation: ({ operation, item }) => {
-        if ((operation === 'create' || operation === 'update') && item) {
-          // Update lastLogin
-          item.lastLogin = new Date();
-        }
       },
     },
     fields: {
@@ -73,19 +66,6 @@ export const lists = {
         },
       }),
       posts: relationship({ ref: 'Post.author', many: true }),
-      heavenletters: relationship({ ref: 'Heavenletter.author', many: true }),
-      translations: relationship({ ref: 'Translation.translator', many: true }),
-      lastLogin: timestamp(),
-      isActive: select({
-        options: [
-          { label: 'Active', value: 'true' },
-          { label: 'Inactive', value: 'false' },
-        ],
-        defaultValue: 'true',
-        ui: {
-          displayMode: 'segmented-control',
-        },
-      }),
       createdAt: timestamp({
         defaultValue: { kind: 'now' },
       }),
@@ -99,22 +79,16 @@ export const lists = {
   Heavenletter: list({
     access: {
       operation: {
-        create: ({ session }) => !!session?.data && ['admin', 'author'].includes(session.data.role),
-        update: ({ session, item }: any) => {
-          if (!session?.data) return false;
-          if (session.data.role === 'admin') return true;
-          if (session.data.role === 'author' && item?.author === session.data.id) return true;
-          return false;
-        },
+        create: ({ session }) => !!session?.data && session.data.role === 'admin',
+        update: ({ session }) => !!session?.data && session.data.role === 'admin',
         delete: ({ session }) => !!session?.data && session.data.role === 'admin',
         query: ({ session }) => !!session?.data,
       },
     },
     fields: {
-      number: integer({
-        validation: { isRequired: true, min: 1 },
+      permalink: text({
+        validation: { isRequired: true },
         isIndexed: 'unique',
-        isFilterable: true,
       }),
       title: text({ validation: { isRequired: true } }),
       body: text({
@@ -123,136 +97,37 @@ export const lists = {
           displayMode: 'textarea',
         },
       }),
-      status: select({
-        options: [
-          { label: 'Draft', value: 'draft' },
-          { label: 'Published', value: 'published' },
-          { label: 'Archived', value: 'archived' },
-        ],
-        defaultValue: 'draft',
-        ui: {
-          displayMode: 'segmented-control',
-        },
+      locale: text({
+        validation: { isRequired: true, length: { min: 2, max: 8 } },
+        isIndexed: true,
       }),
-      publishedAt: timestamp(),
-      author: relationship({
-        ref: 'User.heavenletters',
-        ui: {
-          displayMode: 'cards',
-          cardFields: ['name', 'email', 'role'],
-          inlineEdit: { fields: ['name', 'email'] },
-          linkToItem: true,
-          inlineConnect: true,
-        },
-        many: false,
-      }),
-      translations: relationship({
-        ref: 'Translation.heavenletter',
-        many: true,
-        ui: {
-          displayMode: 'cards',
-          cardFields: ['languageCode', 'status', 'translatedTitle'],
-          hideCreate: true,
-        },
-      }),
-      createdAt: timestamp({
-        defaultValue: { kind: 'now' },
-      }),
-      updatedAt: timestamp({
-        defaultValue: { kind: 'now' },
-      }),
-    },
-    ui: {
-      listView: {
-        initialColumns: ['number', 'title', 'status', 'author', 'translations', 'publishedAt'],
-      },
-    },
-  }),
-  Translation: list({
-    access: {
-      operation: {
-        create: ({ session }) => !!session?.data && ['admin', 'translator'].includes(session.data.role),
-        update: ({ session, item }: any) => {
-          if (!session?.data) return false;
-          if (session.data.role === 'admin') return true;
-          if (session.data.role === 'translator' && item?.translator === session.data.id) return true;
-          return false;
-        },
-        delete: ({ session, item }: any) => {
-          if (!session?.data) return false;
-          if (session.data.role === 'admin') return true;
-          if (session.data.role === 'translator' && item?.translator === session.data.id) return true;
-          return false;
-        },
-        query: ({ session }) => !!session?.data,
-      },
-    },
-    fields: {
-      languageCode: select({
-        options: [
-          { label: 'English', value: 'en' },
-          { label: 'German', value: 'de' },
-          { label: 'Spanish', value: 'es' },
-          { label: 'French', value: 'fr' },
-          { label: 'Italian', value: 'it' },
-          { label: 'Portuguese', value: 'pt' },
-          { label: 'Russian', value: 'ru' },
-          { label: 'Chinese', value: 'zh' },
-          { label: 'Japanese', value: 'ja' },
-          { label: 'Arabic', value: 'ar' },
-        ],
-        validation: { isRequired: true },
+      publishNumber: integer({
         isFilterable: true,
       }),
-      translatedTitle: text({ validation: { isRequired: true } }),
-      translatedBody: text({
-        validation: { isRequired: true },
-        ui: {
-          displayMode: 'textarea',
-        },
-      }),
-      translator: relationship({
-        ref: 'User.translations',
-        ui: {
-          displayMode: 'cards',
-          cardFields: ['name', 'email', 'role'],
-          inlineEdit: { fields: ['name', 'email'] },
-          linkToItem: true,
-          inlineConnect: true,
-        },
-        many: false,
-      }),
-      status: select({
-        options: [
-          { label: 'Draft', value: 'draft' },
-          { label: 'Translated', value: 'translated' },
-          { label: 'Published', value: 'published' },
-        ],
-        defaultValue: 'draft',
-        ui: {
-          displayMode: 'segmented-control',
-        },
-      }),
-      heavenletter: relationship({
-        ref: 'Heavenletter.translations',
-        ui: {
-          displayMode: 'cards',
-          cardFields: ['number', 'title', 'status'],
-          linkToItem: true,
-          inlineConnect: false,
-        },
-        many: false,
-      }),
+      publishedOn: timestamp(),
+      writtenOn: timestamp(),
+      nid: integer(),
+      tnid: integer(),
+      tags: json(),
+      embeddings: json(),
       createdAt: timestamp({
         defaultValue: { kind: 'now' },
+        ui: {
+          createView: { fieldMode: 'hidden' },
+          itemView: { fieldMode: 'read' },
+        },
       }),
       updatedAt: timestamp({
-        defaultValue: { kind: 'now' },
+        ui: {
+          createView: { fieldMode: 'hidden' },
+          itemView: { fieldMode: 'read' },
+        },
       }),
     },
     ui: {
+      labelField: 'title',
       listView: {
-        initialColumns: ['heavenletter', 'languageCode', 'status', 'translatedTitle', 'translator'],
+        initialColumns: ['title', 'locale', 'publishNumber', 'publishedOn', 'permalink'],
       },
     },
   }),

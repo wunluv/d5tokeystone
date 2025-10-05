@@ -1,6 +1,6 @@
 # Project Todo List
 
-Current item being worked on: Adopt URL_SPEC permalink approach and prepare Safety Preflight (secrets rotation, least-privilege DB user).
+Current item being worked on: Gate A Safety Preflight (secrets rotation, least-privilege DB user, backup/restore verification).
 
 - [x] Discuss and decide frontend framework (Astro vs. Next.js): Review pros/cons, confirm choice (Astro for performance on static content with islands)
 - [x] Update PROJECT_ROADMAP.md with chosen framework and rationale (AstroJS frontend, islands for dynamics; edit file to reflect)
@@ -15,9 +15,9 @@ Current item being worked on: Adopt URL_SPEC permalink approach and prepare Safe
 - [x] Create URL_SPEC.md codifying canonical URLs from Drupal url_alias.dst; no publish_number in URLs; each translation retains its own root-level alias
 - [x] Update PROJECT_ROADMAP.md to v3.1 reflecting URL_SPEC permalink policy and Keystone permalink column
 
-- [ ] Final plan approval (Confirm roadmap v3.1 with url_alias-based permalinks, ks_heavenletter.permalink UNIQUE, and safety gates; greenlight Orchestrator Phase 0 Safety Preflight)
+- [x] Final plan approval (Confirm roadmap v3.1 with url_alias-based permalinks, ks_heavenletter.permalink UNIQUE, and safety gates; greenlight Orchestrator Phase 0 Safety Preflight)
 
-Safety Preflight and Secrets (Phase 0)
+Safety Preflight and Secrets (Phase 0) — Owner: Orchestrator — Status: In Progress
 - [ ] Sanitize DEVELOPMENT.md by removing plaintext credentials; add .env.sample and a short Secrets Policy; note to rotate exposed DB password immediately
 - [ ] Rotate DB password on 192.168.8.103; move credentials to .env; restrict access credentials distribution
 - [ ] Provision least-privilege Keystone DB user with CREATE, INSERT, UPDATE, SELECT, INDEX on ks_ tables only; deny ALTER/DROP on legacy Drupal tables

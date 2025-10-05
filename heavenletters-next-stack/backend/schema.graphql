@@ -10,16 +10,7 @@ type User {
   role: String
   posts(where: PostWhereInput! = {}, orderBy: [PostOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: PostWhereUniqueInput): [Post!]
   postsCount(where: PostWhereInput! = {}): Int
-  heavenletters(where: HeavenletterWhereInput! = {}, orderBy: [HeavenletterOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: HeavenletterWhereUniqueInput): [Heavenletter!]
-  heavenlettersCount(where: HeavenletterWhereInput! = {}): Int
-  translations(where: TranslationWhereInput! = {}, orderBy: [TranslationOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TranslationWhereUniqueInput): [Translation!]
-  translationsCount(where: TranslationWhereInput! = {}): Int
-  lastLogin: DateTime
-  isActive: String
   createdAt: DateTime
-  passwordResetToken: PasswordState
-  passwordResetIssuedAt: DateTime
-  passwordResetRedeemedAt: DateTime
 }
 
 type PasswordState {
@@ -43,14 +34,7 @@ input UserWhereInput {
   bio: StringFilter
   role: StringNullableFilter
   posts: PostManyRelationFilter
-  heavenletters: HeavenletterManyRelationFilter
-  translations: TranslationManyRelationFilter
-  lastLogin: DateTimeNullableFilter
-  isActive: StringNullableFilter
   createdAt: DateTimeNullableFilter
-  passwordResetToken: PasswordFilter
-  passwordResetIssuedAt: DateTimeNullableFilter
-  passwordResetRedeemedAt: DateTimeNullableFilter
 }
 
 input IDFilter {
@@ -112,18 +96,6 @@ input PostManyRelationFilter {
   none: PostWhereInput
 }
 
-input HeavenletterManyRelationFilter {
-  every: HeavenletterWhereInput
-  some: HeavenletterWhereInput
-  none: HeavenletterWhereInput
-}
-
-input TranslationManyRelationFilter {
-  every: TranslationWhereInput
-  some: TranslationWhereInput
-  none: TranslationWhereInput
-}
-
 input DateTimeNullableFilter {
   equals: DateTime
   in: [DateTime!]
@@ -135,21 +107,13 @@ input DateTimeNullableFilter {
   not: DateTimeNullableFilter
 }
 
-input PasswordFilter {
-  isSet: Boolean!
-}
-
 input UserOrderByInput {
   id: OrderDirection
   name: OrderDirection
   email: OrderDirection
   bio: OrderDirection
   role: OrderDirection
-  lastLogin: OrderDirection
-  isActive: OrderDirection
   createdAt: OrderDirection
-  passwordResetIssuedAt: OrderDirection
-  passwordResetRedeemedAt: OrderDirection
 }
 
 enum OrderDirection {
@@ -164,14 +128,7 @@ input UserUpdateInput {
   bio: String
   role: String
   posts: PostRelateToManyForUpdateInput
-  heavenletters: HeavenletterRelateToManyForUpdateInput
-  translations: TranslationRelateToManyForUpdateInput
-  lastLogin: DateTime
-  isActive: String
   createdAt: DateTime
-  passwordResetToken: String
-  passwordResetIssuedAt: DateTime
-  passwordResetRedeemedAt: DateTime
 }
 
 input PostRelateToManyForUpdateInput {
@@ -179,20 +136,6 @@ input PostRelateToManyForUpdateInput {
   set: [PostWhereUniqueInput!]
   create: [PostCreateInput!]
   connect: [PostWhereUniqueInput!]
-}
-
-input HeavenletterRelateToManyForUpdateInput {
-  disconnect: [HeavenletterWhereUniqueInput!]
-  set: [HeavenletterWhereUniqueInput!]
-  create: [HeavenletterCreateInput!]
-  connect: [HeavenletterWhereUniqueInput!]
-}
-
-input TranslationRelateToManyForUpdateInput {
-  disconnect: [TranslationWhereUniqueInput!]
-  set: [TranslationWhereUniqueInput!]
-  create: [TranslationCreateInput!]
-  connect: [TranslationWhereUniqueInput!]
 }
 
 input UserUpdateArgs {
@@ -207,14 +150,7 @@ input UserCreateInput {
   bio: String
   role: String
   posts: PostRelateToManyForCreateInput
-  heavenletters: HeavenletterRelateToManyForCreateInput
-  translations: TranslationRelateToManyForCreateInput
-  lastLogin: DateTime
-  isActive: String
   createdAt: DateTime
-  passwordResetToken: String
-  passwordResetIssuedAt: DateTime
-  passwordResetRedeemedAt: DateTime
 }
 
 input PostRelateToManyForCreateInput {
@@ -222,33 +158,26 @@ input PostRelateToManyForCreateInput {
   connect: [PostWhereUniqueInput!]
 }
 
-input HeavenletterRelateToManyForCreateInput {
-  create: [HeavenletterCreateInput!]
-  connect: [HeavenletterWhereUniqueInput!]
-}
-
-input TranslationRelateToManyForCreateInput {
-  create: [TranslationCreateInput!]
-  connect: [TranslationWhereUniqueInput!]
-}
-
 type Heavenletter {
   id: ID!
-  number: Int
+  permalink: String
   title: String
   body: String
-  status: String
-  publishedAt: DateTime
-  author: User
-  translations(where: TranslationWhereInput! = {}, orderBy: [TranslationOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TranslationWhereUniqueInput): [Translation!]
-  translationsCount(where: TranslationWhereInput! = {}): Int
+  locale: String
+  publishNumber: Int
+  publishedOn: DateTime
+  writtenOn: DateTime
+  nid: Int
+  tnid: Int
+  tags: JSON
+  embeddings: JSON
   createdAt: DateTime
   updatedAt: DateTime
 }
 
 input HeavenletterWhereUniqueInput {
   id: ID
-  number: Int
+  permalink: String
 }
 
 input HeavenletterWhereInput {
@@ -256,18 +185,20 @@ input HeavenletterWhereInput {
   OR: [HeavenletterWhereInput!]
   NOT: [HeavenletterWhereInput!]
   id: IDFilter
-  number: IntFilter
+  permalink: StringFilter
   title: StringFilter
   body: StringFilter
-  status: StringNullableFilter
-  publishedAt: DateTimeNullableFilter
-  author: UserWhereInput
-  translations: TranslationManyRelationFilter
+  locale: StringFilter
+  publishNumber: IntNullableFilter
+  publishedOn: DateTimeNullableFilter
+  writtenOn: DateTimeNullableFilter
+  nid: IntNullableFilter
+  tnid: IntNullableFilter
   createdAt: DateTimeNullableFilter
   updatedAt: DateTimeNullableFilter
 }
 
-input IntFilter {
+input IntNullableFilter {
   equals: Int
   in: [Int!]
   notIn: [Int!]
@@ -275,36 +206,38 @@ input IntFilter {
   lte: Int
   gt: Int
   gte: Int
-  not: IntFilter
+  not: IntNullableFilter
 }
 
 input HeavenletterOrderByInput {
   id: OrderDirection
-  number: OrderDirection
+  permalink: OrderDirection
   title: OrderDirection
   body: OrderDirection
-  status: OrderDirection
-  publishedAt: OrderDirection
+  locale: OrderDirection
+  publishNumber: OrderDirection
+  publishedOn: OrderDirection
+  writtenOn: OrderDirection
+  nid: OrderDirection
+  tnid: OrderDirection
   createdAt: OrderDirection
   updatedAt: OrderDirection
 }
 
 input HeavenletterUpdateInput {
-  number: Int
+  permalink: String
   title: String
   body: String
-  status: String
-  publishedAt: DateTime
-  author: UserRelateToOneForUpdateInput
-  translations: TranslationRelateToManyForUpdateInput
+  locale: String
+  publishNumber: Int
+  publishedOn: DateTime
+  writtenOn: DateTime
+  nid: Int
+  tnid: Int
+  tags: JSON
+  embeddings: JSON
   createdAt: DateTime
   updatedAt: DateTime
-}
-
-input UserRelateToOneForUpdateInput {
-  create: UserCreateInput
-  connect: UserWhereUniqueInput
-  disconnect: Boolean
 }
 
 input HeavenletterUpdateArgs {
@@ -313,99 +246,19 @@ input HeavenletterUpdateArgs {
 }
 
 input HeavenletterCreateInput {
-  number: Int
+  permalink: String
   title: String
   body: String
-  status: String
-  publishedAt: DateTime
-  author: UserRelateToOneForCreateInput
-  translations: TranslationRelateToManyForCreateInput
+  locale: String
+  publishNumber: Int
+  publishedOn: DateTime
+  writtenOn: DateTime
+  nid: Int
+  tnid: Int
+  tags: JSON
+  embeddings: JSON
   createdAt: DateTime
   updatedAt: DateTime
-}
-
-input UserRelateToOneForCreateInput {
-  create: UserCreateInput
-  connect: UserWhereUniqueInput
-}
-
-type Translation {
-  id: ID!
-  languageCode: String
-  translatedTitle: String
-  translatedBody: String
-  translator: User
-  status: String
-  heavenletter: Heavenletter
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-
-input TranslationWhereUniqueInput {
-  id: ID
-}
-
-input TranslationWhereInput {
-  AND: [TranslationWhereInput!]
-  OR: [TranslationWhereInput!]
-  NOT: [TranslationWhereInput!]
-  id: IDFilter
-  languageCode: StringFilter
-  translatedTitle: StringFilter
-  translatedBody: StringFilter
-  translator: UserWhereInput
-  status: StringNullableFilter
-  heavenletter: HeavenletterWhereInput
-  createdAt: DateTimeNullableFilter
-  updatedAt: DateTimeNullableFilter
-}
-
-input TranslationOrderByInput {
-  id: OrderDirection
-  languageCode: OrderDirection
-  translatedTitle: OrderDirection
-  translatedBody: OrderDirection
-  status: OrderDirection
-  createdAt: OrderDirection
-  updatedAt: OrderDirection
-}
-
-input TranslationUpdateInput {
-  languageCode: String
-  translatedTitle: String
-  translatedBody: String
-  translator: UserRelateToOneForUpdateInput
-  status: String
-  heavenletter: HeavenletterRelateToOneForUpdateInput
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-
-input HeavenletterRelateToOneForUpdateInput {
-  create: HeavenletterCreateInput
-  connect: HeavenletterWhereUniqueInput
-  disconnect: Boolean
-}
-
-input TranslationUpdateArgs {
-  where: TranslationWhereUniqueInput!
-  data: TranslationUpdateInput!
-}
-
-input TranslationCreateInput {
-  languageCode: String
-  translatedTitle: String
-  translatedBody: String
-  translator: UserRelateToOneForCreateInput
-  status: String
-  heavenletter: HeavenletterRelateToOneForCreateInput
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-
-input HeavenletterRelateToOneForCreateInput {
-  create: HeavenletterCreateInput
-  connect: HeavenletterWhereUniqueInput
 }
 
 type Post {
@@ -463,6 +316,12 @@ input PostUpdateInput {
   publishedAt: DateTime
 }
 
+input UserRelateToOneForUpdateInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+  disconnect: Boolean
+}
+
 input TagRelateToManyForUpdateInput {
   disconnect: [TagWhereUniqueInput!]
   set: [TagWhereUniqueInput!]
@@ -483,6 +342,11 @@ input PostCreateInput {
   tags: TagRelateToManyForCreateInput
   createdAt: DateTime
   publishedAt: DateTime
+}
+
+input UserRelateToOneForCreateInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
 }
 
 input TagRelateToManyForCreateInput {
@@ -553,12 +417,6 @@ type Mutation {
   updateHeavenletters(data: [HeavenletterUpdateArgs!]!): [Heavenletter]
   deleteHeavenletter(where: HeavenletterWhereUniqueInput!): Heavenletter
   deleteHeavenletters(where: [HeavenletterWhereUniqueInput!]!): [Heavenletter]
-  createTranslation(data: TranslationCreateInput!): Translation
-  createTranslations(data: [TranslationCreateInput!]!): [Translation]
-  updateTranslation(where: TranslationWhereUniqueInput!, data: TranslationUpdateInput!): Translation
-  updateTranslations(data: [TranslationUpdateArgs!]!): [Translation]
-  deleteTranslation(where: TranslationWhereUniqueInput!): Translation
-  deleteTranslations(where: [TranslationWhereUniqueInput!]!): [Translation]
   createPost(data: PostCreateInput!): Post
   createPosts(data: [PostCreateInput!]!): [Post]
   updatePost(where: PostWhereUniqueInput!, data: PostUpdateInput!): Post
@@ -571,40 +429,6 @@ type Mutation {
   updateTags(data: [TagUpdateArgs!]!): [Tag]
   deleteTag(where: TagWhereUniqueInput!): Tag
   deleteTags(where: [TagWhereUniqueInput!]!): [Tag]
-  endSession: Boolean!
-  authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
-  createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
-  sendUserPasswordResetLink(email: String!): Boolean!
-  redeemUserPasswordResetToken(email: String!, token: String!, password: String!): RedeemUserPasswordResetTokenResult
-}
-
-union UserAuthenticationWithPasswordResult = UserAuthenticationWithPasswordSuccess | UserAuthenticationWithPasswordFailure
-
-type UserAuthenticationWithPasswordSuccess {
-  sessionToken: String!
-  item: User!
-}
-
-type UserAuthenticationWithPasswordFailure {
-  message: String!
-}
-
-input CreateInitialUserInput {
-  name: String
-  email: String
-  password: String
-  role: String
-}
-
-type RedeemUserPasswordResetTokenResult {
-  code: PasswordResetRedemptionErrorCode!
-  message: String!
-}
-
-enum PasswordResetRedemptionErrorCode {
-  FAILURE
-  TOKEN_EXPIRED
-  TOKEN_REDEEMED
 }
 
 type Query {
@@ -614,9 +438,6 @@ type Query {
   heavenletter(where: HeavenletterWhereUniqueInput!): Heavenletter
   heavenletters(where: HeavenletterWhereInput! = {}, orderBy: [HeavenletterOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: HeavenletterWhereUniqueInput): [Heavenletter!]
   heavenlettersCount(where: HeavenletterWhereInput! = {}): Int
-  translation(where: TranslationWhereUniqueInput!): Translation
-  translations(where: TranslationWhereInput! = {}, orderBy: [TranslationOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TranslationWhereUniqueInput): [Translation!]
-  translationsCount(where: TranslationWhereInput! = {}): Int
   post(where: PostWhereUniqueInput!): Post
   posts(where: PostWhereInput! = {}, orderBy: [PostOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: PostWhereUniqueInput): [Post!]
   postsCount(where: PostWhereInput! = {}): Int
@@ -624,17 +445,6 @@ type Query {
   tags(where: TagWhereInput! = {}, orderBy: [TagOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TagWhereUniqueInput): [Tag!]
   tagsCount(where: TagWhereInput! = {}): Int
   keystone: KeystoneMeta!
-  authenticatedItem: AuthenticatedItem
-  validateUserPasswordResetToken(email: String!, token: String!): ValidateUserPasswordResetTokenResult
-  heavenlettersByTitle(search: String, title: String): [Heavenletter]
-  heavenletterByNumber(number: Int): Heavenletter
-}
-
-union AuthenticatedItem = User
-
-type ValidateUserPasswordResetTokenResult {
-  code: PasswordResetRedemptionErrorCode!
-  message: String!
 }
 
 type KeystoneMeta {
