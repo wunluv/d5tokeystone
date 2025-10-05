@@ -1,0 +1,16 @@
+{
+  "name": "h2",
+  "version": "1.0.0",
+  "description": "The theme was originally designed in 2006 pro bono for The International Godwriting Society of Heavenletters and runs on a custom Drupal 5 build that served a community of 20K active users.",
+  "main": "add_bookmark.js",
+  "scripts": {
+    "build": "pnpm tailwindcss -i ./src/input.css -o ./dist/output.css",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^4.1.14"
+  }
+}
