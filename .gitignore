@@ -13,6 +13,7 @@ sites/heavenletters.org/themes/
 settings.php
 .env
 files/*
+sites/*/files/
 **/.svn/
 *.sql
 *.db
