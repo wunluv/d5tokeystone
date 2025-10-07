@@ -12,9 +12,13 @@ sites/*/files/
 **/.svn/
 *.sql
 *.db
+*.csv
 # Node modules and external libraries
 node_modules/
 
 # Sensitive configuration files
 .roo/mcp.json
 .aider*
+
+# Private data directory
+private_data/
