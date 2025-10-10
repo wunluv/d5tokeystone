@@ -22,7 +22,19 @@ This configuration provides a **conflict-free** Listmonk installation that works
 - Unique container names: `listmonk_app`, `listmonk_db`
 - No shared services with Mailu
 
-## 📋 Quick Start
+## 🔐 Security Features
+
+**Environment Variables:**
+- Sensitive data stored in `.env` file (not in Docker Compose)
+- Automatic secure password generation
+- No hardcoded credentials in configuration files
+
+**Access Control:**
+- Web interface only accessible locally (`127.0.0.1:9000`)
+- Isolated Docker network from Mailu
+- Health checks and logging included
+
+## � Quick Start
 
 ### 1. Run the Setup Script
 

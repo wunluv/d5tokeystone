@@ -1,14 +1,9 @@
 # Listmonk Docker Compose - Standalone Configuration
 # Compatible with Mailu mail server setup
+# Uses .env file for sensitive configuration
 # No port conflicts, isolated networks and volumes
 
 version: '3.8'
-
-# Database credentials - change these for security
-x-db-credentials: &db-credentials
-  POSTGRES_USER: listmonk_user
-  POSTGRES_PASSWORD: ChangeThisToASecurePassword123!
-  POSTGRES_DB: listmonk_db
 
 services:
   # Listmonk application
@@ -35,25 +30,25 @@ services:
     # Environment variables for configuration
     environment:
       # Application settings
-      LISTMONK_app__address: 0.0.0.0:9000
+      LISTMONK_app__address: ${LISTMONK_app__address:-0.0.0.0:9000}
 
       # Database connection settings
-      LISTMONK_db__host: listmonk_db
-      LISTMONK_db__port: 5432
-      LISTMONK_db__user: *db-user
-      LISTMONK_db__password: *db-password
-      LISTMONK_db__database: *db-name
-      LISTMONK_db__ssl_mode: disable
-      LISTMONK_db__max_open: 25
-      LISTMONK_db__max_idle: 25
-      LISTMONK_db__max_lifetime: 300s
+      LISTMONK_db__host: ${LISTMONK_db__host:-listmonk_db}
+      LISTMONK_db__port: ${LISTMONK_db__port:-5432}
+      LISTMONK_db__user: ${POSTGRES_USER}
+      LISTMONK_db__password: ${POSTGRES_PASSWORD}
+      LISTMONK_db__database: ${POSTGRES_DB}
+      LISTMONK_db__ssl_mode: ${LISTMONK_db__ssl_mode:-disable}
+      LISTMONK_db__max_open: ${LISTMONK_db__max_open:-25}
+      LISTMONK_db__max_idle: ${LISTMONK_db__max_idle:-25}
+      LISTMONK_db__max_lifetime: ${LISTMONK_db__max_lifetime:-300s}
 
       # Timezone
-      TZ: Etc/UTC
+      TZ: ${TZ:-Etc/UTC}
 
       # Admin user (set these during first run)
-      # LISTMONK_ADMIN_USER: admin
-      # LISTMONK_ADMIN_PASSWORD: your_secure_password
+      LISTMONK_ADMIN_USER: ${LISTMONK_ADMIN_USER:-}
+      LISTMONK_ADMIN_PASSWORD: ${LISTMONK_ADMIN_PASSWORD:-}
 
     # Volume mounts
     volumes:
@@ -86,11 +81,13 @@ services:
 
     # Database credentials
     environment:
-      <<: *db-credentials
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
 
     # Health check
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U listmonk_user -d listmonk_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 6
