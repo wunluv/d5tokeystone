@@ -22,3 +22,6 @@ node_modules/
 
 # Private data directory
 private_data/
+WARP.md
+.aider*
+.roo
